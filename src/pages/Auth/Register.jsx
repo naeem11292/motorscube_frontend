@@ -1,3 +1,5 @@
+
+import axios from "axios";
 import { useState } from "react";
 import "./SignUp.css";
 
@@ -26,12 +28,59 @@ function SignUp() {
     });
   }
 
-  function handleSubmit(event) {
+  // ==============================
+  // REGISTER USER
+  // ==============================
+  async function handleSubmit(event) {
     event.preventDefault();
 
-    console.log(formData);
+    // Check password confirmation
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
 
-    alert("Account creation submitted!");
+    // Convert frontend fields
+    // to backend fields
+    const registrationData = {
+      user_type: formData.accountType,
+      user_name: formData.fullName,
+      user_email: formData.email,
+      user_country_code: formData.countryCode,
+      user_mobile: formData.mobile,
+      user_password: formData.password,
+    };
+
+    console.log("Sending registration:", registrationData);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:5000/api/v1/auth/register",
+        registrationData
+      );
+
+      console.log("Registration response:", response.data);
+
+      alert(
+        "Registration successful. OTP has been sent to your email."
+      );
+    } catch (error) {
+      console.error("Registration error:", error);
+
+      if (error.response) {
+        console.error(
+          "Backend response:",
+          error.response.data
+        );
+
+        alert(
+          error.response.data?.message ||
+            "Registration failed."
+        );
+      } else {
+        alert("Could not connect to the backend.");
+      }
+    }
   }
 
   return (
@@ -279,11 +328,10 @@ function SignUp() {
           {/* Sign In */}
           <p className="signin-link">
             Already have an account?{" "}
-            {/* <a href="/">
-              Sign In
-            </a> */}
 
-            <Link to="/">Sign In</Link>
+            <Link to="/">
+              Sign In
+            </Link>
           </p>
 
         </div>
