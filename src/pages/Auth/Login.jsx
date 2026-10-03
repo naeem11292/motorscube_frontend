@@ -1,5 +1,6 @@
 import { useState } from "react";
-import "./App.css";
+import "../../styles/App.css";
+
 
 import { Link } from "react-router-dom";
 
@@ -132,14 +133,11 @@ function SignIn() {
               </div>
 
 
-              {/* Forgot password */}
-              <div className="forgot-container">
-
-                <a href="#">
-                  Forgot Password?
-                </a>
-
-              </div>
+             <div className="forgot-container">
+             <Link to="/forgot-password">
+             Forgot Password?
+                   </Link>
+            </div>
 
 
               {/* Sign in */}
