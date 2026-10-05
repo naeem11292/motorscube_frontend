@@ -10,7 +10,7 @@ function ResetPassword() {
   const navigate = useNavigate();
 
   const email = location.state?.email || "";
-  const otp = location.state?.otp || "";
+  const resetToken = location.state?.resetToken || "";
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -21,16 +21,37 @@ function ResetPassword() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-
     setError("");
 
-    if (!email || !otp) {
-      setError("Reset session is invalid. Please request a new OTP.");
+    if (!email || !resetToken) {
+      setError(
+        "Reset session is invalid. Please request a new OTP from Forgot Password."
+      );
       return;
     }
 
     if (!password || !confirmPassword) {
       setError("Please enter both passwords.");
+      return;
+    }
+
+    if (password.length < 8 || password.length > 10) {
+      setError("Password must be between 8 and 10 characters.");
+      return;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      setError("Password must contain an uppercase letter.");
+      return;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      setError("Password must contain a lowercase letter.");
+      return;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      setError("Password must contain a number.");
       return;
     }
 
@@ -45,22 +66,30 @@ function ResetPassword() {
       const response = await axios.post(
         `${API_BASE_URL}/auth/reset-password`,
         {
-          user_email: email,
-          otp: otp,
+          reset_token: resetToken,
           new_password: password,
         }
       );
 
-      console.log("Password reset response:", response.data);
+      console.log(
+        "Password reset response:",
+        response.data
+      );
 
-      alert("Password reset successfully. Please sign in.");
+      alert(
+        "Password reset successfully. Please sign in with your new password."
+      );
 
       navigate("/login");
     } catch (error) {
-      console.error("Password reset error:", error);
+      console.error(
+        "Password reset error:",
+        error.response?.data || error.message
+      );
 
       setError(
         error.response?.data?.message ||
+          error.response?.data?.error ||
           "Unable to reset password. Please try again."
       );
     } finally {
@@ -126,7 +155,9 @@ function ResetPassword() {
                 <div className="password-container">
                   <input
                     id="password"
-                    type={showPassword ? "text" : "password"}
+                    type={
+                      showPassword ? "text" : "password"
+                    }
                     placeholder="Enter new password"
                     value={password}
                     onChange={(event) =>
@@ -162,7 +193,9 @@ function ResetPassword() {
                     placeholder="Confirm new password"
                     value={confirmPassword}
                     onChange={(event) =>
-                      setConfirmPassword(event.target.value)
+                      setConfirmPassword(
+                        event.target.value
+                      )
                     }
                   />
 
@@ -187,7 +220,9 @@ function ResetPassword() {
                 className="signin-button"
                 disabled={loading}
               >
-                {loading ? "Resetting..." : "Reset Password"}
+                {loading
+                  ? "Resetting..."
+                  : "Reset Password"}
               </button>
             </form>
           </div>

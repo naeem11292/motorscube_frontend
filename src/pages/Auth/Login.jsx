@@ -1,44 +1,152 @@
+
 import { useState } from "react";
 import "../../styles/App.css";
+import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
-
-import { Link } from "react-router-dom";
-
-
-
+const API_BASE_URL = "http://localhost:5000/api/v1";
 
 function SignIn() {
+  const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  function handleSubmit(event) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  async function handleSubmit(event) {
     event.preventDefault();
 
-    console.log("Email:", email);
-    console.log("Password:", password);
+    setError("");
 
-    alert("Sign in button clicked!");
+    const userEmail = email.trim();
+
+    // =====================================================
+    // BASIC VALIDATION
+    // =====================================================
+
+    if (!userEmail) {
+      setError("Please enter your email.");
+      return;
+    }
+
+    if (!password) {
+      setError("Please enter your password.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // ===================================================
+      // LOGIN API
+      // ===================================================
+
+      const response = await axios.post(
+        `${API_BASE_URL}/auth/login`,
+        {
+          user_email: userEmail,
+          user_password: password,
+        }
+      );
+
+      console.log(
+        "Login response:",
+        response.data
+      );
+
+      // ===================================================
+      // GET ACCESS TOKEN
+      // ===================================================
+
+      const accessToken =
+        response.data?.data?.access_token ||
+        response.data?.access_token;
+
+      if (!accessToken) {
+        setError(
+          "Login successful, but access token was not received."
+        );
+        return;
+      }
+
+      // ===================================================
+      // SAVE TOKEN
+      // ===================================================
+
+      localStorage.setItem(
+        "motorscube_token",
+        accessToken
+      );
+
+      // Notify Navbar / other components
+      window.dispatchEvent(
+        new Event("auth-changed")
+      );
+
+      // ===================================================
+      // GO TO DASHBOARD
+      // ===================================================
+
+      navigate("/dashboard");
+
+    } catch (error) {
+      console.error(
+        "Login error:",
+        error.response?.data || error.message
+      );
+
+      // ===================================================
+      // BACKEND ERROR
+      // ===================================================
+
+      if (axios.isAxiosError(error)) {
+        const backendMessage =
+          error.response?.data?.message ||
+          error.response?.data?.error;
+
+        setError(
+          backendMessage ||
+            "Invalid email or password."
+        );
+      } else {
+        setError(
+          "Unable to sign in. Please try again."
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <div className="auth-page">
+
       {/* Header */}
       <header className="auth-header">
+
         <div className="logo">
           Motors<span>Cube</span>
         </div>
 
-        <a href="#" className="web-authentication">
+        <a
+          href="#"
+          className="web-authentication"
+        >
           Web Authentication
         </a>
+
       </header>
+
 
       {/* Main content */}
       <main className="auth-container">
 
         {/* Left side */}
         <section className="welcome-panel">
+
           <div className="welcome-content">
 
             <div className="eyebrow">
@@ -50,8 +158,9 @@ function SignIn() {
             </h1>
 
             <p>
-              Browse premium vehicles, manage ads, connect with
-              traders, and keep your MotorsCube account secure.
+              Browse premium vehicles, manage ads, connect
+              with traders, and keep your MotorsCube account
+              secure.
             </p>
 
           </div>
@@ -60,6 +169,7 @@ function SignIn() {
           <div className="large-ring">
             <div className="small-ring"></div>
           </div>
+
         </section>
 
 
@@ -77,6 +187,21 @@ function SignIn() {
             </p>
 
 
+            {/* Error message */}
+            {error && (
+              <div
+                role="alert"
+                style={{
+                  color: "#d32f2f",
+                  marginBottom: "15px",
+                  fontSize: "14px",
+                }}
+              >
+                {error}
+              </div>
+            )}
+
+
             <form onSubmit={handleSubmit}>
 
               {/* Email */}
@@ -91,9 +216,11 @@ function SignIn() {
                   type="text"
                   placeholder="Enter email or mobile number"
                   value={email}
-                  onChange={(event) =>
-                    setEmail(event.target.value)
-                  }
+                  onChange={(event) => {
+                    setEmail(event.target.value);
+                    setError("");
+                  }}
+                  disabled={loading}
                 />
 
               </div>
@@ -110,22 +237,32 @@ function SignIn() {
 
                   <input
                     id="password"
-                    type={showPassword ? "text" : "password"}
+                    type={
+                      showPassword
+                        ? "text"
+                        : "password"
+                    }
                     placeholder="Enter password"
                     value={password}
-                    onChange={(event) =>
-                      setPassword(event.target.value)
-                    }
+                    onChange={(event) => {
+                      setPassword(event.target.value);
+                      setError("");
+                    }}
+                    disabled={loading}
                   />
 
                   <button
                     type="button"
                     className="show-password"
                     onClick={() =>
-                      setShowPassword(!showPassword)
+                      setShowPassword(
+                        !showPassword
+                      )
                     }
                   >
-                    {showPassword ? "Hide" : ""}
+                    {showPassword
+                      ? "Hide"
+                      : "Show"}
                   </button>
 
                 </div>
@@ -133,19 +270,25 @@ function SignIn() {
               </div>
 
 
-             <div className="forgot-container">
-             <Link to="/forgot-password">
-             Forgot Password?
-                   </Link>
-            </div>
+              {/* Forgot password */}
+              <div className="forgot-container">
+
+                <Link to="/forgot-password">
+                  Forgot Password?
+                </Link>
+
+              </div>
 
 
               {/* Sign in */}
               <button
                 type="submit"
                 className="signin-button"
+                disabled={loading}
               >
-                Sign In
+                {loading
+                  ? "Signing In..."
+                  : "Sign In"}
               </button>
 
             </form>
@@ -180,11 +323,9 @@ function SignIn() {
 
               {" "}
 
-              {/* <a href="#">
+              <Link to="/signup">
                 Sign Up
-              </a> */}
-
-              <Link to="/signup">Sign Up</Link>
+              </Link>
 
             </p>
 
@@ -193,6 +334,7 @@ function SignIn() {
         </section>
 
       </main>
+
     </div>
   );
 }

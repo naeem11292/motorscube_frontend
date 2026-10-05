@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -17,11 +18,15 @@ export default function ForgotPassword() {
   const [contactError, setContactError] = useState("");
   const [contactLoading, setContactLoading] = useState(false);
 
-  const [otp, setOtp] = useState(Array(OTP_LENGTH).fill(""));
+  const [otp, setOtp] = useState(
+    Array(OTP_LENGTH).fill("")
+  );
   const [otpError, setOtpError] = useState("");
   const [otpLoading, setOtpLoading] = useState(false);
 
-  const [seconds, setSeconds] = useState(RESEND_SECONDS);
+  const [seconds, setSeconds] = useState(
+    RESEND_SECONDS
+  );
 
   const inputs = useRef([]);
 
@@ -43,9 +48,11 @@ export default function ForgotPassword() {
   // =========================================================
   useEffect(() => {
     if (step === 2) {
-      setTimeout(() => {
+      const timer = setTimeout(() => {
         inputs.current[0]?.focus();
       }, 100);
+
+      return () => clearTimeout(timer);
     }
   }, [step]);
 
@@ -78,15 +85,20 @@ export default function ForgotPassword() {
         response.data
       );
 
+      // Clear previous OTP
       setOtp(Array(OTP_LENGTH).fill(""));
       setOtpError("");
+
+      // Restart countdown
       setSeconds(RESEND_SECONDS);
+
+      // Move to OTP step
       setStep(2);
 
     } catch (error) {
       console.error(
         "Forgot password error:",
-        error
+        error.response?.data || error.message
       );
 
       if (axios.isAxiosError(error)) {
@@ -108,9 +120,27 @@ export default function ForgotPassword() {
   // RESEND OTP
   // =========================================================
   const handleResend = async () => {
-    if (seconds > 0 || contactLoading) return;
+    if (
+      seconds > 0 ||
+      contactLoading ||
+      otpLoading
+    ) {
+      return;
+    }
 
-    setOtp(Array(OTP_LENGTH).fill(""));
+    const value = contact.trim();
+
+    if (!value) {
+      setOtpError(
+        "Email is missing. Please start again."
+      );
+      return;
+    }
+
+    setOtp(
+      Array(OTP_LENGTH).fill("")
+    );
+
     setOtpError("");
     setContactError("");
     setContactLoading(true);
@@ -119,7 +149,7 @@ export default function ForgotPassword() {
       const response = await axios.post(
         `${API_BASE_URL}/auth/forgot-password`,
         {
-          user_email: contact.trim(),
+          user_email: value,
         }
       );
 
@@ -137,7 +167,7 @@ export default function ForgotPassword() {
     } catch (error) {
       console.error(
         "Resend OTP error:",
-        error
+        error.response?.data || error.message
       );
 
       if (axios.isAxiosError(error)) {
@@ -182,7 +212,10 @@ export default function ForgotPassword() {
   // =========================================================
   // OTP KEYBOARD CONTROLS
   // =========================================================
-  const handleOtpKeyDown = (index, event) => {
+  const handleOtpKeyDown = (
+    index,
+    event
+  ) => {
     if (
       event.key === "Backspace" &&
       !otp[index] &&
@@ -206,7 +239,11 @@ export default function ForgotPassword() {
     }
 
     if (event.key === "Enter") {
-      handleVerify();
+      event.preventDefault();
+
+      if (!otpLoading) {
+        handleVerify();
+      }
     }
   };
 
@@ -214,18 +251,20 @@ export default function ForgotPassword() {
   // OTP PASTE
   // =========================================================
   const handleOtpPaste = (event) => {
-    const digits = event.clipboardData
+    const pastedDigits = event.clipboardData
       .getData("text")
       .replace(/\D/g, "")
       .slice(0, OTP_LENGTH);
 
-    if (!digits) return;
+    if (!pastedDigits) {
+      return;
+    }
 
     event.preventDefault();
 
     const next = Array(OTP_LENGTH).fill("");
 
-    digits
+    pastedDigits
       .split("")
       .forEach((digit, index) => {
         next[index] = digit;
@@ -235,7 +274,7 @@ export default function ForgotPassword() {
     setOtpError("");
 
     const focusIndex = Math.min(
-      digits.length,
+      pastedDigits.length,
       OTP_LENGTH - 1
     );
 
@@ -248,13 +287,22 @@ export default function ForgotPassword() {
   const handleVerify = async () => {
     const code = otp.join("");
 
-    if (code.length < OTP_LENGTH) {
+    // Check OTP length
+    if (code.length !== OTP_LENGTH) {
       setOtpError(
         "Enter all 6 digits of the code."
       );
 
       inputs.current[code.length]?.focus();
 
+      return;
+    }
+
+    // Check email/contact
+    if (!contact.trim()) {
+      setOtpError(
+        "Email is missing. Please start again."
+      );
       return;
     }
 
@@ -276,22 +324,74 @@ export default function ForgotPassword() {
         response.data
       );
 
+      // =====================================================
+      // IMPORTANT:
+      // sendSuccess() puts the service result inside data.
+      //
+      // Backend returns:
+      //
+      // {
+      //   success: true,
+      //   message: "...",
+      //   data: {
+      //     success: true,
+      //     message: "...",
+      //     reset_token: "..."
+      //   }
+      // }
+      // =====================================================
+
+      const responseData =
+        response.data?.data ||
+        response.data;
+
+      console.log(
+        "OTP verification data:",
+        responseData
+      );
+
+      const resetToken =
+        responseData?.reset_token;
+
+      console.log(
+        "Reset token received:",
+        resetToken
+      );
+
+      // =====================================================
+      // MAKE SURE BACKEND RETURNED RESET TOKEN
+      // =====================================================
+
+      if (!resetToken) {
+        setOtpError(
+          "OTP was verified, but the reset token was not received. Please request a new OTP."
+        );
+
+        return;
+      }
+
+      // =====================================================
+      // MOVE TO RESET PASSWORD PAGE
+      // =====================================================
+
       navigate("/reset-password", {
+        replace: true,
         state: {
           email: contact.trim(),
-          otp: code,
+          resetToken: resetToken,
         },
       });
 
     } catch (error) {
       console.error(
         "OTP verification error:",
-        error
+        error.response?.data || error.message
       );
 
       if (axios.isAxiosError(error)) {
         setOtpError(
           error.response?.data?.message ||
+            error.response?.data?.error ||
             "Invalid or expired verification code."
         );
       } else {
@@ -304,7 +404,13 @@ export default function ForgotPassword() {
     }
   };
 
-  const timer = `00:${String(seconds).padStart(2, "0")}`;
+  // =========================================================
+  // TIMER
+  // =========================================================
+  const timer = `00:${String(seconds).padStart(
+    2,
+    "0"
+  )}`;
 
   // =========================================================
   // UI
@@ -312,7 +418,10 @@ export default function ForgotPassword() {
   return (
     <div className="fp">
 
-      {/* HEADER */}
+      {/* =====================================================
+          HEADER
+          ===================================================== */}
+
       <header className="fp-header">
 
         <div className="fp-logo">
@@ -329,10 +438,16 @@ export default function ForgotPassword() {
       </header>
 
 
-      {/* MAIN */}
+      {/* =====================================================
+          MAIN
+          ===================================================== */}
+
       <main className="fp-main">
 
-        {/* HERO */}
+        {/* ===================================================
+            HERO
+            =================================================== */}
+
         <section className="fp-hero">
 
           <small>
@@ -354,6 +469,7 @@ export default function ForgotPassword() {
           </p>
 
           <div className="fp-ring fp-ring-a" />
+
           <div className="fp-ring fp-ring-b" />
 
         </section>
@@ -362,6 +478,7 @@ export default function ForgotPassword() {
         {/* ===================================================
             STEP 1 — EMAIL
             =================================================== */}
+
         {step === 1 ? (
 
           <section className="fp-card">
@@ -391,7 +508,11 @@ export default function ForgotPassword() {
               }}
               onKeyDown={(event) => {
                 if (event.key === "Enter") {
-                  handleSend();
+                  event.preventDefault();
+
+                  if (!contactLoading) {
+                    handleSend();
+                  }
                 }
               }}
               disabled={contactLoading}
@@ -435,6 +556,7 @@ export default function ForgotPassword() {
           /* =================================================
              STEP 2 — OTP
              ================================================= */
+
           <section className="fp-card">
 
             <h2>
@@ -447,7 +569,7 @@ export default function ForgotPassword() {
 
             <p>
               Enter the 6-digit code sent to your
-              registered contact.
+              registered email.
             </p>
 
             <div
@@ -494,7 +616,10 @@ export default function ForgotPassword() {
             </div>
 
 
-            {/* RESEND */}
+            {/* =================================================
+                RESEND
+                ================================================= */}
+
             <div className="fp-small flush">
 
               Didn't receive the code?{" "}
@@ -511,7 +636,10 @@ export default function ForgotPassword() {
                   type="button"
                   className="fp-link"
                   onClick={handleResend}
-                  disabled={contactLoading}
+                  disabled={
+                    contactLoading ||
+                    otpLoading
+                  }
                 >
                   {contactLoading
                     ? "Sending..."
@@ -523,7 +651,10 @@ export default function ForgotPassword() {
             </div>
 
 
-            {/* ERROR */}
+            {/* =================================================
+                ERROR
+                ================================================= */}
+
             <div
               className="fp-err"
               role="alert"
@@ -532,12 +663,18 @@ export default function ForgotPassword() {
             </div>
 
 
-            {/* VERIFY BUTTON */}
+            {/* =================================================
+                VERIFY BUTTON
+                ================================================= */}
+
             <button
               type="button"
               className="fp-btn"
               onClick={handleVerify}
-              disabled={otpLoading}
+              disabled={
+                otpLoading ||
+                otp.join("").length !== OTP_LENGTH
+              }
             >
               {otpLoading
                 ? "Verifying..."
@@ -545,7 +682,10 @@ export default function ForgotPassword() {
             </button>
 
 
-            {/* BACK TO LOGIN */}
+            {/* =================================================
+                BACK TO LOGIN
+                ================================================= */}
+
             <div className="fp-small">
 
               Remember your password?{" "}
