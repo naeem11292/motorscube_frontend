@@ -1,0 +1,93 @@
+.sell-hero {
+  width: 100%;
+  min-height: 300px;
+  background: linear-gradient(
+    120deg,
+    #17181c,
+    #30333a
+  );
+  overflow: hidden;
+}
+
+.sell-hero-content {
+  max-width: 1200px;
+  min-height: 300px;
+  margin: 0 auto;
+  padding: 40px 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+}
+
+.sell-hero-text {
+  max-width: 550px;
+}
+
+.sell-hero-label {
+  display: inline-block;
+  margin-bottom: 12px;
+
+  color: #e63946;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.sell-hero h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(32px, 5vw, 56px);
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+.sell-hero h1 span {
+  color: #e63946;
+}
+
+.sell-hero p {
+  margin: 18px 0 0;
+  max-width: 480px;
+
+  color: #c9c9d1;
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.sell-hero-image {
+  width: 440px;
+  flex-shrink: 0;
+}
+
+.sell-hero-image img {
+  display: block;
+  width: 100%;
+  height: 260px;
+
+  object-fit: contain;
+}
+
+@media (max-width: 768px) {
+  .sell-hero-content {
+    min-height: auto;
+    padding: 40px 20px;
+
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .sell-hero-text {
+    max-width: 100%;
+  }
+
+  .sell-hero p {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .sell-hero-image {
+    width: min(100%, 400px);
+  }
+}

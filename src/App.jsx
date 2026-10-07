@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 import AddSale from "./pages/AddSale/AddSale";
+import Navbar from "./components/Navbar/Navbar";
 
 function App() {
   return (
@@ -58,6 +59,7 @@ function App() {
           path="/dashboard/add-sale"
           element={
             <ProtectedRoute>
+              <Navbar />
               <AddSale />
             </ProtectedRoute>
           }

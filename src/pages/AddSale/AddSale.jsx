@@ -1,5 +1,8 @@
 import { useState } from "react";
 import { createSaleAd } from "../../api/itemsAdSale.api";
+import SellHero from "../../components/AddSale/SellHero";
+
+
 
 import VehicleTypeSelector from "../../components/AddSale/VehicleTypeSelector";
 import BasicInformation from "../../components/AddSale/BasicInformation";
@@ -18,6 +21,8 @@ import PlantFields from "../../components/AddSale/PlantFields";
 import "./AddSale.css";
 
 function AddSale() {
+  const [images, setImages] = useState([]);
+
   const [formData, setFormData] = useState({
     // Vehicle Type
     vehicle_type: "",
@@ -55,16 +60,6 @@ function AddSale() {
     // Description
     description: "",
 
-    // Images
-    image_1: null,
-    image_2: null,
-    image_3: null,
-    image_4: null,
-    image_5: null,
-    image_6: null,
-    image_7: null,
-    image_8: null,
-
     // Machinery / Plant
     weight: "",
     plant_name: "",
@@ -73,13 +68,12 @@ function AddSale() {
     serial_no: "",
   });
 
-  // Handles all text, number, select and file inputs
   const handleChange = (event) => {
-    const { name, value, files } = event.target;
+    const { name, value } = event.target;
 
     setFormData((previous) => ({
       ...previous,
-      [name]: files ? files[0] : value,
+      [name]: value,
     }));
   };
 
@@ -111,20 +105,20 @@ function AddSale() {
             : undefined,
       };
 
-      // Images are not being uploaded yet.
-      // Remove image fields from the JSON request.
-      for (let i = 1; i <= 8; i++) {
-        delete payload[`image_${i}`];
-      }
-
+      console.log("Vehicle Type:", formData.vehicle_type);
+      console.log("Complete Form Data:", formData);
       console.log("Sale Payload:", payload);
+      console.log(
+        "Vehicle Type Being Sent:",
+        payload.vehicle_type
+      );
+      console.log("Selected Images:", images);
 
       const response = await createSaleAd(payload);
 
       console.log("Sale created:", response);
 
       alert("Sale ad created successfully!");
-
     } catch (error) {
       console.error("Create sale error:", error);
 
@@ -136,97 +130,103 @@ function AddSale() {
   };
 
   return (
-    <div className="add-sale-page">
-      <h1>Add Sale</h1>
+    <>
+      {/* Sell Hero */}
+      <SellHero />
 
-      <form onSubmit={handleSubmit}>
+      {/* Add Sale Form */}
+      <div className="add-sale-page">
+        <h1>Add Sale</h1>
 
-        {/* Vehicle Type */}
-        <VehicleTypeSelector
-          value={formData.vehicle_type}
-          onChange={(event) =>
-            setFormData((previous) => ({
-              ...previous,
-              vehicle_type: event.target.value,
-            }))
-          }
-        />
+        <form onSubmit={handleSubmit}>
+          {/* Vehicle Type */}
+          <VehicleTypeSelector
+            value={formData.vehicle_type}
+            onChange={(event) =>
+              setFormData((previous) => ({
+                ...previous,
+                vehicle_type: event.target.value,
+              }))
+            }
+          />
 
-        {/* Vehicle-specific fields */}
+          {/* Vehicle-specific fields */}
 
-        {formData.vehicle_type === "car" && (
-          <CarFields
+          {formData.vehicle_type === "car" && (
+            <CarFields
+              formData={formData}
+              handleChange={handleChange}
+            />
+          )}
+
+          {formData.vehicle_type === "bike" && (
+            <BikeFields
+              formData={formData}
+              handleChange={handleChange}
+            />
+          )}
+
+          {formData.vehicle_type === "commercial" && (
+            <CommercialFields
+              formData={formData}
+              handleChange={handleChange}
+            />
+          )}
+
+          {formData.vehicle_type === "machinery" && (
+            <MachineryFields
+              formData={formData}
+              handleChange={handleChange}
+            />
+          )}
+
+          {formData.vehicle_type === "plant" && (
+            <PlantFields
+              formData={formData}
+              handleChange={handleChange}
+            />
+          )}
+
+          {/* Common sections */}
+
+          <BasicInformation
             formData={formData}
             handleChange={handleChange}
           />
-        )}
 
-        {formData.vehicle_type === "bike" && (
-          <BikeFields
+          <LocationInformation
             formData={formData}
             handleChange={handleChange}
           />
-        )}
 
-        {formData.vehicle_type === "commercial" && (
-          <CommercialFields
+          <VehicleDetails
             formData={formData}
             handleChange={handleChange}
           />
-        )}
 
-        {formData.vehicle_type === "machinery" && (
-          <MachineryFields
+          <AdInformation
             formData={formData}
             handleChange={handleChange}
           />
-        )}
 
-        {formData.vehicle_type === "plant" && (
-          <PlantFields
+          <Description
             formData={formData}
             handleChange={handleChange}
           />
-        )}
 
-        {/* Common sections */}
+          {/* Images */}
 
-        <BasicInformation
-          formData={formData}
-          handleChange={handleChange}
-        />
+          <ImageUpload
+            images={images}
+            setImages={setImages}
+          />
 
-        <LocationInformation
-          formData={formData}
-          handleChange={handleChange}
-        />
-
-        <VehicleDetails
-          formData={formData}
-          handleChange={handleChange}
-        />
-
-        <AdInformation
-          formData={formData}
-          handleChange={handleChange}
-        />
-
-        <Description
-          formData={formData}
-          handleChange={handleChange}
-        />
-
-        <ImageUpload
-          formData={formData}
-          handleChange={handleChange}
-        />
-
-        <button type="submit">
-          Continue
-        </button>
-
-      </form>
-    </div>
+          <button type="submit">
+            Continue
+          </button>
+        </form>
+      </div>
+    </>
   );
 }
 
