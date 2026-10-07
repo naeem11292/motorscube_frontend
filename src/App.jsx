@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import SignIn from "./pages/Auth/Login";
@@ -11,17 +10,14 @@ import PasswordResetSuccess from "./pages/Auth/PasswordResetSuccess";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
+import AddSale from "./pages/AddSale/AddSale";
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-
-        {/* ================= AUTH ROUTES ================= */}
-
         <Route path="/" element={<SignIn />} />
-
         <Route path="/login" element={<SignIn />} />
-
         <Route path="/signup" element={<SignUp />} />
 
         <Route
@@ -49,9 +45,6 @@ function App() {
           element={<PasswordResetSuccess />}
         />
 
-
-        {/* ================= DASHBOARD ================= */}
-
         <Route
           path="/dashboard"
           element={
@@ -61,6 +54,14 @@ function App() {
           }
         />
 
+        <Route
+          path="/dashboard/add-sale"
+          element={
+            <ProtectedRoute>
+              <AddSale />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

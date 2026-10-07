@@ -1,0 +1,204 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+/* ---------- Page background (dark hero look from the design) ---------- */
+.add-sale-page {
+  --red: #e5232b;
+  --red-dark: #c81d24;
+  --blue: #2f6bff;
+  --black: #08090b;
+  --glass: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.16);
+  --text: #ffffff;
+  --muted: #b4b9c4;
+
+  min-height: 100vh;
+  padding: 48px 20px 80px;
+  font-family: "Poppins", system-ui, sans-serif;
+  color: var(--text);
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: var(--black);
+}
+
+/* Car photo layer: --car-bg is set from AddSale.jsx (see import) so the path always resolves */
+.add-sale-page::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 100vh;
+  z-index: -1;
+  background: var(--car-bg) center top / cover no-repeat;
+  -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 35%, transparent 100%);
+}
+
+.add-sale-page::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background: radial-gradient(circle at 25% 60%, #1d2026 0%, var(--black) 65%);
+}
+
+.add-sale-page *,
+.add-sale-page *::before,
+.add-sale-page *::after { box-sizing: border-box; }
+
+/* ---------- Heading ---------- */
+.add-sale-page h1 {
+  max-width: 900px;
+  margin: 0 auto 28px;
+  font-size: clamp(30px, 4.5vw, 48px);
+  font-weight: 600;
+  line-height: 1.15;
+}
+.add-sale-page h1::before {
+  content: "Sell Your Car";
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--red);
+}
+
+/* ---------- Form container ---------- */
+.add-sale-page form {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  gap: 20px;
+}
+
+/* Each section component (VehicleTypeSelector, BasicInformation, ...) becomes a glass card */
+.add-sale-page form > div,
+.add-sale-page form > section,
+.add-sale-page form > fieldset {
+  margin: 0;
+  padding: 24px;
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  background: rgba(12, 13, 16, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+}
+
+.add-sale-page h2,
+.add-sale-page h3,
+.add-sale-page legend {
+  margin: 0 0 16px;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+/* Inputs inside a section sit in a responsive 2-column grid */
+.add-sale-page form > div,
+.add-sale-page form > section {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  align-content: start;
+}
+.add-sale-page form > div > h2,
+.add-sale-page form > div > h3,
+.add-sale-page form > section > h2,
+.add-sale-page form > section > h3,
+.add-sale-page form > div > textarea,
+.add-sale-page form > div > label:has(textarea) { grid-column: 1 / -1; }
+
+/* ---------- Labels & fields ---------- */
+.add-sale-page label {
+  display: grid;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+}
+
+.add-sale-page input,
+.add-sale-page select,
+.add-sale-page textarea {
+  width: 100%;
+  padding: 12px 14px;
+  font: 400 14px "Poppins", sans-serif;
+  color: var(--text);
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.add-sale-page input::placeholder,
+.add-sale-page textarea::placeholder { color: #7d8390; }
+
+.add-sale-page select option { background: #14161a; color: #fff; }
+.add-sale-page textarea { min-height: 130px; resize: vertical; }
+
+.add-sale-page input:hover,
+.add-sale-page select:hover,
+.add-sale-page textarea:hover { border-color: rgba(255, 255, 255, 0.35); }
+
+.add-sale-page input:focus,
+.add-sale-page select:focus,
+.add-sale-page textarea:focus {
+  outline: none;
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(229, 35, 43, 0.25);
+}
+
+/* Radio / checkbox */
+.add-sale-page input[type="radio"],
+.add-sale-page input[type="checkbox"] {
+  width: auto;
+  accent-color: var(--red);
+}
+
+/* File upload (ImageUpload) */
+.add-sale-page input[type="file"] {
+  padding: 10px;
+  border-style: dashed;
+  cursor: pointer;
+  font-size: 12px;
+  color: var(--muted);
+}
+.add-sale-page input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 8px 14px;
+  font: 600 12px "Poppins", sans-serif;
+  color: #fff;
+  background: var(--red);
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.add-sale-page input[type="file"]::file-selector-button:hover { background: var(--red-dark); }
+
+/* ---------- Submit button ---------- */
+.add-sale-page button[type="submit"] {
+  justify-self: end;
+  padding: 14px 40px;
+  font: 600 15px "Poppins", sans-serif;
+  color: #fff;
+  background: var(--red);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(229, 35, 43, 0.35);
+  transition: background 0.2s, transform 0.15s;
+}
+.add-sale-page button[type="submit"]:hover { background: var(--red-dark); transform: translateY(-1px); }
+.add-sale-page button[type="submit"]:focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 640px) {
+  .add-sale-page { padding: 32px 14px 60px; }
+  .add-sale-page form > div,
+  .add-sale-page form > section { grid-template-columns: 1fr; padding: 18px; }
+  .add-sale-page button[type="submit"] { width: 100%; justify-self: stretch; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .add-sale-page * { transition: none !important; }
+}
