@@ -1,8 +1,7 @@
+
 import { useState } from "react";
 import { createSaleAd } from "../../api/itemsAdSale.api";
 import SellHero from "../../components/AddSale/SellHero";
-
-
 
 import VehicleTypeSelector from "../../components/AddSale/VehicleTypeSelector";
 import BasicInformation from "../../components/AddSale/BasicInformation";
@@ -81,51 +80,98 @@ function AddSale() {
     event.preventDefault();
 
     try {
-      const payload = {
-        ...formData,
 
-        year:
-          formData.year !== ""
-            ? Number(formData.year)
-            : undefined,
+      // --------------------------------------------------
+      // CREATE FORM DATA
+      // --------------------------------------------------
 
-        mileage:
-          formData.mileage !== ""
-            ? Number(formData.mileage)
-            : undefined,
+      const payload = new FormData();
 
-        price:
-          formData.price !== ""
-            ? Number(formData.price)
-            : undefined,
 
-        serial_no:
-          formData.serial_no !== ""
-            ? Number(formData.serial_no)
-            : undefined,
-      };
+      // --------------------------------------------------
+      // ADD FORM FIELDS
+      // --------------------------------------------------
 
-      console.log("Vehicle Type:", formData.vehicle_type);
-      console.log("Complete Form Data:", formData);
-      console.log("Sale Payload:", payload);
-      console.log(
-        "Vehicle Type Being Sent:",
-        payload.vehicle_type
+      Object.entries(formData).forEach(
+        ([key, value]) => {
+
+          if (value !== "") {
+            payload.append(
+              key,
+              value
+            );
+          }
+
+        }
       );
-      console.log("Selected Images:", images);
 
-      const response = await createSaleAd(payload);
 
-      console.log("Sale created:", response);
+      // --------------------------------------------------
+      // ADD IMAGES
+      // Maximum 30 images
+      // --------------------------------------------------
 
-      alert("Sale ad created successfully!");
+      images.forEach((image) => {
+
+        payload.append(
+          "images",
+          image
+        );
+
+      });
+
+
+      // --------------------------------------------------
+      // DEBUG
+      // --------------------------------------------------
+
+      console.log(
+        "Vehicle Type:",
+        formData.vehicle_type
+      );
+
+      console.log(
+        "Selected Images:",
+        images
+      );
+
+      console.log(
+        "Image Count:",
+        images.length
+      );
+
+
+      // --------------------------------------------------
+      // CREATE SALE AD
+      // --------------------------------------------------
+
+      const response =
+        await createSaleAd(
+          payload
+        );
+
+
+      console.log(
+        "Sale created:",
+        response
+      );
+
+      alert(
+        "Sale ad created successfully!"
+      );
+
     } catch (error) {
-      console.error("Create sale error:", error);
+
+      console.error(
+        "Create sale error:",
+        error
+      );
 
       alert(
         error.response?.data?.message ||
           "Failed to create sale ad"
       );
+
     }
   };
 
@@ -136,19 +182,24 @@ function AddSale() {
 
       {/* Add Sale Form */}
       <div className="add-sale-page">
+
         <h1>Add Sale</h1>
 
         <form onSubmit={handleSubmit}>
+
           {/* Vehicle Type */}
+
           <VehicleTypeSelector
             value={formData.vehicle_type}
             onChange={(event) =>
               setFormData((previous) => ({
                 ...previous,
-                vehicle_type: event.target.value,
+                vehicle_type:
+                  event.target.value,
               }))
             }
           />
+
 
           {/* Vehicle-specific fields */}
 
@@ -187,6 +238,7 @@ function AddSale() {
             />
           )}
 
+
           {/* Common sections */}
 
           <BasicInformation
@@ -214,6 +266,7 @@ function AddSale() {
             handleChange={handleChange}
           />
 
+
           {/* Images */}
 
           <ImageUpload
@@ -221,13 +274,18 @@ function AddSale() {
             setImages={setImages}
           />
 
+
           <button type="submit">
             Continue
           </button>
+
         </form>
+
       </div>
     </>
   );
 }
 
 export default AddSale;
+
+
