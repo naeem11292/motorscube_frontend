@@ -21,6 +21,7 @@ import "./AddSale.css";
 
 function AddSale() {
   const [images, setImages] = useState([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     // Vehicle Type
@@ -56,9 +57,6 @@ function AddSale() {
     ad_type: "",
     post_status: "",
 
-    // Description
-    description: "",
-
     // Machinery / Plant
     weight: "",
     plant_name: "",
@@ -67,6 +65,7 @@ function AddSale() {
     serial_no: "",
   });
 
+  // Handle changes in all form fields
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -76,133 +75,93 @@ function AddSale() {
     }));
   };
 
+  // Handle vehicle category button selection
+  const handleVehicleTypeChange = (event) => {
+    const selectedType = event.target.value;
+
+    setFormData((previous) => ({
+      ...previous,
+      vehicle_type: selectedType,
+    }));
+  };
+
+  // Submit sale advertisement
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    try {
+    if (!formData.vehicle_type) {
+      alert("Please select a vehicle type.");
+      return;
+    }
 
-      // --------------------------------------------------
-      // CREATE FORM DATA
-      // --------------------------------------------------
+    if (images.length > 30) {
+      alert("You can upload a maximum of 30 images.");
+      return;
+    }
+
+    try {
+      setIsSubmitting(true);
 
       const payload = new FormData();
 
-
-      // --------------------------------------------------
-      // ADD FORM FIELDS
-      // --------------------------------------------------
-
-      Object.entries(formData).forEach(
-        ([key, value]) => {
-
-          if (value !== "") {
-            payload.append(
-              key,
-              value
-            );
-          }
-
+      // Add form fields
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== "" && value !== null && value !== undefined) {
+          payload.append(key, value);
         }
-      );
-
-
-      // --------------------------------------------------
-      // ADD IMAGES
-      // Maximum 30 images
-      // --------------------------------------------------
-
-      images.forEach((image) => {
-
-        payload.append(
-          "images",
-          image
-        );
-
       });
 
+      // Add images
+      images.forEach((image) => {
+        payload.append("images", image);
+      });
 
-      // --------------------------------------------------
-      // DEBUG
-      // --------------------------------------------------
+      console.log("Sale form data:", formData);
+      console.log("Selected images:", images);
+      console.log("Image count:", images.length);
 
-      console.log(
-        "Vehicle Type:",
-        formData.vehicle_type
-      );
+      // Call existing sale API
+      const response = await createSaleAd(payload);
 
-      console.log(
-        "Selected Images:",
-        images
-      );
+      console.log("Sale created:", response);
 
-      console.log(
-        "Image Count:",
-        images.length
-      );
-
-
-      // --------------------------------------------------
-      // CREATE SALE AD
-      // --------------------------------------------------
-
-      const response =
-        await createSaleAd(
-          payload
-        );
-
-
-      console.log(
-        "Sale created:",
-        response
-      );
-
-      alert(
-        "Sale ad created successfully!"
-      );
-
+      alert("Sale ad created successfully!");
     } catch (error) {
-
-      console.error(
-        "Create sale error:",
-        error
-      );
+      console.error("Create sale error:", error);
 
       alert(
         error.response?.data?.message ||
-          "Failed to create sale ad"
+          "Failed to create sale ad. Please try again."
       );
-
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <>
-      {/* Sell Hero */}
+      {/* Sale Hero */}
       <SellHero />
 
-      {/* Add Sale Form */}
-      <div className="add-sale-page">
-
-        <h1>Add Sale</h1>
+      {/* Add Sale Page */}
+      <main className="add-sale-page">
+        <div className="add-sale-header">
+          <h1>Add Sale</h1>
+          <p>
+            Enter your vehicle details to create a sale advertisement.
+          </p>
+        </div>
 
         <form onSubmit={handleSubmit}>
+          {/* Step 1: Select Vehicle Type */}
+          <section className="sale-form-section">
+            <VehicleTypeSelector
+              value={formData.vehicle_type}
+              onChange={handleVehicleTypeChange}
+            />
+          </section>
 
-          {/* Vehicle Type */}
-
-          <VehicleTypeSelector
-            value={formData.vehicle_type}
-            onChange={(event) =>
-              setFormData((previous) => ({
-                ...previous,
-                vehicle_type:
-                  event.target.value,
-              }))
-            }
-          />
-
-
-          {/* Vehicle-specific fields */}
-
+          {/* Step 2: Show selected vehicle fields */}
           {formData.vehicle_type === "car" && (
             <CarFields
               formData={formData}
@@ -238,9 +197,7 @@ function AddSale() {
             />
           )}
 
-
-          {/* Common sections */}
-
+          {/* Step 3: Common Information */}
           <BasicInformation
             formData={formData}
             handleChange={handleChange}
@@ -266,26 +223,25 @@ function AddSale() {
             handleChange={handleChange}
           />
 
-
-          {/* Images */}
-
+          {/* Step 4: Upload Images */}
           <ImageUpload
             images={images}
             setImages={setImages}
           />
 
-
-          <button type="submit">
-            Continue
-          </button>
-
+          {/* Submit Sale Advertisement */}
+          <div className="add-sale-submit">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Submitting..." : "Continue"}
+            </button>
+          </div>
         </form>
-
-      </div>
+      </main>
     </>
   );
 }
 
 export default AddSale;
-
-

@@ -1,41 +1,55 @@
+import "./VehicleTypeSelector.css";
+
+const vehicleTypes = [
+  { value: "car", icon: "🚗", label: "Car" },
+  { value: "bike", icon: "🏍️", label: "Bike" },
+  { value: "commercial", icon: "🚚", label: "Commercial" },
+  { value: "machinery", icon: "⚙️", label: "Machinery" },
+  { value: "plant", icon: "🏗️", label: "Plant" },
+];
+
 function VehicleTypeSelector({ value, onChange }) {
   return (
-    <div>
-      <label htmlFor="vehicle_type">
-        Vehicle Type
-      </label>
+    <section className="sale-vehicle-section">
+      <h2>What do you want to sell?</h2>
 
-      <select
-        id="vehicle_type"
-        name="vehicle_type"
-        value={value}
-        onChange={onChange}
-      >
-        <option value="">
-          Select Vehicle Type
-        </option>
+      <p className="sale-vehicle-subtitle">
+        Select a vehicle category to continue.
+      </p>
 
-        <option value="car">
-          Car
-        </option>
+      <div className="sale-vehicle-grid">
+        {vehicleTypes.map((vehicle) => (
+          <button
+            key={vehicle.value}
+            type="button"
+            className={`sale-vehicle-card ${
+              value === vehicle.value ? "active" : ""
+            }`}
+            onClick={() =>
+              onChange({
+                target: {
+                  name: "vehicle_type",
+                  value: vehicle.value,
+                },
+              })
+            }
+            aria-pressed={value === vehicle.value}
+          >
+            <span className="sale-vehicle-icon">
+              {vehicle.icon}
+            </span>
 
-        <option value="bike">
-          Bike
-        </option>
+            <span className="sale-vehicle-label">
+              {vehicle.label}
+            </span>
 
-        <option value="commercial">
-          Commercial
-        </option>
-
-        <option value="machinery">
-          Machinery
-        </option>
-
-        <option value="plant">
-          Plant
-        </option>
-      </select>
-    </div>
+            {value === vehicle.value && (
+              <span className="sale-vehicle-check">✓</span>
+            )}
+          </button>
+        ))}
+      </div>
+    </section>
   );
 }
 

@@ -11,6 +11,7 @@ import Dashboard from "./pages/Dashboard/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 
 import AddSale from "./pages/AddSale/AddSale";
+import AddHire from "./pages/AddHire/AddHire";
 import Navbar from "./components/Navbar/Navbar";
 
 function App() {
@@ -61,6 +62,16 @@ function App() {
             <ProtectedRoute>
               <Navbar />
               <AddSale />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/add-hire"
+          element={
+            <ProtectedRoute>
+              <Navbar />
+              <AddHire />
             </ProtectedRoute>
           }
         />

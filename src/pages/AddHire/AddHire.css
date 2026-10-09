@@ -1,0 +1,13 @@
+.add-hire-page {
+  width: 100%;
+  min-height: 100vh;
+  padding: 30px 0;
+  box-sizing: border-box;
+  background: #f5f7fb;
+}
+
+@media (max-width: 600px) {
+  .add-hire-page {
+    padding: 12px 0;
+  }
+}
