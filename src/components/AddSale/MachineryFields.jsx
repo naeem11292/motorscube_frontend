@@ -1,3 +1,4 @@
+
 function MachineryFields({ formData, handleChange }) {
   return (
     <section className="add-sale-section">
@@ -71,6 +72,7 @@ function MachineryFields({ formData, handleChange }) {
           id="machinery_year"
           name="year"
           type="number"
+          min="0"
           value={formData.year}
           onChange={handleChange}
           placeholder="Enter year"
@@ -98,6 +100,23 @@ function MachineryFields({ formData, handleChange }) {
           value={formData.dimensions}
           onChange={handleChange}
           placeholder="Enter dimensions"
+        />
+      </div>
+
+      {/* New: Operating Hours */}
+      <div className="form-group">
+        <label htmlFor="machinery_hours_used">
+          Hours Used
+        </label>
+        <input
+          id="machinery_hours_used"
+          name="hours_used"
+          type="number"
+          min="0"
+          step="0.01"
+          value={formData.hours_used}
+          onChange={handleChange}
+          placeholder="e.g. 1250"
         />
       </div>
     </section>

@@ -48,7 +48,7 @@
 }
 
 .add-sale-page h1::before {
-  content: "Sell Your Car";
+  content: "";
   display: block;
   margin-bottom: 6px;
   font-size: 13px;

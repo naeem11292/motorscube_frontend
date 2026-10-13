@@ -5,14 +5,20 @@ function CarFields({ formData, handleChange }) {
 
       <div className="form-group">
         <label htmlFor="car_doors">Doors</label>
-        <input
+        <select
           id="car_doors"
           name="doors"
           type="text"
           value={formData.doors}
           onChange={handleChange}
-          placeholder="e.g. 4"
-        />
+          >
+            <option value="">Select number of doors</option>
+             <option value="2">2 Doors</option>
+             <option value="3">3 Doors</option>
+             <option value="4">4 Doors</option>
+             <option value="5">5 Doors</option>
+          </select>
+        
       </div>
 
       <div className="form-group">

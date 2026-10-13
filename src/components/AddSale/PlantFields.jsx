@@ -1,3 +1,4 @@
+
 function PlantFields({ formData, handleChange }) {
   return (
     <section className="add-sale-section">
@@ -57,9 +58,25 @@ function PlantFields({ formData, handleChange }) {
           id="plant_serial_no"
           name="serial_no"
           type="number"
+          min="0"
           value={formData.serial_no}
           onChange={handleChange}
           placeholder="Enter serial number"
+        />
+      </div>
+
+      {/* New: Operating Hours */}
+      <div className="form-group">
+        <label htmlFor="plant_hours_used">Hours Used</label>
+        <input
+          id="plant_hours_used"
+          name="hours_used"
+          type="number"
+          min="0"
+          step="0.01"
+          value={formData.hours_used}
+          onChange={handleChange}
+          placeholder="e.g. 1250"
         />
       </div>
     </section>

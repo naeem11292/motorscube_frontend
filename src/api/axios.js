@@ -1,3 +1,4 @@
+
 import axios from "axios";
 
 const BASE_URL =
@@ -14,6 +15,11 @@ axiosInstance.interceptors.request.use(
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
+    }
+
+    // Let the browser set the multipart boundary for FormData.
+    if (config.data instanceof FormData) {
+      delete config.headers["Content-Type"];
     }
 
     return config;

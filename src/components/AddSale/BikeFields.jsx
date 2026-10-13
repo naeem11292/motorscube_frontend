@@ -1,3 +1,4 @@
+
 function BikeFields({ formData, handleChange }) {
   return (
     <section className="add-sale-section">
@@ -16,15 +17,32 @@ function BikeFields({ formData, handleChange }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="bike_engine_size">Engine Size</label>
+        <label htmlFor="bike_engine_size">Engine Size (cc)</label>
         <input
           id="bike_engine_size"
           name="engine_size"
           type="number"
+          min="0"
           value={formData.engine_size}
           onChange={handleChange}
-          placeholder="Enter engine size"
+          placeholder="e.g. 70, 125, 150"
         />
+      </div>
+
+      {/* New: Engine Type */}
+      <div className="form-group">
+        <label htmlFor="bike_engine_type">Engine Type</label>
+        <select
+          id="bike_engine_type"
+          name="engine_type"
+          value={formData.engine_type}
+          onChange={handleChange}
+        >
+          <option value="">Select engine type</option>
+          <option value="2-stroke">2-Stroke</option>
+          <option value="4-stroke">4-Stroke</option>
+          <option value="electric">Electric Motor</option>
+        </select>
       </div>
 
       <div className="form-group">
