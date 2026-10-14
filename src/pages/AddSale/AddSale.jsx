@@ -45,8 +45,9 @@ function AddSale() {
   const [walletBalance, setWalletBalance] = useState(0);
   const [isLoadingWallet, setIsLoadingWallet] = useState(true);
 
-  // Controls which payment card is visible.
+  // Controls which payment option is visible.
   const [paymentSection, setPaymentSection] = useState("");
+  const [freeAdConfirmed, setFreeAdConfirmed] = useState(false);
 
   const [makes, setMakes] = useState([]);
   const [models, setModels] = useState([]);
@@ -381,11 +382,12 @@ function AddSale() {
     setModels([]);
     setVersions([]);
 
-    // Reset the payment selection for the new advertisement.
+    // Reset payment selection and free-ad confirmation.
     setPaymentSection("");
+    setFreeAdConfirmed(false);
   };
 
-  // Receives the selected promotion/payment details only.
+  // Handle the selected promotion/payment details.
   // Actual payment processing is not implemented here.
   const handlePostCardPayment = (paymentDetails) => {
     console.log("Selected promotion payment:", paymentDetails);
@@ -399,6 +401,17 @@ function AddSale() {
   // Submit the free sale advertisement.
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    // Prevent submission unless the free-ad option is selected.
+    if (paymentSection !== "free") {
+      return;
+    }
+
+    // Require checkbox confirmation before posting for free.
+    if (!freeAdConfirmed) {
+      alert("Please confirm that you want to post this ad for free.");
+      return;
+    }
 
     if (!formData.vehicle_type) {
       alert("Please select a vehicle category.");
@@ -946,10 +959,11 @@ function AddSale() {
                   <button
                     type="button"
                     aria-pressed={paymentSection === "free"}
-                    className={
-                      paymentSection === "free" ? "active" : ""
-                    }
-                    onClick={() => setPaymentSection("free")}
+                    className={paymentSection === "free" ? "active" : ""}
+                    onClick={() => {
+                      setPaymentSection("free");
+                      setFreeAdConfirmed(false);
+                    }}
                   >
                     <BadgeCheck size={24} aria-hidden="true" />
 
@@ -970,10 +984,11 @@ function AddSale() {
                   <button
                     type="button"
                     aria-pressed={paymentSection === "post"}
-                    className={
-                      paymentSection === "post" ? "active" : ""
-                    }
-                    onClick={() => setPaymentSection("post")}
+                    className={paymentSection === "post" ? "active" : ""}
+                    onClick={() => {
+                      setPaymentSection("post");
+                      setFreeAdConfirmed(false);
+                    }}
                   >
                     <CreditCard size={24} aria-hidden="true" />
 
@@ -993,61 +1008,72 @@ function AddSale() {
                 </div>
               </section>
 
-              {/* Show only the selected card */}
+              {/* Free-ad card and its external submit button */}
               {paymentSection === "free" && (
-                <section className="post-ad-free-card">
-                  <div className="post-ad-free-header">
-                    <div className="post-ad-free-icon">
-                      <BadgeCheck size={28} aria-hidden="true" />
+                <>
+                  <section className="post-ad-free-card">
+                    <div className="post-ad-free-header">
+                      <div className="post-ad-free-icon">
+                        <BadgeCheck size={28} aria-hidden="true" />
+                      </div>
+
+                      <div>
+                        <h2>Post Your Ad for Free</h2>
+                        <p>
+                          You're one step away from listing your vehicle
+                          on MotorsCube.
+                        </p>
+                      </div>
                     </div>
 
-                    <div>
-                      <h2>Post Your Ad for Free</h2>
-                      <p>
-                        You're one step away from listing your vehicle
-                        on MotorsCube.
-                      </p>
-                    </div>
-                  </div>
+                    <div className="post-ad-free-benefits">
+                      <div>
+                        <CheckCircle2 size={18} aria-hidden="true" />
+                        <span>Free ad posting</span>
+                      </div>
 
-                  <div className="post-ad-free-benefits">
-                    <div>
-                      <CheckCircle2 size={18} aria-hidden="true" />
-                      <span>Free ad posting</span>
+                      <div>
+                        <CheckCircle2 size={18} aria-hidden="true" />
+                        <span>Up to 30 vehicle images</span>
+                      </div>
+
+                      <div>
+                        <CheckCircle2 size={18} aria-hidden="true" />
+                        <span>
+                          Showcase your vehicle to potential buyers
+                        </span>
+                      </div>
                     </div>
 
-                    <div>
-                      <CheckCircle2 size={18} aria-hidden="true" />
-                      <span>Up to 30 vehicle images</span>
-                    </div>
-
-                    <div>
-                      <CheckCircle2 size={18} aria-hidden="true" />
+                    {/* Checkbox inside the free-ad card */}
+                    <label className="free-ad-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={freeAdConfirmed}
+                        onChange={(event) =>
+                          setFreeAdConfirmed(event.target.checked)
+                        }
+                      />
                       <span>
-                        Showcase your vehicle to potential buyers
+                        I confirm that I want to post this ad for free.
                       </span>
-                    </div>
-                  </div>
+                    </label>
+                  </section>
 
-                  <div className="post-ad-free-footer">
+                  {/* Submit button outside the card, bottom-left */}
+                  <div className="free-ad-actions">
                     <button
                       type="submit"
-                      className="post-ad-free-button"
-                      disabled={isSubmitting}
+                      className="free-ad-submit-btn"
+                      disabled={isSubmitting || !freeAdConfirmed}
                     >
-                      {isSubmitting ? (
-                        "Posting Your Ad..."
-                      ) : (
-                        <>
-                          <BadgeCheck size={18} aria-hidden="true" />
-                          Post Ad Free
-                        </>
-                      )}
+                      {isSubmitting ? "Posting Your Ad..." : "Post Ad Free"}
                     </button>
                   </div>
-                </section>
+                </>
               )}
 
+              {/* Paid promotion card */}
               {paymentSection === "post" && (
                 <PostCard
                   walletBalance={walletBalance}
