@@ -1,14 +1,26 @@
+
+import {
+  ClipboardList,
+  BadgeCheck,
+} from "lucide-react";
+
 function AdInformation({ formData, handleChange }) {
   return (
     <section className="add-sale-section">
-      <h2>Ad Information</h2>
-
-  
-
-   
+      <h2 className="add-sale-section-heading">
+        <ClipboardList size={22} aria-hidden="true" />
+        <span>Ad Information</span>
+      </h2>
 
       <div className="form-group">
-        <label htmlFor="post_status">Post Status</label>
+        <label
+          htmlFor="post_status"
+          className="add-sale-field-label"
+        >
+          <BadgeCheck size={16} aria-hidden="true" />
+          <span>Post Status</span>
+        </label>
+
         <select
           id="post_status"
           name="post_status"
@@ -16,7 +28,6 @@ function AdInformation({ formData, handleChange }) {
           onChange={handleChange}
         >
           <option value="">Pending</option>
-          
         </select>
       </div>
     </section>

@@ -1,11 +1,32 @@
 
+import {
+  Cog,
+  Layers,
+  ClipboardCheck,
+  Factory,
+  CarFront,
+  CalendarDays,
+  Weight,
+  Ruler,
+  Clock3,
+} from "lucide-react";
+
 function MachineryFields({ formData, handleChange }) {
   return (
     <section className="add-sale-section">
-      <h2>Machinery Details</h2>
+      <h2 className="add-sale-section-heading">
+        <Cog size={22} aria-hidden="true" />
+        <span>Machinery Details</span>
+      </h2>
 
       <div className="form-group">
-        <label htmlFor="machinery_type">Machinery Type</label>
+        <label
+          htmlFor="machinery_type"
+          className="add-sale-field-label"
+        >
+          <Factory size={16} aria-hidden="true" />
+          <span>Machinery Type</span>
+        </label>
         <input
           id="machinery_type"
           name="type"
@@ -17,7 +38,13 @@ function MachineryFields({ formData, handleChange }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="machinery_subtype">Machinery Subtype</label>
+        <label
+          htmlFor="machinery_subtype"
+          className="add-sale-field-label"
+        >
+          <Layers size={16} aria-hidden="true" />
+          <span>Machinery Subtype</span>
+        </label>
         <input
           id="machinery_subtype"
           name="subtype"
@@ -29,7 +56,13 @@ function MachineryFields({ formData, handleChange }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="machinery_condition">Condition</label>
+        <label
+          htmlFor="machinery_condition"
+          className="add-sale-field-label"
+        >
+          <ClipboardCheck size={16} aria-hidden="true" />
+          <span>Condition</span>
+        </label>
         <select
           id="machinery_condition"
           name="condition"
@@ -43,7 +76,13 @@ function MachineryFields({ formData, handleChange }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="machinery_make">Make</label>
+        <label
+          htmlFor="machinery_make"
+          className="add-sale-field-label"
+        >
+          <Factory size={16} aria-hidden="true" />
+          <span>Make</span>
+        </label>
         <input
           id="machinery_make"
           name="make"
@@ -55,7 +94,13 @@ function MachineryFields({ formData, handleChange }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="machinery_model">Model</label>
+        <label
+          htmlFor="machinery_model"
+          className="add-sale-field-label"
+        >
+          <CarFront size={16} aria-hidden="true" />
+          <span>Model</span>
+        </label>
         <input
           id="machinery_model"
           name="model"
@@ -67,7 +112,13 @@ function MachineryFields({ formData, handleChange }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="machinery_year">Year</label>
+        <label
+          htmlFor="machinery_year"
+          className="add-sale-field-label"
+        >
+          <CalendarDays size={16} aria-hidden="true" />
+          <span>Year</span>
+        </label>
         <input
           id="machinery_year"
           name="year"
@@ -80,7 +131,13 @@ function MachineryFields({ formData, handleChange }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="machinery_weight">Weight</label>
+        <label
+          htmlFor="machinery_weight"
+          className="add-sale-field-label"
+        >
+          <Weight size={16} aria-hidden="true" />
+          <span>Weight</span>
+        </label>
         <input
           id="machinery_weight"
           name="weight"
@@ -92,7 +149,13 @@ function MachineryFields({ formData, handleChange }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="machinery_dimensions">Dimensions</label>
+        <label
+          htmlFor="machinery_dimensions"
+          className="add-sale-field-label"
+        >
+          <Ruler size={16} aria-hidden="true" />
+          <span>Dimensions</span>
+        </label>
         <input
           id="machinery_dimensions"
           name="dimensions"
@@ -103,10 +166,13 @@ function MachineryFields({ formData, handleChange }) {
         />
       </div>
 
-      {/* New: Operating Hours */}
       <div className="form-group">
-        <label htmlFor="machinery_hours_used">
-          Hours Used
+        <label
+          htmlFor="machinery_hours_used"
+          className="add-sale-field-label"
+        >
+          <Clock3 size={16} aria-hidden="true" />
+          <span>Hours Used</span>
         </label>
         <input
           id="machinery_hours_used"

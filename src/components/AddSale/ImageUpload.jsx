@@ -1,5 +1,12 @@
 
 import { useState, useRef, useEffect } from "react";
+import {
+  Images,
+  ImagePlus,
+  Trash2,
+  X,
+  Eye,
+} from "lucide-react";
 
 function ImageUpload({ images, setImages }) {
   const MAX_IMAGES = 30;
@@ -11,7 +18,7 @@ function ImageUpload({ images, setImages }) {
 
   const fileInput = useRef(null);
 
-  // Create and clean up image preview URLs
+  // Create and clean up image preview URLs.
   useEffect(() => {
     const urls = images.map((file) => URL.createObjectURL(file));
 
@@ -22,8 +29,7 @@ function ImageUpload({ images, setImages }) {
     };
   }, [images]);
 
-  // Keep five images in each desktop row.
-  // CSS automatically adjusts the number of columns on smaller screens.
+  // Five images per desktop row.
   const rowCount = Math.ceil(images.length / COLUMNS);
 
   const handleImageSelect = (event) => {
@@ -77,7 +83,17 @@ function ImageUpload({ images, setImages }) {
 
   return (
     <section className="add-sale-section image-upload-section">
-      <h2>Vehicle Images</h2>
+      <h2 className="add-sale-section-heading">
+        <Images size={22} aria-hidden="true" />
+        <span>Vehicle Images</span>
+      </h2>
+
+      <div className="image-upload-toolbar">
+        <p className="image-upload-counter">
+          <Images size={16} aria-hidden="true" />
+          <span>{images.length} of {MAX_IMAGES} images selected</span>
+        </p>
+      </div>
 
       {message && (
         <div className="alert alert-warning" role="alert">
@@ -132,28 +148,18 @@ function ImageUpload({ images, setImages }) {
                             alt={`Vehicle ${imageIndex + 1}`}
                           />
 
-                          <span
-                            className="image-delete-button"
-                            role="button"
-                            tabIndex={0}
-                            aria-label={`Delete image ${imageIndex + 1}`}
-                            onClick={(event) => {
-                              event.stopPropagation();
-                              removeImage(imageIndex);
-                            }}
-                            onKeyDown={(event) => {
-                              if (
-                                event.key === "Enter" ||
-                                event.key === " "
-                              ) {
-                                event.preventDefault();
-                                event.stopPropagation();
-                                removeImage(imageIndex);
-                              }
-                            }}
-                          >
-                            ×
+                          <span className="image-preview-indicator">
+                            <Eye size={16} aria-hidden="true" />
                           </span>
+                        </button>
+
+                        <button
+                          type="button"
+                          className="image-delete-button"
+                          aria-label={`Delete image ${imageIndex + 1}`}
+                          onClick={() => removeImage(imageIndex)}
+                        >
+                          <Trash2 size={15} aria-hidden="true" />
                         </button>
                       </div>
                     );
@@ -171,13 +177,15 @@ function ImageUpload({ images, setImages }) {
           className="btn btn-primary row-add-button"
           onClick={openFilePicker}
         >
-          + Add Images ({images.length}/30)
+          <ImagePlus size={17} aria-hidden="true" />
+          <span>Add Images ({images.length}/30)</span>
         </button>
       )}
 
       {images.length === MAX_IMAGES && (
-        <p className="text-muted mt-3">
-          Maximum 30 images selected.
+        <p className="text-muted mt-3 image-limit-message">
+          <Images size={16} aria-hidden="true" />
+          <span>Maximum 30 images selected.</span>
         </p>
       )}
 
@@ -188,6 +196,9 @@ function ImageUpload({ images, setImages }) {
         >
           <div
             className="image-preview-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Vehicle image preview"
             onClick={(event) => event.stopPropagation()}
           >
             <button
@@ -196,13 +207,13 @@ function ImageUpload({ images, setImages }) {
               onClick={() => setSelectedImage(null)}
               aria-label="Close preview"
             >
-              ×
+              <X size={22} aria-hidden="true" />
             </button>
 
             <div className="preview-image-container">
               <img
                 src={imageUrls[selectedImage.index]}
-                alt="Vehicle preview"
+                alt={`Vehicle preview ${selectedImage.index + 1}`}
               />
             </div>
 
@@ -212,7 +223,8 @@ function ImageUpload({ images, setImages }) {
                 className="btn btn-danger"
                 onClick={() => removeImage(selectedImage.index)}
               >
-                Delete Image
+                <Trash2 size={16} aria-hidden="true" />
+                <span>Delete Image</span>
               </button>
 
               {images.length < MAX_IMAGES && (
@@ -224,7 +236,8 @@ function ImageUpload({ images, setImages }) {
                     openFilePicker();
                   }}
                 >
-                  + Add Image
+                  <ImagePlus size={16} aria-hidden="true" />
+                  <span>Add Image</span>
                 </button>
               )}
             </div>
@@ -237,6 +250,29 @@ function ImageUpload({ images, setImages }) {
           width: 100%;
           min-width: 0;
           box-sizing: border-box;
+        }
+
+        .image-upload-toolbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-bottom: 16px;
+        }
+
+        .image-upload-counter,
+        .image-limit-message {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin: 0;
+          color: #64748b;
+          font-size: 14px;
+        }
+
+        .image-upload-counter svg,
+        .image-limit-message svg {
+          flex-shrink: 0;
+          color: #2563eb;
         }
 
         .vehicle-image-rows {
@@ -259,6 +295,7 @@ function ImageUpload({ images, setImages }) {
         }
 
         .vehicle-image-slot {
+          position: relative;
           min-width: 0;
           width: 100%;
           box-sizing: border-box;
@@ -279,7 +316,7 @@ function ImageUpload({ images, setImages }) {
         }
 
         .vehicle-image-button:hover {
-          border-color: #0d6efd;
+          border-color: #2563eb;
         }
 
         .vehicle-image-button img {
@@ -287,6 +324,27 @@ function ImageUpload({ images, setImages }) {
           width: 100%;
           height: 100%;
           object-fit: cover;
+        }
+
+        .image-preview-indicator {
+          position: absolute;
+          right: 8px;
+          bottom: 8px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          background: rgba(0, 0, 0, 0.7);
+          color: white;
+          opacity: 0;
+          transition: opacity 0.2s ease;
+        }
+
+        .vehicle-image-button:hover .image-preview-indicator,
+        .vehicle-image-button:focus-visible .image-preview-indicator {
+          opacity: 1;
         }
 
         .image-delete-button {
@@ -297,15 +355,13 @@ function ImageUpload({ images, setImages }) {
           display: flex;
           align-items: center;
           justify-content: center;
-          width: 30px;
-          height: 30px;
-          border: 0;
+          width: 32px;
+          height: 32px;
+          padding: 0;
+          border: none;
           border-radius: 50%;
           background: rgba(0, 0, 0, 0.78);
           color: white;
-          font-size: 23px;
-          font-weight: bold;
-          line-height: 1;
           cursor: pointer;
           box-sizing: border-box;
         }
@@ -315,16 +371,17 @@ function ImageUpload({ images, setImages }) {
         }
 
         .row-add-button {
-          width: 170px !important;
-          min-height: 42px;
-          margin: 8px 0 0 auto;
           display: flex !important;
           align-items: center;
           justify-content: center;
-          padding: 0 10px !important;
+          gap: 8px;
+          width: 190px !important;
+          min-height: 42px;
+          margin: 8px 0 0 auto;
+          padding: 0 12px !important;
           border: none !important;
           border-radius: 6px !important;
-          background: #0d6efd !important;
+          background: #2563eb !important;
           color: white !important;
           font-size: 14px !important;
           font-weight: 500 !important;
@@ -333,10 +390,20 @@ function ImageUpload({ images, setImages }) {
         }
 
         .row-add-button:hover {
-          background: #0b5ed7 !important;
+          background: #1d4ed8 !important;
         }
 
-        /* Image preview modal */
+        .image-limit-message {
+          margin-top: 16px;
+        }
+
+        .preview-actions .btn {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+        }
+
         .image-preview-overlay {
           position: fixed;
           inset: 0;
@@ -365,14 +432,16 @@ function ImageUpload({ images, setImages }) {
           top: 8px;
           right: 12px;
           z-index: 2;
+          display: flex;
+          align-items: center;
+          justify-content: center;
           width: 35px;
           height: 35px;
+          padding: 0;
           border: none;
           border-radius: 50%;
           background: #222;
           color: white;
-          font-size: 24px;
-          line-height: 30px;
           cursor: pointer;
         }
 
@@ -400,7 +469,6 @@ function ImageUpload({ images, setImages }) {
           margin-top: 15px;
         }
 
-        /* Smaller laptops and tablets: 3 images per row */
         @media (max-width: 992px) {
           .vehicle-images-grid {
             grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -412,18 +480,12 @@ function ImageUpload({ images, setImages }) {
           }
         }
 
-          /* Mobile: exactly 2 images per row */
-         @media (max-width: 576px) {
-           .vehicle-images-grid {
-           grid-template-columns: repeat(2, minmax(0, 1fr));
-           column-gap: 16px;
-           row-gap: 16px;
-         } 
-          
-         .vehicle-image-slot {
-           min-width: 0;
-           width: 100%;
-         }
+        @media (max-width: 576px) {
+          .vehicle-images-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            column-gap: 16px;
+            row-gap: 16px;
+          }
 
           .vehicle-image-button {
             height: auto;
@@ -436,11 +498,14 @@ function ImageUpload({ images, setImages }) {
             right: 8px;
             width: 30px;
             height: 30px;
-            font-size: 22px;
+          }
+
+          .image-preview-indicator {
+            display: none;
           }
 
           .row-add-button {
-            width: 160px !important;
+            width: 180px !important;
           }
 
           .image-preview-overlay {

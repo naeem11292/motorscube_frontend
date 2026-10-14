@@ -1,10 +1,22 @@
+
+import { FileText, AlignLeft } from "lucide-react";
+
 function Description({ formData, handleChange }) {
   return (
     <section className="add-sale-section">
-      <h2>Description</h2>
+      <h2 className="add-sale-section-heading">
+        <FileText size={22} aria-hidden="true" />
+        <span>Description</span>
+      </h2>
 
       <div className="form-group">
-        <label htmlFor="description">Description</label>
+        <label
+          htmlFor="description"
+          className="add-sale-field-label"
+        >
+          <AlignLeft size={16} aria-hidden="true" />
+          <span>Description</span>
+        </label>
 
         <textarea
           id="description"

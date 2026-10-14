@@ -14,6 +14,24 @@ import BikeFields from "../../components/AddSale/BikeFields";
 import CommercialFields from "../../components/AddSale/CommercialFields";
 import MachineryFields from "../../components/AddSale/MachineryFields";
 import PlantFields from "../../components/AddSale/PlantFields";
+import SearchableSelect from "../../components/AddSale/SearchableSelect";
+
+import {
+  CarFront,
+  Bike,
+  Truck,
+  Cog,
+  Sprout,
+  ClipboardList,
+  Layers,
+  Factory,
+  BadgeCheck,
+  CalendarDays,
+  MapPin,
+  Building2,
+  ClipboardCheck,
+  CheckCircle2,
+} from "lucide-react";
 
 import "./AddSale.css";
 
@@ -31,8 +49,6 @@ function AddSale() {
 
   const [formData, setFormData] = useState({
     vehicle_type: "",
-
-    // Basic information
     type: "",
     subtype: "",
     condition: "",
@@ -40,13 +56,9 @@ function AddSale() {
     model: "",
     version: "",
     year: "",
-
-    // Location
     registration_city: "",
     location: "",
     country: "",
-
-    // Vehicle details
     mileage: "",
     price: "",
     body_type: "",
@@ -58,30 +70,28 @@ function AddSale() {
     doors: "",
     wheels_power: "",
     features: "",
-
-    // Advertisement information
     user_type: "",
     ad_type: "",
     post_status: "",
-
-    // Machinery and plant
     weight: "",
     plant_name: "",
     parameter_type: "",
     dimensions: "",
     serial_no: "",
     hours_used: "",
-
     description: "",
   });
 
-  // Fetch makes when the vehicle category changes.
   useEffect(() => {
     let cancelled = false;
 
     const fetchMakes = async () => {
+      setMakes([]);
+      setModels([]);
+      setVersions([]);
+
       if (!formData.vehicle_type) {
-        setMakes([]);
+        setLoadingMakes(false);
         return;
       }
 
@@ -89,23 +99,23 @@ function AddSale() {
         setLoadingMakes(true);
 
         const response = await axios.get("/vehicle-makes", {
-          params: {
-            vehicle_type: formData.vehicle_type,
-          },
+          params: { vehicle_type: formData.vehicle_type },
         });
 
         if (!cancelled) {
-          setMakes(response.data?.data || []);
+          const data = response.data?.data;
+          setMakes(Array.isArray(data) ? data : []);
         }
       } catch (error) {
         if (!cancelled) {
-          console.error("Failed to fetch vehicle makes:", error);
+          console.error(
+            "Failed to fetch vehicle makes:",
+            error.response?.data || error.message
+          );
           setMakes([]);
         }
       } finally {
-        if (!cancelled) {
-          setLoadingMakes(false);
-        }
+        if (!cancelled) setLoadingMakes(false);
       }
     };
 
@@ -116,13 +126,15 @@ function AddSale() {
     };
   }, [formData.vehicle_type]);
 
-  // Fetch models when the selected make changes.
   useEffect(() => {
     let cancelled = false;
 
     const fetchModels = async () => {
+      setModels([]);
+      setVersions([]);
+
       if (!formData.make) {
-        setModels([]);
+        setLoadingModels(false);
         return;
       }
 
@@ -130,31 +142,30 @@ function AddSale() {
         setLoadingModels(true);
 
         const response = await axios.get("/vehicle-models", {
-          params: {
-            vehicle_make_id: formData.make,
-          },
+          params: { vehicle_make_id: formData.make },
         });
 
-        if (!cancelled) {
-          const fetchedModels = response.data?.data || [];
+        if (cancelled) return;
 
-          setModels(
-            fetchedModels.filter(
-              (model) =>
-                String(model.vehicle_make_id) ===
-                String(formData.make)
-            )
-          );
-        }
+        const data = response.data?.data;
+        const fetchedModels = Array.isArray(data) ? data : [];
+
+        setModels(
+          fetchedModels.filter(
+            (model) =>
+              String(model.vehicle_make_id) === String(formData.make)
+          )
+        );
       } catch (error) {
         if (!cancelled) {
-          console.error("Failed to fetch vehicle models:", error);
+          console.error(
+            "Failed to fetch vehicle models:",
+            error.response?.data || error.message
+          );
           setModels([]);
         }
       } finally {
-        if (!cancelled) {
-          setLoadingModels(false);
-        }
+        if (!cancelled) setLoadingModels(false);
       }
     };
 
@@ -165,41 +176,48 @@ function AddSale() {
     };
   }, [formData.make]);
 
-  // Fetch versions when the selected model changes.
   useEffect(() => {
     let cancelled = false;
 
     const fetchVersions = async () => {
+      setVersions([]);
+
+      if (!formData.model) {
+        setLoadingVersions(false);
+        return;
+      }
+
       const selectedModel = models.find(
-        (model) => model.model_name === formData.model
+        (model) =>
+          String(model.vehicle_model_id) === String(formData.model)
       );
 
-      if (!selectedModel) {
-        setVersions([]);
+      if (!selectedModel?.vehicle_model_id) {
+        setLoadingVersions(false);
         return;
       }
 
       try {
         setLoadingVersions(true);
 
-        const response = await axios.get("/vehicle-versions", {
-          params: {
-            model_id: selectedModel.vehicle_model_id,
-          },
-        });
+        const response = await axios.get(
+          `/version/model/${selectedModel.vehicle_model_id}`
+        );
 
         if (!cancelled) {
-          setVersions(response.data?.data || []);
+          const data = response.data?.data;
+          setVersions(Array.isArray(data) ? data : []);
         }
       } catch (error) {
         if (!cancelled) {
-          console.error("Failed to fetch vehicle versions:", error);
+          console.error(
+            "Failed to fetch vehicle versions:",
+            error.response?.data || error.message
+          );
           setVersions([]);
         }
       } finally {
-        if (!cancelled) {
-          setLoadingVersions(false);
-        }
+        if (!cancelled) setLoadingVersions(false);
       }
     };
 
@@ -219,10 +237,7 @@ function AddSale() {
     }));
   };
 
-  // Clear the model and version when the make changes.
-  const handleMakeChange = (event) => {
-    const selectedMakeId = event.target.value;
-
+  const handleMakeChange = (selectedMakeId) => {
     setFormData((previous) => ({
       ...previous,
       make: selectedMakeId,
@@ -234,27 +249,22 @@ function AddSale() {
     setVersions([]);
   };
 
-  // Clear the version when the model changes.
-  const handleModelChange = (event) => {
-    const selectedModel = event.target.value;
-
+  const handleModelChange = (selectedModelId) => {
     setFormData((previous) => ({
       ...previous,
-      model: selectedModel,
+      model: selectedModelId,
       version: "",
     }));
 
     setVersions([]);
   };
 
-  // Reset dependent selections when the vehicle category changes.
   const handleVehicleTypeChange = (event) => {
     const selectedType = event.target.value;
 
     setFormData((previous) => ({
       ...previous,
       vehicle_type: selectedType,
-
       type: "",
       subtype: "",
       condition: "",
@@ -262,11 +272,9 @@ function AddSale() {
       model: "",
       version: "",
       year: "",
-
       registration_city: "",
       location: "",
       country: "",
-
       mileage: "",
       price: "",
       body_type: "",
@@ -278,7 +286,6 @@ function AddSale() {
       doors: "",
       wheels_power: "",
       features: "",
-
       weight: "",
       plant_name: "",
       parameter_type: "",
@@ -330,7 +337,10 @@ function AddSale() {
       console.log("Sale created:", response);
       alert("Sale advertisement created successfully!");
     } catch (error) {
-      console.error("Create sale error:", error);
+      console.error(
+        "Create sale error:",
+        error.response?.data || error.message
+      );
 
       alert(
         error.response?.data?.message ||
@@ -341,106 +351,77 @@ function AddSale() {
     }
   };
 
-  // Shared fields for car, bike, commercial and machinery.
   function renderCommonVehicleFields() {
     return (
       <>
-        <div className="form-group">
-          <label htmlFor={`${formData.vehicle_type}_make`}>
-            Make
-          </label>
+        <SearchableSelect
+          id={`${formData.vehicle_type}_make`}
+          label="Make"
+          icon={Factory}
+          value={formData.make}
+          options={makes}
+          getOptionValue={(make) => make.vehicle_make_id}
+          getOptionLabel={(make) => make.make_name}
+          onChange={handleMakeChange}
+          placeholder={
+            loadingMakes ? "Loading makes..." : "Search or select make"
+          }
+          disabled={loadingMakes}
+        />
 
-          <select
-            id={`${formData.vehicle_type}_make`}
-            name="make"
-            value={formData.make}
-            onChange={handleMakeChange}
-            disabled={loadingMakes}
+        <SearchableSelect
+          id={`${formData.vehicle_type}_model`}
+          label="Model"
+          icon={CarFront}
+          value={formData.model}
+          options={models}
+          getOptionValue={(model) => model.vehicle_model_id}
+          getOptionLabel={(model) => model.model_name}
+          onChange={handleModelChange}
+          placeholder={
+            !formData.make
+              ? "Select make first"
+              : loadingModels
+                ? "Loading models..."
+                : "Search or select model"
+          }
+          disabled={!formData.make || loadingModels}
+        />
+
+        <SearchableSelect
+          id={`${formData.vehicle_type}_version`}
+          label="Version"
+          icon={BadgeCheck}
+          value={formData.version}
+          options={versions}
+          getOptionValue={(version) => version.version_name}
+          getOptionLabel={(version) => version.version_name}
+          onChange={(selectedVersion) =>
+            setFormData((previous) => ({
+              ...previous,
+              version: selectedVersion,
+            }))
+          }
+          placeholder={
+            !formData.model
+              ? "Select model first"
+              : loadingVersions
+                ? "Loading versions..."
+                : versions.length === 0
+                  ? "No versions available"
+                  : "Search or select version"
+          }
+          disabled={!formData.model || loadingVersions}
+        />
+
+        <div className="form-group">
+          <label
+            htmlFor={`${formData.vehicle_type}_year`}
+            className="add-sale-field-label"
           >
-            <option value="">
-              {loadingMakes ? "Loading makes..." : "Select make"}
-            </option>
-
-            {makes.map((make) => (
-              <option
-                key={make.vehicle_make_id}
-                value={make.vehicle_make_id}
-              >
-                {make.make_name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor={`${formData.vehicle_type}_model`}>
-            Model
+            <CalendarDays size={16} aria-hidden="true" />
+            <span>Year</span>
           </label>
-
-          <select
-            id={`${formData.vehicle_type}_model`}
-            name="model"
-            value={formData.model}
-            onChange={handleModelChange}
-            disabled={!formData.make || loadingModels}
-          >
-            <option value="">
-              {!formData.make
-                ? "Select make first"
-                : loadingModels
-                  ? "Loading models..."
-                  : "Select model"}
-            </option>
-
-            {models.map((model) => (
-              <option
-                key={model.vehicle_model_id}
-                value={model.model_name}
-              >
-                {model.model_name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor={`${formData.vehicle_type}_version`}>
-            Version
-          </label>
-
-          <select
-            id={`${formData.vehicle_type}_version`}
-            name="version"
-            value={formData.version}
-            onChange={handleChange}
-            disabled={!formData.model || loadingVersions}
-          >
-            <option value="">
-              {!formData.model
-                ? "Select model first"
-                : loadingVersions
-                  ? "Loading versions..."
-                  : versions.length === 0
-                    ? "No versions available"
-                    : "Select version"}
-            </option>
-
-            {versions.map((version) => (
-              <option
-                key={version.version_id}
-                value={version.version_name}
-              >
-                {version.version_name}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor={`${formData.vehicle_type}_year`}>
-            Year
-          </label>
-
           <input
             id={`${formData.vehicle_type}_year`}
             name="year"
@@ -453,10 +434,13 @@ function AddSale() {
         </div>
 
         <div className="form-group">
-          <label htmlFor={`${formData.vehicle_type}_condition`}>
-            Condition
+          <label
+            htmlFor={`${formData.vehicle_type}_condition`}
+            className="add-sale-field-label"
+          >
+            <ClipboardCheck size={16} aria-hidden="true" />
+            <span>Condition</span>
           </label>
-
           <select
             id={`${formData.vehicle_type}_condition`}
             name="condition"
@@ -466,20 +450,20 @@ function AddSale() {
             <option value="">Select condition</option>
             <option value="new">New</option>
             <option value="used">Used</option>
-
             {formData.vehicle_type === "bike" && (
-              <option value="re-conditioned">
-                Re-Conditioned
-              </option>
+              <option value="re-conditioned">Re-Conditioned</option>
             )}
           </select>
         </div>
 
         <div className="form-group">
-          <label htmlFor={`${formData.vehicle_type}_location`}>
-            City / Location
+          <label
+            htmlFor={`${formData.vehicle_type}_location`}
+            className="add-sale-field-label"
+          >
+            <MapPin size={16} aria-hidden="true" />
+            <span>City / Location</span>
           </label>
-
           <input
             id={`${formData.vehicle_type}_location`}
             name="location"
@@ -492,10 +476,11 @@ function AddSale() {
         <div className="form-group">
           <label
             htmlFor={`${formData.vehicle_type}_registration_city`}
+            className="add-sale-field-label"
           >
-            Registration City
+            <Building2 size={16} aria-hidden="true" />
+            <span>Registration City</span>
           </label>
-
           <input
             id={`${formData.vehicle_type}_registration_city`}
             name="registration_city"
@@ -514,10 +499,16 @@ function AddSale() {
         return (
           <>
             <section className="add-sale-section">
-              <h2>Car Basic Information</h2>
+              <h2 className="add-sale-section-heading">
+                <CarFront size={22} aria-hidden="true" />
+                <span>Car Basic Information</span>
+              </h2>
 
               <div className="form-group">
-                <label htmlFor="car_type">Type</label>
+                <label htmlFor="car_type" className="add-sale-field-label">
+                  <CarFront size={16} aria-hidden="true" />
+                  <span>Type</span>
+                </label>
                 <input
                   id="car_type"
                   name="type"
@@ -528,7 +519,10 @@ function AddSale() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="car_subtype">Subtype</label>
+                <label htmlFor="car_subtype" className="add-sale-field-label">
+                  <Layers size={16} aria-hidden="true" />
+                  <span>Subtype</span>
+                </label>
                 <input
                   id="car_subtype"
                   name="subtype"
@@ -541,10 +535,7 @@ function AddSale() {
               {renderCommonVehicleFields()}
             </section>
 
-            <CarFields
-              formData={formData}
-              handleChange={handleChange}
-            />
+            <CarFields formData={formData} handleChange={handleChange} />
           </>
         );
 
@@ -552,10 +543,16 @@ function AddSale() {
         return (
           <>
             <section className="add-sale-section">
-              <h2>Bike Basic Information</h2>
+              <h2 className="add-sale-section-heading">
+                <Bike size={22} aria-hidden="true" />
+                <span>Bike Basic Information</span>
+              </h2>
 
               <div className="form-group">
-                <label htmlFor="bike_type">Type</label>
+                <label htmlFor="bike_type" className="add-sale-field-label">
+                  <Bike size={16} aria-hidden="true" />
+                  <span>Type</span>
+                </label>
                 <input
                   id="bike_type"
                   name="type"
@@ -566,7 +563,10 @@ function AddSale() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="bike_subtype">Subtype</label>
+                <label htmlFor="bike_subtype" className="add-sale-field-label">
+                  <Layers size={16} aria-hidden="true" />
+                  <span>Subtype</span>
+                </label>
                 <input
                   id="bike_subtype"
                   name="subtype"
@@ -579,10 +579,7 @@ function AddSale() {
               {renderCommonVehicleFields()}
             </section>
 
-            <BikeFields
-              formData={formData}
-              handleChange={handleChange}
-            />
+            <BikeFields formData={formData} handleChange={handleChange} />
           </>
         );
 
@@ -590,11 +587,18 @@ function AddSale() {
         return (
           <>
             <section className="add-sale-section">
-              <h2>Commercial Basic Information</h2>
+              <h2 className="add-sale-section-heading">
+                <Truck size={22} aria-hidden="true" />
+                <span>Commercial Basic Information</span>
+              </h2>
 
               <div className="form-group">
-                <label htmlFor="commercial_type">
-                  Vehicle Type
+                <label
+                  htmlFor="commercial_type"
+                  className="add-sale-field-label"
+                >
+                  <Truck size={16} aria-hidden="true" />
+                  <span>Vehicle Type</span>
                 </label>
                 <input
                   id="commercial_type"
@@ -606,7 +610,13 @@ function AddSale() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="commercial_subtype">Subtype</label>
+                <label
+                  htmlFor="commercial_subtype"
+                  className="add-sale-field-label"
+                >
+                  <Layers size={16} aria-hidden="true" />
+                  <span>Subtype</span>
+                </label>
                 <input
                   id="commercial_subtype"
                   name="subtype"
@@ -630,11 +640,18 @@ function AddSale() {
         return (
           <>
             <section className="add-sale-section">
-              <h2>Machinery Basic Information</h2>
+              <h2 className="add-sale-section-heading">
+                <Cog size={22} aria-hidden="true" />
+                <span>Machinery Basic Information</span>
+              </h2>
 
               <div className="form-group">
-                <label htmlFor="machinery_type">
-                  Machinery Type
+                <label
+                  htmlFor="machinery_type"
+                  className="add-sale-field-label"
+                >
+                  <Cog size={16} aria-hidden="true" />
+                  <span>Machinery Type</span>
                 </label>
                 <input
                   id="machinery_type"
@@ -646,7 +663,13 @@ function AddSale() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="machinery_subtype">Subtype</label>
+                <label
+                  htmlFor="machinery_subtype"
+                  className="add-sale-field-label"
+                >
+                  <Layers size={16} aria-hidden="true" />
+                  <span>Subtype</span>
+                </label>
                 <input
                   id="machinery_subtype"
                   name="subtype"
@@ -670,10 +693,16 @@ function AddSale() {
         return (
           <>
             <section className="add-sale-section">
-              <h2>Plant Basic Information</h2>
+              <h2 className="add-sale-section-heading">
+                <Sprout size={22} aria-hidden="true" />
+                <span>Plant Basic Information</span>
+              </h2>
 
               <div className="form-group">
-                <label htmlFor="plant_name">Plant Name</label>
+                <label htmlFor="plant_name" className="add-sale-field-label">
+                  <Sprout size={16} aria-hidden="true" />
+                  <span>Plant Name</span>
+                </label>
                 <input
                   id="plant_name"
                   name="plant_name"
@@ -684,7 +713,10 @@ function AddSale() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="plant_type">Plant Type</label>
+                <label htmlFor="plant_type" className="add-sale-field-label">
+                  <Sprout size={16} aria-hidden="true" />
+                  <span>Plant Type</span>
+                </label>
                 <input
                   id="plant_type"
                   name="type"
@@ -695,7 +727,13 @@ function AddSale() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="plant_subtype">Subtype</label>
+                <label
+                  htmlFor="plant_subtype"
+                  className="add-sale-field-label"
+                >
+                  <Layers size={16} aria-hidden="true" />
+                  <span>Subtype</span>
+                </label>
                 <input
                   id="plant_subtype"
                   name="subtype"
@@ -706,7 +744,13 @@ function AddSale() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="plant_condition">Condition</label>
+                <label
+                  htmlFor="plant_condition"
+                  className="add-sale-field-label"
+                >
+                  <ClipboardCheck size={16} aria-hidden="true" />
+                  <span>Condition</span>
+                </label>
                 <select
                   id="plant_condition"
                   name="condition"
@@ -720,8 +764,12 @@ function AddSale() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="plant_location">
-                  City / Location
+                <label
+                  htmlFor="plant_location"
+                  className="add-sale-field-label"
+                >
+                  <MapPin size={16} aria-hidden="true" />
+                  <span>City / Location</span>
                 </label>
                 <input
                   id="plant_location"
@@ -733,10 +781,7 @@ function AddSale() {
               </div>
             </section>
 
-            <PlantFields
-              formData={formData}
-              handleChange={handleChange}
-            />
+            <PlantFields formData={formData} handleChange={handleChange} />
           </>
         );
 
@@ -751,10 +796,14 @@ function AddSale() {
 
       <main className="add-sale-page">
         <div className="add-sale-header">
-          <h1>Add Sale</h1>
+          <h1 className="add-sale-page-heading">
+            <ClipboardList size={28} aria-hidden="true" />
+            <span>Add Sale</span>
+          </h1>
+
           <p>
-            Select a category and enter the relevant details for
-            your advertisement.
+            Select a category and enter the relevant details for your
+            advertisement.
           </p>
         </div>
 
@@ -780,16 +829,60 @@ function AddSale() {
                 handleChange={handleChange}
               />
 
-              <ImageUpload
-                images={images}
-                setImages={setImages}
-              />
+              <ImageUpload images={images} setImages={setImages} />
 
-              <div className="add-sale-submit">
-                <button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Submitting..." : "Continue"}
-                </button>
-              </div>
+              {/* Post Ad Free Card */}
+              <section className="post-ad-free-card">
+                <div className="post-ad-free-header">
+                  <div className="post-ad-free-icon">
+                    <BadgeCheck size={28} aria-hidden="true" />
+                  </div>
+
+                  <div>
+                    <h2>Post Your Ad for Free</h2>
+                    <p>
+                      You're one step away from listing your vehicle on
+                      MotorsCube.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="post-ad-free-benefits">
+                  <div>
+                    <CheckCircle2 size={18} aria-hidden="true" />
+                    <span>Free ad posting</span>
+                  </div>
+
+                  <div>
+                    <CheckCircle2 size={18} aria-hidden="true" />
+                    <span>Up to 30 vehicle images</span>
+                  </div>
+
+                  <div>
+                    <CheckCircle2 size={18} aria-hidden="true" />
+                    <span>Showcase your vehicle to potential buyers</span>
+                  </div>
+                </div>
+
+                <div className="post-ad-free-footer">
+                  <span className="post-ad-free-price">Free</span>
+
+                  <button
+                    type="submit"
+                    className="post-ad-free-button"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting ? (
+                      "Posting Your Ad..."
+                    ) : (
+                      <>
+                        <BadgeCheck size={18} aria-hidden="true" />
+                        Post Ad Free
+                      </>
+                    )}
+                  </button>
+                </div>
+              </section>
             </>
           )}
         </form>

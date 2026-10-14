@@ -240,3 +240,164 @@
     transition: none !important;
   }
 }
+
+.add-sale-section-heading,
+.add-sale-page-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.add-sale-section-heading svg,
+.add-sale-page-heading svg {
+  flex-shrink: 0;
+  color: #2563eb;
+}
+
+.add-sale-section-heading {
+  margin-bottom: 20px;
+}
+
+/* Post Ad Free Card */
+.post-ad-free-card {
+  width: 100%;
+  margin: 28px 0;
+  padding: 28px;
+  box-sizing: border-box;
+  background: #ffffff;
+  border: 1px solid #dbe5f2;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(15, 23, 42, 0.05);
+}
+
+.post-ad-free-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.post-ad-free-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 54px;
+  height: 54px;
+  color: #2563eb;
+  background: #eff6ff;
+  border-radius: 14px;
+}
+
+.post-ad-free-header h2 {
+  margin: 0 0 6px;
+  color: #172033;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.post-ad-free-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.post-ad-free-benefits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  margin: 26px 0;
+  padding: 20px 0;
+  border-top: 1px solid #edf0f5;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.post-ad-free-benefits > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #334155;
+  font-size: 14px;
+}
+
+.post-ad-free-benefits svg {
+  flex-shrink: 0;
+  color: #16a34a;
+}
+
+.post-ad-free-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.post-ad-free-price {
+  color: #15803d;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.post-ad-free-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 48px;
+  padding: 0 24px;
+  border: none;
+  border-radius: 9px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.post-ad-free-button:hover:not(:disabled) {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.post-ad-free-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@media (max-width: 576px) {
+  .post-ad-free-card {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+
+  .post-ad-free-header {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .post-ad-free-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .post-ad-free-header h2 {
+    font-size: 18px;
+  }
+
+  .post-ad-free-benefits {
+    flex-direction: column;
+    gap: 14px;
+    margin: 20px 0;
+    padding: 18px 0;
+  }
+
+  .post-ad-free-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .post-ad-free-button {
+    width: 100%;
+  }
+}

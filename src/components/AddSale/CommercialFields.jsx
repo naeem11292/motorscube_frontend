@@ -1,10 +1,29 @@
+
+import {
+  Truck,
+  CarFront,
+  Palette,
+  Fuel,
+  Gauge,
+  CircleGauge,
+} from "lucide-react";
+
 function CommercialFields({ formData, handleChange }) {
   return (
     <section className="add-sale-section">
-      <h2>Commercial Vehicle Details</h2>
+      <h2 className="add-sale-section-heading">
+        <Truck size={22} aria-hidden="true" />
+        <span>Commercial Vehicle Details</span>
+      </h2>
 
       <div className="form-group">
-        <label htmlFor="commercial_body_type">Body Type</label>
+        <label
+          htmlFor="commercial_body_type"
+          className="add-sale-field-label"
+        >
+          <CarFront size={16} aria-hidden="true" />
+          <span>Body Type</span>
+        </label>
         <input
           id="commercial_body_type"
           name="body_type"
@@ -16,7 +35,13 @@ function CommercialFields({ formData, handleChange }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="commercial_color">Color</label>
+        <label
+          htmlFor="commercial_color"
+          className="add-sale-field-label"
+        >
+          <Palette size={16} aria-hidden="true" />
+          <span>Color</span>
+        </label>
         <input
           id="commercial_color"
           name="color"
@@ -28,7 +53,13 @@ function CommercialFields({ formData, handleChange }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="commercial_fuel_type">Fuel Type</label>
+        <label
+          htmlFor="commercial_fuel_type"
+          className="add-sale-field-label"
+        >
+          <Fuel size={16} aria-hidden="true" />
+          <span>Fuel Type</span>
+        </label>
         <select
           id="commercial_fuel_type"
           name="fuel_type"
@@ -45,7 +76,13 @@ function CommercialFields({ formData, handleChange }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="commercial_engine_size">Engine Size</label>
+        <label
+          htmlFor="commercial_engine_size"
+          className="add-sale-field-label"
+        >
+          <Gauge size={16} aria-hidden="true" />
+          <span>Engine Size</span>
+        </label>
         <input
           id="commercial_engine_size"
           name="engine_size"
@@ -57,7 +94,13 @@ function CommercialFields({ formData, handleChange }) {
       </div>
 
       <div className="form-group">
-        <label htmlFor="commercial_wheels_power">Wheels Power</label>
+        <label
+          htmlFor="commercial_wheels_power"
+          className="add-sale-field-label"
+        >
+          <CircleGauge size={16} aria-hidden="true" />
+          <span>Wheels Power</span>
+        </label>
         <input
           id="commercial_wheels_power"
           name="wheels_power"
