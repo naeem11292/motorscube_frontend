@@ -260,8 +260,9 @@
 
 /* Post Ad Free Card */
 .post-ad-free-card {
-  width: 100%;
-  margin: 28px 0;
+  width: 40%;
+  height: 40%;
+  margin: 28px 0 28px 24px; /* Adds 24px left gap */
   padding: 28px;
   box-sizing: border-box;
   background: #ffffff;
@@ -338,12 +339,100 @@
   font-weight: 700;
 }
 
+
+/* ---------- Post Ad Free Card ---------- */
+.post-ad-free-card {
+  width: 50%;
+  max-width: 900px;
+  height: auto;
+  margin: 32px auto;
+  padding: 28px;
+  box-sizing: border-box;
+
+  background: #ffffff;
+  border: 1px solid #dbe5f2;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(15, 23, 42, 0.05);
+}
+
+/* Keep the card contents separate */
+.post-ad-free-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.post-ad-free-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 54px;
+  height: 54px;
+  color: #2563eb;
+  background: #eff6ff;
+  border-radius: 14px;
+}
+
+.post-ad-free-header h2 {
+  margin: 0 0 6px;
+  color: #172033;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.post-ad-free-header p {
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* Benefits */
+.post-ad-free-benefits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  margin: 26px 0;
+  padding: 20px 0;
+  border-top: 1px solid #edf0f5;
+  border-bottom: 1px solid #edf0f5;
+}
+
+.post-ad-free-benefits > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #334155;
+  font-size: 14px;
+}
+
+.post-ad-free-benefits svg {
+  flex-shrink: 0;
+  color: #16a34a;
+}
+
+/* Card footer */
+.post-ad-free-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.post-ad-free-price {
+  color: #15803d;
+  font-size: 24px;
+  font-weight: 700;
+}
+
 .post-ad-free-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 9px;
-  min-height: 48px;
+  gap: 12px;
+  min-height: 44px;
   padding: 0 24px;
   border: none;
   border-radius: 9px;
@@ -365,8 +454,17 @@
   cursor: not-allowed;
 }
 
+/* ---------- Separate the Post Ad submit button ---------- */
+.add-sale-page form > button[type="submit"] {
+  margin-top: 16px;
+  margin-bottom: 16px;
+}
+
+/* ---------- Mobile ---------- */
 @media (max-width: 576px) {
   .post-ad-free-card {
+    width: 100%;
+    margin: 24px auto;
     padding: 20px 16px;
     border-radius: 12px;
   }
@@ -377,8 +475,8 @@
   }
 
   .post-ad-free-icon {
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
   }
 
   .post-ad-free-header h2 {
@@ -399,5 +497,138 @@
 
   .post-ad-free-button {
     width: 100%;
+  }
+}
+
+/* Payment option selection */
+.payment-choice-section {
+  width: 100%;
+  max-width: 900px;
+  margin: 12px auto 0;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid #e1e4e8;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+
+.payment-choice-heading {
+  margin-bottom: 20px;
+}
+
+.payment-choice-heading h2 {
+  margin: 0 0 8px;
+  color: #17181b;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.payment-choice-heading p {
+  margin: 0;
+  color: #666b73;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.payment-section-selector {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.payment-section-selector > button {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  min-height: 92px;
+  padding: 18px;
+  text-align: left;
+  color: #334155;
+  background: #fff;
+  border: 1px solid #dbe5f2;
+  border-radius: 12px;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.payment-section-selector > button > svg:first-child {
+  flex-shrink: 0;
+  color: #64748b;
+}
+
+.payment-section-selector > button:hover {
+  border-color: #93b4ff;
+  background: #f8faff;
+}
+
+.payment-section-selector > button.active {
+  background: #eff6ff;
+  border: 2px solid #2563eb;
+  padding: 17px;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.07);
+}
+
+.payment-section-selector > button.active > svg:first-child {
+  color: #2563eb;
+}
+
+.payment-choice-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.payment-choice-text strong {
+  color: #172033;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.payment-choice-text small {
+  color: #64748b;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.payment-section-selector .payment-choice-check {
+  flex-shrink: 0;
+  color: #2563eb;
+}
+
+/* Selected card spacing */
+.post-ad-free-card,
+.add-sale-page .post-card {
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto 0;
+  box-sizing: border-box;
+}
+
+@media (max-width: 640px) {
+  .payment-choice-section {
+    padding: 18px;
+  }
+
+  .payment-choice-heading h2 {
+    font-size: 18px;
+  }
+
+  .payment-section-selector {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .payment-section-selector > button {
+    min-height: 78px;
+    padding: 14px;
+  }
+
+  .payment-section-selector > button.active {
+    padding: 13px;
   }
 }

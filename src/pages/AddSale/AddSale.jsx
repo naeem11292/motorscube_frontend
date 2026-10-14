@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import axios from "../../api/axios";
 import { createSaleAd } from "../../api/itemsAdSale.api";
 import SellHero from "../../components/AddSale/SellHero";
+import { jwtDecode } from "jwt-decode";
 
 import VehicleTypeSelector from "../../components/AddSale/VehicleTypeSelector";
 import AdInformation from "../../components/AddSale/AdInformation";
@@ -15,6 +16,7 @@ import CommercialFields from "../../components/AddSale/CommercialFields";
 import MachineryFields from "../../components/AddSale/MachineryFields";
 import PlantFields from "../../components/AddSale/PlantFields";
 import SearchableSelect from "../../components/AddSale/SearchableSelect";
+import PostCard from "../../components/AddSale/PostCard";
 
 import {
   CarFront,
@@ -31,6 +33,7 @@ import {
   Building2,
   ClipboardCheck,
   CheckCircle2,
+  CreditCard,
 } from "lucide-react";
 
 import "./AddSale.css";
@@ -38,6 +41,12 @@ import "./AddSale.css";
 function AddSale() {
   const [images, setImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [walletBalance, setWalletBalance] = useState(0);
+  const [isLoadingWallet, setIsLoadingWallet] = useState(true);
+
+  // Controls which payment card is visible.
+  const [paymentSection, setPaymentSection] = useState("");
 
   const [makes, setMakes] = useState([]);
   const [models, setModels] = useState([]);
@@ -82,6 +91,64 @@ function AddSale() {
     description: "",
   });
 
+  // Fetch the authenticated user's wallet balance.
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchWalletBalance = async () => {
+      try {
+        setIsLoadingWallet(true);
+
+        const token = localStorage.getItem("motorscube_token");
+
+        if (!token) {
+          throw new Error("Please log in to view your wallet balance.");
+        }
+
+        const decoded = jwtDecode(token);
+        const userId = decoded.sub;
+
+        if (!userId) {
+          throw new Error("User ID not found in authentication token.");
+        }
+
+        const response = await axios.get(
+          `/user-wallet/user/${encodeURIComponent(String(userId))}`
+        );
+
+        const wallet = response.data?.data;
+        const amount = Number(wallet?.remaining_amount);
+
+        if (!Number.isFinite(amount) || amount < 0) {
+          throw new Error("Invalid wallet balance returned by the API.");
+        }
+
+        if (!cancelled) {
+          setWalletBalance(amount);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error(
+            "Failed to fetch wallet balance:",
+            error.response?.data || error.message
+          );
+          setWalletBalance(0);
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingWallet(false);
+        }
+      }
+    };
+
+    fetchWalletBalance();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // Fetch vehicle makes when the category changes.
   useEffect(() => {
     let cancelled = false;
 
@@ -99,7 +166,9 @@ function AddSale() {
         setLoadingMakes(true);
 
         const response = await axios.get("/vehicle-makes", {
-          params: { vehicle_type: formData.vehicle_type },
+          params: {
+            vehicle_type: formData.vehicle_type,
+          },
         });
 
         if (!cancelled) {
@@ -115,7 +184,9 @@ function AddSale() {
           setMakes([]);
         }
       } finally {
-        if (!cancelled) setLoadingMakes(false);
+        if (!cancelled) {
+          setLoadingMakes(false);
+        }
       }
     };
 
@@ -126,6 +197,7 @@ function AddSale() {
     };
   }, [formData.vehicle_type]);
 
+  // Fetch vehicle models when a make is selected.
   useEffect(() => {
     let cancelled = false;
 
@@ -142,7 +214,9 @@ function AddSale() {
         setLoadingModels(true);
 
         const response = await axios.get("/vehicle-models", {
-          params: { vehicle_make_id: formData.make },
+          params: {
+            vehicle_make_id: formData.make,
+          },
         });
 
         if (cancelled) return;
@@ -165,7 +239,9 @@ function AddSale() {
           setModels([]);
         }
       } finally {
-        if (!cancelled) setLoadingModels(false);
+        if (!cancelled) {
+          setLoadingModels(false);
+        }
       }
     };
 
@@ -176,6 +252,7 @@ function AddSale() {
     };
   }, [formData.make]);
 
+  // Fetch vehicle versions when a model is selected.
   useEffect(() => {
     let cancelled = false;
 
@@ -217,7 +294,9 @@ function AddSale() {
           setVersions([]);
         }
       } finally {
-        if (!cancelled) setLoadingVersions(false);
+        if (!cancelled) {
+          setLoadingVersions(false);
+        }
       }
     };
 
@@ -228,6 +307,7 @@ function AddSale() {
     };
   }, [formData.model, models]);
 
+  // Handle regular form inputs.
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -237,6 +317,7 @@ function AddSale() {
     }));
   };
 
+  // Handle make selection.
   const handleMakeChange = (selectedMakeId) => {
     setFormData((previous) => ({
       ...previous,
@@ -249,6 +330,7 @@ function AddSale() {
     setVersions([]);
   };
 
+  // Handle model selection.
   const handleModelChange = (selectedModelId) => {
     setFormData((previous) => ({
       ...previous,
@@ -259,6 +341,7 @@ function AddSale() {
     setVersions([]);
   };
 
+  // Reset category-specific information when category changes.
   const handleVehicleTypeChange = (event) => {
     const selectedType = event.target.value;
 
@@ -297,8 +380,23 @@ function AddSale() {
     setMakes([]);
     setModels([]);
     setVersions([]);
+
+    // Reset the payment selection for the new advertisement.
+    setPaymentSection("");
   };
 
+  // Receives the selected promotion/payment details only.
+  // Actual payment processing is not implemented here.
+  const handlePostCardPayment = (paymentDetails) => {
+    console.log("Selected promotion payment:", paymentDetails);
+
+    alert(
+      "Your package and payment selection have been received. " +
+        "Actual payment processing is not connected yet."
+    );
+  };
+
+  // Submit the free sale advertisement.
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -351,6 +449,7 @@ function AddSale() {
     }
   };
 
+  // Common fields used by vehicle categories.
   function renderCommonVehicleFields() {
     return (
       <>
@@ -493,6 +592,7 @@ function AddSale() {
     );
   }
 
+  // Render category-specific information.
   const renderCategoryDetails = () => {
     switch (formData.vehicle_type) {
       case "car":
@@ -727,10 +827,7 @@ function AddSale() {
               </div>
 
               <div className="form-group">
-                <label
-                  htmlFor="plant_subtype"
-                  className="add-sale-field-label"
-                >
+                <label htmlFor="plant_subtype" className="add-sale-field-label">
                   <Layers size={16} aria-hidden="true" />
                   <span>Subtype</span>
                 </label>
@@ -831,58 +928,133 @@ function AddSale() {
 
               <ImageUpload images={images} setImages={setImages} />
 
-              {/* Post Ad Free Card */}
-              <section className="post-ad-free-card">
-                <div className="post-ad-free-header">
-                  <div className="post-ad-free-icon">
-                    <BadgeCheck size={28} aria-hidden="true" />
-                  </div>
-
-                  <div>
-                    <h2>Post Your Ad for Free</h2>
-                    <p>
-                      You're one step away from listing your vehicle on
-                      MotorsCube.
-                    </p>
-                  </div>
+              {/* Payment option selector */}
+              <section className="payment-choice-section">
+                <div className="payment-choice-heading">
+                  <h2>Choose How to Post Your Ad</h2>
+                  <p>
+                    Post your advertisement for free or choose a
+                    promotion package to increase its visibility.
+                  </p>
                 </div>
 
-                <div className="post-ad-free-benefits">
-                  <div>
-                    <CheckCircle2 size={18} aria-hidden="true" />
-                    <span>Free ad posting</span>
-                  </div>
+                <div
+                  className="payment-section-selector"
+                  role="group"
+                  aria-label="Choose advertisement posting option"
+                >
+                  <button
+                    type="button"
+                    aria-pressed={paymentSection === "free"}
+                    className={
+                      paymentSection === "free" ? "active" : ""
+                    }
+                    onClick={() => setPaymentSection("free")}
+                  >
+                    <BadgeCheck size={24} aria-hidden="true" />
 
-                  <div>
-                    <CheckCircle2 size={18} aria-hidden="true" />
-                    <span>Up to 30 vehicle images</span>
-                  </div>
+                    <span className="payment-choice-text">
+                      <strong>Post Ad Free</strong>
+                      <small>Publish a regular advertisement.</small>
+                    </span>
 
-                  <div>
-                    <CheckCircle2 size={18} aria-hidden="true" />
-                    <span>Showcase your vehicle to potential buyers</span>
-                  </div>
-                </div>
-
-                <div className="post-ad-free-footer">
-                  <span className="post-ad-free-price">Free</span>
+                    {paymentSection === "free" && (
+                      <CheckCircle2
+                        className="payment-choice-check"
+                        size={20}
+                        aria-hidden="true"
+                      />
+                    )}
+                  </button>
 
                   <button
-                    type="submit"
-                    className="post-ad-free-button"
-                    disabled={isSubmitting}
+                    type="button"
+                    aria-pressed={paymentSection === "post"}
+                    className={
+                      paymentSection === "post" ? "active" : ""
+                    }
+                    onClick={() => setPaymentSection("post")}
                   >
-                    {isSubmitting ? (
-                      "Posting Your Ad..."
-                    ) : (
-                      <>
-                        <BadgeCheck size={18} aria-hidden="true" />
-                        Post Ad Free
-                      </>
+                    <CreditCard size={24} aria-hidden="true" />
+
+                    <span className="payment-choice-text">
+                      <strong>Post Ad</strong>
+                      <small>Explore promotion packages.</small>
+                    </span>
+
+                    {paymentSection === "post" && (
+                      <CheckCircle2
+                        className="payment-choice-check"
+                        size={20}
+                        aria-hidden="true"
+                      />
                     )}
                   </button>
                 </div>
               </section>
+
+              {/* Show only the selected card */}
+              {paymentSection === "free" && (
+                <section className="post-ad-free-card">
+                  <div className="post-ad-free-header">
+                    <div className="post-ad-free-icon">
+                      <BadgeCheck size={28} aria-hidden="true" />
+                    </div>
+
+                    <div>
+                      <h2>Post Your Ad for Free</h2>
+                      <p>
+                        You're one step away from listing your vehicle
+                        on MotorsCube.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="post-ad-free-benefits">
+                    <div>
+                      <CheckCircle2 size={18} aria-hidden="true" />
+                      <span>Free ad posting</span>
+                    </div>
+
+                    <div>
+                      <CheckCircle2 size={18} aria-hidden="true" />
+                      <span>Up to 30 vehicle images</span>
+                    </div>
+
+                    <div>
+                      <CheckCircle2 size={18} aria-hidden="true" />
+                      <span>
+                        Showcase your vehicle to potential buyers
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="post-ad-free-footer">
+                    <button
+                      type="submit"
+                      className="post-ad-free-button"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting ? (
+                        "Posting Your Ad..."
+                      ) : (
+                        <>
+                          <BadgeCheck size={18} aria-hidden="true" />
+                          Post Ad Free
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </section>
+              )}
+
+              {paymentSection === "post" && (
+                <PostCard
+                  walletBalance={walletBalance}
+                  isLoadingWallet={isLoadingWallet}
+                  onPayment={handlePostCardPayment}
+                />
+              )}
             </>
           )}
         </form>
