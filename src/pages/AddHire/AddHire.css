@@ -1,13 +1,75 @@
+
 .add-hire-page {
-  width: 100%;
   min-height: 100vh;
-  padding: 30px 0;
-  box-sizing: border-box;
-  background: #f5f7fb;
+  background: #f5f6f8;
+  color: #222;
+  font-family: "Poppins", sans-serif;
+  padding-bottom: 48px;
+}
+
+.add-hire-container {
+  width: min(1100px, calc(100% - 32px));
+  margin: 32px auto 0;
+}
+
+.add-hire-heading {
+  margin-bottom: 24px;
+}
+
+.add-hire-heading h1 {
+  margin: 0 0 8px;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.add-hire-heading p {
+  margin: 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.add-hire-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 28px;
+  background: #fff;
+  border: 1px solid #e1e4e8;
+  border-radius: 12px;
+}
+
+.add-hire-submit {
+  align-self: flex-start;
+  border: none;
+  border-radius: 6px;
+  padding: 13px 26px;
+  background: #e5232b;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.add-hire-submit:hover {
+  background: #c81d24;
 }
 
 @media (max-width: 600px) {
-  .add-hire-page {
-    padding: 12px 0;
+  .add-hire-container {
+    width: calc(100% - 20px);
+    margin-top: 20px;
+  }
+
+  .add-hire-heading h1 {
+    font-size: 22px;
+  }
+
+  .add-hire-form {
+    padding: 16px;
+    gap: 18px;
+  }
+
+  .add-hire-submit {
+    width: 100%;
   }
 }

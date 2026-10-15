@@ -1,57 +1,60 @@
-.hire-vehicle-grid {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 16px;
+
+.hire-section {
   width: 100%;
-  margin-bottom: 24px;
 }
 
-.hire-vehicle-card {
+.hire-section h2 {
+  margin: 0 0 8px;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.hire-section-description {
+  margin: 0 0 18px;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.hire-vehicle-types {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.hire-vehicle-option {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 12px;
-  min-width: 0;
+  gap: 10px;
   min-height: 110px;
-  padding: 16px 10px;
-  border: 1px solid #d8dce2;
-  border-radius: 10px;
+  padding: 16px 8px;
   background: #fff;
-  color: #252a34;
+  border: 1px solid #dfe3e8;
+  border-radius: 8px;
+  color: #333;
+  font: inherit;
+  font-size: 14px;
   cursor: pointer;
-  transition: border-color 0.2s ease, background-color 0.2s ease;
+  transition: border-color 0.2s, background 0.2s;
 }
 
-.hire-vehicle-card:hover {
-  border-color: #1769ff;
+.hire-vehicle-option:hover {
+  border-color: #e5232b;
 }
 
-.hire-vehicle-card.active {
-  border: 2px solid #1769ff;
-  background: #eef4ff;
+.hire-vehicle-option.selected {
+  border: 2px solid #e5232b;
+  background: #fff5f5;
+  color: #c81d24;
 }
 
 .hire-vehicle-icon {
-  font-size: 32px;
-  line-height: 1;
-}
-
-.hire-vehicle-label {
-  font-size: 14px;
-  font-weight: 600;
-  text-align: center;
+  font-size: 30px;
 }
 
 @media (max-width: 700px) {
-  .hire-vehicle-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 10px;
-  }
-}
-
-@media (max-width: 400px) {
-  .hire-vehicle-grid {
+  .hire-vehicle-types {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
