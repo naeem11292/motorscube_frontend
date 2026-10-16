@@ -1090,3 +1090,4 @@ function AddSale() {
 }
 
 export default AddSale;
+// This is not the end of it we will fix it and we will decide what more things to add in it

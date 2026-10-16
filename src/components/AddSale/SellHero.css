@@ -1,93 +1,223 @@
+
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+
 .sell-hero {
-  width: 100%;
-  min-height: 300px;
-  background: linear-gradient(
-    120deg,
-    #17181c,
-    #30333a
-  );
+  position: relative;
+  width: 1438px;
+  height: 400px;
+  opacity: 1;
+  margin: 0 auto 24px;
   overflow: hidden;
+}
+.sell-hero-banner {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
 }
 
 .sell-hero-content {
-  max-width: 1200px;
-  min-height: 300px;
-  margin: 0 auto;
-  padding: 40px 30px;
-
+  position: absolute;
+  inset: 0;
+  z-index: 1;
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 40px;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+  text-align: center;
 }
 
-.sell-hero-text {
-  max-width: 550px;
-}
-
-.sell-hero-label {
-  display: inline-block;
-  margin-bottom: 12px;
-
-  color: #e63946;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 2px;
-}
-
-.sell-hero h1 {
+.sell-hero-title {
+  width: 100%;
   margin: 0;
   color: #ffffff;
-  font-size: clamp(32px, 5vw, 56px);
-  line-height: 1.1;
-  font-weight: 700;
+  font-family: "Poppins", sans-serif;
+  font-size: 87px;
+  font-weight: 600;
+  line-height: 100px;
+  letter-spacing: 0;
+  text-align: center;
 }
 
-.sell-hero h1 span {
-  color: #e63946;
-}
-
-.sell-hero p {
-  margin: 18px 0 0;
-  max-width: 480px;
-
-  color: #c9c9d1;
-  font-size: 16px;
-  line-height: 1.7;
-}
-
-.sell-hero-image {
-  width: 440px;
-  flex-shrink: 0;
-}
-
-.sell-hero-image img {
-  display: block;
+.sell-hero-description {
   width: 100%;
-  height: 260px;
-
-  object-fit: contain;
+  max-width: 909px;
+  margin: 0;
+  color: #cbcaca;
+  font-family: "Poppins", sans-serif;
+  font-size: 27.01px;
+  font-weight: 400;
+  line-height: 1.65;
+  text-align: center;
 }
 
 @media (max-width: 768px) {
+  .sell-hero {
+    height: auto;
+    aspect-ratio: 909 / 350;
+  }
+
   .sell-hero-content {
-    min-height: auto;
-    padding: 40px 20px;
-
-    flex-direction: column;
-    text-align: center;
+    gap: 10px;
+    padding: 12px;
   }
 
-  .sell-hero-text {
-    max-width: 100%;
+  .sell-hero-title {
+    font-size: clamp(28px, 7vw, 52px);
+    line-height: 1.15;
   }
 
-  .sell-hero p {
+  .sell-hero-description {
+    font-size: clamp(11px, 2.5vw, 16px);
+    line-height: 1.4;
+  }
+}
+.sell-hero-label-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sell-hero-line {
+  width: 41px;
+  height: 0;
+  border-top: 1px solid #0872fe;
+  background: #0872fe;
+}
+
+.sell-hero-label {
+  margin: 0;
+  color: #0872fe;
+  font-family: "Poppins", sans-serif;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+/* ================================
+   Add Sale - Responsive Layout
+================================ */
+
+/* Laptop: 1024px–1440px */
+@media (max-width: 1440px) {
+  .add-sale-page {
+    width: 94%;
+    max-width: 1200px;
     margin-left: auto;
     margin-right: auto;
   }
+}
 
-  .sell-hero-image {
-    width: min(100%, 400px);
+/* Tablet: 768px–1023px */
+@media (max-width: 1023px) {
+  .add-sale-page {
+    width: 92%;
+    padding: 20px 0;
+  }
+
+  .sell-hero {
+    width: 100%;
+    height: auto;
+    min-height: 280px;
+    aspect-ratio: 909 / 350;
+  }
+
+  .sell-hero-title {
+    font-size: clamp(36px, 6vw, 60px);
+    line-height: 1.15;
+  }
+
+  .sell-hero-description {
+    font-size: clamp(14px, 2vw, 20px);
+    line-height: 1.5;
+  }
+
+  .add-sale-page .form-row,
+  .add-sale-page .fields-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .add-sale-page input,
+  .add-sale-page select,
+  .add-sale-page textarea {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+/* Mobile: up to 767px */
+@media (max-width: 767px) {
+  .add-sale-page {
+    width: 100%;
+    padding: 16px;
+    box-sizing: border-box;
+  }
+
+  .sell-hero {
+    width: 100%;
+    height: auto;
+    min-height: 220px;
+    aspect-ratio: 909 / 350;
+    margin-bottom: 20px;
+  }
+
+  .sell-hero-content {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .sell-hero-label {
+    font-size: 14px;
+  }
+
+  .sell-hero-line {
+    width: 24px;
+  }
+
+  .sell-hero-title {
+    font-size: clamp(25px, 7vw, 38px);
+    line-height: 1.15;
+  }
+
+  .sell-hero-description {
+    font-size: clamp(11px, 3vw, 14px);
+    line-height: 1.4;
+  }
+
+  .add-sale-page .form-row,
+  .add-sale-page .fields-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .add-sale-page input,
+  .add-sale-page select,
+  .add-sale-page textarea,
+  .add-sale-page button {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .add-sale-page img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Very small mobile screens */
+@media (max-width: 380px) {
+  .add-sale-page {
+    padding: 12px;
+  }
+
+  .sell-hero-title {
+    font-size: 25px;
+  }
+
+  .sell-hero-description {
+    font-size: 11px;
   }
 }

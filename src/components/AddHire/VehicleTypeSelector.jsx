@@ -1,35 +1,51 @@
-
 import "./VehicleTypeSelector.css";
 
 const vehicleTypes = [
-  { value: "car", label: "Car", icon: "🚗" },
-  { value: "bike", label: "Bike", icon: "🏍️" },
-  { value: "commercial", label: "Commercial", icon: "🚚" },
-  { value: "machinery", label: "Machinery", icon: "⚙️" },
-  { value: "plant", label: "Plant", icon: "🏗️" },
+  { value: "car", icon: "🚗", label: "Car" },
+  { value: "bike", icon: "🏍️", label: "Bike" },
+  { value: "commercial", icon: "🚚", label: "Commercial" },
+  { value: "machinery", icon: "⚙️", label: "Machinery" },
+  { value: "plant", icon: "🏗️", label: "Plant" },
 ];
 
 function VehicleTypeSelector({ value, onChange }) {
   return (
-    <section className="hire-section">
-      <h2>Vehicle Type</h2>
-      <p className="hire-section-description">
-        Select the type of vehicle or equipment you want to hire out.
+    <section className="sale-vehicle-section">
+      <h2>What do you want to Hire?</h2>
+
+      <p className="sale-vehicle-subtitle">
+        Select a vehicle category to continue.
       </p>
 
-      <div className="hire-vehicle-types">
-        {vehicleTypes.map((type) => (
+      <div className="sale-vehicle-grid">
+        {vehicleTypes.map((vehicle) => (
           <button
-            key={type.value}
+            key={vehicle.value}
             type="button"
-            className={`hire-vehicle-option ${
-              value === type.value ? "selected" : ""
+            className={`sale-vehicle-card ${
+              value === vehicle.value ? "active" : ""
             }`}
-            onClick={() => onChange(type.value)}
-            aria-pressed={value === type.value}
+            onClick={() =>
+              onChange({
+                target: {
+                  name: "vehicle_type",
+                  value: vehicle.value,
+                },
+              })
+            }
+            aria-pressed={value === vehicle.value}
           >
-            <span className="hire-vehicle-icon">{type.icon}</span>
-            <span>{type.label}</span>
+            <span className="sale-vehicle-icon">
+              {vehicle.icon}
+            </span>
+
+            <span className="sale-vehicle-label">
+              {vehicle.label}
+            </span>
+
+            {value === vehicle.value && (
+              <span className="sale-vehicle-check">✓</span>
+            )}
           </button>
         ))}
       </div>

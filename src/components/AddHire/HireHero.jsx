@@ -1,14 +1,30 @@
-
-import React from "react";
+import heroImg from "../../assets/hero.png";
 import "./HireHero.css";
 
-export default function HireHero() {
+function HireHero() {
   return (
-    <section className="hire-hero">
-      <div className="hire-hero-content">
-        <h1>Hire a Vehicle</h1>
-        <p>Find the right vehicle for your business or personal needs.</p>
+    <section className="Hire-hero">
+      <div className="Hire-hero-content">
+        <div className="Hire-hero-text">
+          <span className="Hire-hero-label">MOTORSCUBE</span>
+
+          <h1>
+            Hire Your Vehicle
+            <span> With Confidence</span>
+          </h1>
+
+          <p>
+            Reach thousands of buyers and sell your vehicle
+            quickly through MotorsCube.
+          </p>
+        </div>
+
+        <div className="sell-hero-image">
+          <img src={heroImg} alt="Hire your vehicle" />
+        </div>
       </div>
     </section>
   );
 }
+
+export default HireHero;

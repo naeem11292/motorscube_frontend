@@ -1,27 +1,25 @@
-import heroImg from "../../assets/hero.png";
+
+import saleBanner from "../../assets/sale.banner.png";
 import "./SellHero.css";
 
 function SellHero() {
   return (
     <section className="sell-hero">
+      <img
+        src={saleBanner}
+        alt="MotorsCube car sale banner"
+        className="sell-hero-banner"
+      />
+
       <div className="sell-hero-content">
-        <div className="sell-hero-text">
-          <span className="sell-hero-label">MOTORSCUBE</span>
+        <p className="sell-hero-label">Sell Car</p>
+        <h1 className="sell-hero-title">Sell Your Car</h1>
 
-          <h1>
-            Sell Your Vehicle
-            <span> With Confidence</span>
-          </h1>
-
-          <p>
-            Reach thousands of buyers and sell your vehicle
-            quickly through MotorsCube.
-          </p>
-        </div>
-
-        <div className="sell-hero-image">
-          <img src={heroImg} alt="Sell your vehicle" />
-        </div>
+        <p className="sell-hero-description">
+          Complete the details below to list your vehicle on MotorsCube.
+          Reach thousands of verified buyers and start receiving offers
+          in just a few simple steps.
+        </p>
       </div>
     </section>
   );

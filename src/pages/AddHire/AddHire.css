@@ -1,75 +1,461 @@
 
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+/* ---------- Page background ---------- */
 .add-hire-page {
+  --red: #e5232b;
+  --red-dark: #c81d24;
+  --blue: #2f6bff;
+
+  --background: #f5f6f8;
+  --card: #ffffff;
+  --border: #e1e4e8;
+  --text: #17181b;
+  --muted: #666b73;
+
   min-height: 100vh;
-  background: #f5f6f8;
-  color: #222;
-  font-family: "Poppins", sans-serif;
-  padding-bottom: 48px;
+  padding: 48px 20px 80px;
+  font-family: "Poppins", system-ui, sans-serif;
+  color: var(--text);
+  background: var(--background);
+  position: relative;
+  isolation: isolate;
 }
 
-.add-hire-container {
-  width: min(1100px, calc(100% - 32px));
-  margin: 32px auto 0;
+.add-hire-page *,
+.add-hire-page *::before,
+.add-hire-page *::after {
+  box-sizing: border-box;
 }
 
-.add-hire-heading {
-  margin-bottom: 24px;
+/* ---------- Remove dark background layers ---------- */
+.add-hire-page::before,
+.add-hire-page::after {
+  display: none;
 }
 
-.add-hire-heading h1 {
-  margin: 0 0 8px;
-  font-size: 28px;
-  font-weight: 700;
+/* ---------- Page heading ---------- */
+.add-hire-page .add-sale-header {
+  max-width: 900px;
+  margin: 0 auto 28px;
 }
 
-.add-hire-heading p {
+.add-hire-page .add-sale-page-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 12px;
+  font-size: clamp(30px, 4.5vw, 42px);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--text);
+}
+
+.add-hire-page .add-sale-page-heading svg {
+  flex-shrink: 0;
+  color: #2563eb;
+}
+
+.add-hire-page .add-sale-header p {
   margin: 0;
-  color: #666;
+  color: var(--muted);
   font-size: 14px;
+  line-height: 1.7;
 }
 
-.add-hire-form {
+/* ---------- Form layout ---------- */
+.add-hire-page form {
+  max-width: 900px;
+  margin: 0 auto;
+  display: grid;
+  gap: 20px;
+}
+
+/* ---------- Form sections ---------- */
+.add-hire-page .add-sale-section,
+.add-hire-page .sale-form-section {
+  min-width: 0;
+  margin: 0;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--card);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.06);
+}
+
+/* ---------- Section headings ---------- */
+.add-hire-page .add-sale-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  grid-column: 1 / -1;
+  margin: 0 0 20px;
+  padding: 0;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.add-hire-page .add-sale-section-heading svg {
+  flex-shrink: 0;
+  color: #2563eb;
+}
+
+/* ---------- Fields grid ---------- */
+.add-hire-page .add-sale-fields-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px 16px;
+  align-content: start;
+}
+
+.add-hire-page .form-group {
   display: flex;
   flex-direction: column;
-  gap: 24px;
-  padding: 28px;
-  background: #fff;
-  border: 1px solid #e1e4e8;
-  border-radius: 12px;
+  min-width: 0;
+  gap: 7px;
 }
 
-.add-hire-submit {
-  align-self: flex-start;
-  border: none;
-  border-radius: 6px;
-  padding: 13px 26px;
-  background: #e5232b;
-  color: #fff;
-  font-size: 15px;
+/* ---------- Labels ---------- */
+.add-hire-page .add-sale-field-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.add-hire-page .add-sale-field-label svg {
+  flex-shrink: 0;
+  color: #64748b;
+}
+
+/* ---------- Inputs ---------- */
+.add-hire-page input,
+.add-hire-page select,
+.add-hire-page textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 12px 14px;
+  font: 400 14px "Poppins", sans-serif;
+  color: var(--text);
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.add-hire-page input::placeholder,
+.add-hire-page textarea::placeholder {
+  color: #9a9ea5;
+}
+
+.add-hire-page select option {
+  color: var(--text);
+  background: #fff;
+}
+
+.add-hire-page textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.add-hire-page input:hover,
+.add-hire-page select:hover,
+.add-hire-page textarea:hover {
+  border-color: #b9bec6;
+}
+
+.add-hire-page input:focus,
+.add-hire-page select:focus,
+.add-hire-page textarea:focus {
+  outline: none;
+  border-color: var(--red);
+  box-shadow: 0 0 0 3px rgba(229, 35, 43, 0.12);
+}
+
+.add-hire-page input[type="checkbox"],
+.add-hire-page input[type="radio"] {
+  width: auto;
+  accent-color: var(--red);
+}
+
+/* ---------- Vehicle category selector ---------- */
+.add-hire-page .hire-category-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.add-hire-page .hire-category-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-width: 0;
+  min-height: 105px;
+  padding: 16px 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: #fff;
+  color: #475569;
+  font: 500 12px "Poppins", sans-serif;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    color 0.2s,
+    transform 0.2s;
+}
+
+.add-hire-page .hire-category-button svg {
+  color: #64748b;
+  transition: color 0.2s;
+}
+
+.add-hire-page .hire-category-button:hover {
+  border-color: #93b4ff;
+  background: #f8faff;
+  transform: translateY(-1px);
+}
+
+.add-hire-page .hire-category-button.active {
+  border: 2px solid #2563eb;
+  padding: 15px 7px;
+  background: #eff6ff;
+  color: #1d4ed8;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.08);
+}
+
+.add-hire-page .hire-category-button.active svg {
+  color: #2563eb;
+}
+
+/* ---------- Image upload area ---------- */
+.add-hire-page .hire-image-upload {
+  grid-column: 1 / -1;
+}
+
+.add-hire-page .hire-image-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 180px;
+  padding: 24px;
+  border: 2px dashed #cbd5e1;
+  border-radius: 12px;
+  background: #fafbfc;
+  color: #64748b;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.add-hire-page .hire-image-picker:hover {
+  border-color: var(--red);
+  background: #fffafa;
+}
+
+.add-hire-page .hire-image-picker > svg {
+  color: #2563eb;
+}
+
+.add-hire-page .hire-image-picker strong {
+  color: var(--text);
+  font-size: 14px;
   font-weight: 600;
+}
+
+.add-hire-page .hire-image-picker span {
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.add-hire-page input[type="file"] {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+/* ---------- Image preview grid ---------- */
+.add-hire-page .hire-image-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.add-hire-page .hire-image-preview {
+  position: relative;
+  min-width: 0;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #f1f5f9;
+}
+
+.add-hire-page .hire-image-preview img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.add-hire-page .hire-image-preview button {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(23, 24, 27, 0.78);
+  color: #fff;
   cursor: pointer;
 }
 
-.add-hire-submit:hover {
-  background: #c81d24;
+.add-hire-page .hire-image-preview button:hover {
+  background: var(--red);
 }
 
-@media (max-width: 600px) {
-  .add-hire-container {
-    width: calc(100% - 20px);
-    margin-top: 20px;
+/* ---------- Submit button ---------- */
+.add-hire-page .hire-submit-actions {
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.add-hire-page .free-ad-submit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 12px 28px;
+  border: none;
+  border-radius: 8px;
+  background: var(--red);
+  color: #fff;
+  font: 600 15px "Poppins", sans-serif;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.add-hire-page .free-ad-submit-btn:hover:not(:disabled) {
+  background: var(--red-dark);
+}
+
+.add-hire-page .free-ad-submit-btn:disabled {
+  background: #bdbdbd;
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.add-hire-page .free-ad-submit-btn:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 760px) {
+  .add-hire-page .hire-category-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .add-hire-heading h1 {
-    font-size: 22px;
+  .add-hire-page .hire-image-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .add-hire-page {
+    padding: 32px 14px 60px;
   }
 
-  .add-hire-form {
-    padding: 16px;
-    gap: 18px;
+  .add-hire-page .add-sale-header {
+    margin-bottom: 22px;
   }
 
-  .add-hire-submit {
+  .add-hire-page .add-sale-page-heading {
+    font-size: 28px;
+  }
+
+  .add-hire-page form {
+    gap: 16px;
+  }
+
+  .add-hire-page .add-sale-section,
+  .add-hire-page .sale-form-section {
+    padding: 18px;
+  }
+
+  .add-hire-page .add-sale-fields-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .add-hire-page .add-sale-section-heading {
+    font-size: 17px;
+  }
+
+  .add-hire-page .hire-category-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .add-hire-page .hire-category-button {
+    min-height: 90px;
+  }
+
+  .add-hire-page .hire-image-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .add-hire-page .hire-image-picker {
+    min-height: 155px;
+    padding: 18px 12px;
+  }
+
+  .add-hire-page .hire-submit-actions {
     width: 100%;
+  }
+
+  .add-hire-page .free-ad-submit-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 380px) {
+  .add-hire-page .hire-image-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .add-hire-page *,
+  .add-hire-page *::before,
+  .add-hire-page *::after {
+    transition: none !important;
+    animation: none !important;
   }
 }
