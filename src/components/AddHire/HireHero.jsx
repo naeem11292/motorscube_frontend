@@ -1,27 +1,26 @@
-import heroImg from "../../assets/hero.png";
+
+import saleBanner from "../../assets/sale.banner.png";
 import "./HireHero.css";
 
 function HireHero() {
   return (
-    <section className="Hire-hero">
-      <div className="Hire-hero-content">
-        <div className="Hire-hero-text">
-          <span className="Hire-hero-label">MOTORSCUBE</span>
+    <section className="hire-hero">
+      <img
+        src={saleBanner}
+        alt="MotorsCube hire banner"
+        className="hire-hero-banner"
+      />
 
-          <h1>
-            Hire Your Vehicle
-            <span> With Confidence</span>
-          </h1>
+      <div className="hire-hero-content">
+        <p className="hire-hero-label">Hire The Things</p>
 
-          <p>
-            Reach thousands of buyers and sell your vehicle
-            quickly through MotorsCube.
-          </p>
-        </div>
+        <h1 className="hire-hero-title">Hire Your Things</h1>
 
-        <div className="sell-hero-image">
-          <img src={heroImg} alt="Hire your vehicle" />
-        </div>
+        <p className="hire-hero-description">
+          Complete the details below to list your vehicle for hire on
+          MotorsCube. Reach thousands of customers and start receiving
+          enquiries in just a few simple steps.
+        </p>
       </div>
     </section>
   );

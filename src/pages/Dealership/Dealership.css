@@ -1,0 +1,152 @@
+.dealership-page {
+  min-height: 100vh;
+  padding: 32px 24px 60px;
+  background: #f5f6f8;
+  color: #222222;
+  font-family: "Poppins", sans-serif;
+}
+
+.dealership-page-header {
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.dealership-page-header h1 {
+  margin: 0 0 10px;
+  font-size: 32px;
+  font-weight: 700;
+}
+
+.dealership-page-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+.dealership-success {
+  max-width: 1100px;
+  margin: 24px auto 0;
+  padding: 14px 16px;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 14px;
+}
+
+.dealership-cancel-edit {
+  display: block;
+  max-width: 1100px;
+  margin: 0 auto 28px;
+  padding: 11px 18px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dealership-cancel-edit:hover {
+  background: #f3f4f6;
+}
+
+.dealership-list {
+  max-width: 1100px;
+  margin: 48px auto 0;
+}
+
+.dealership-list h2 {
+  margin: 0 0 24px;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.dealership-list-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.dealership-list-card {
+  overflow: hidden;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
+}
+
+.dealership-list-image {
+  display: block;
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  background: #f3f4f6;
+}
+
+.dealership-list-content {
+  padding: 20px;
+}
+
+.dealership-list-content h3 {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.dealership-list-content p {
+  margin: 8px 0;
+  color: #6b7280;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.dealership-list-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.dealership-list-actions button {
+  flex: 1;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #e5232b;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dealership-list-actions button:hover {
+  background: #c81d24;
+}
+
+.dealership-list-actions button:last-child {
+  background: #374151;
+}
+
+.dealership-list-actions button:last-child:hover {
+  background: #1f2937;
+}
+
+@media (max-width: 700px) {
+  .dealership-page {
+    padding: 24px 14px 40px;
+  }
+
+  .dealership-page-header h1 {
+    font-size: 26px;
+  }
+
+  .dealership-list-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dealership-list h2 {
+    font-size: 22px;
+  }
+}

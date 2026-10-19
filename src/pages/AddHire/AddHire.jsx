@@ -1,7 +1,12 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "../../api/axios";
 import HireHero from "../../components/AddHire/HireHero";
+import CommercialFields from "../../components/AddHire/CommercialFields";
+import Description from "../../components/AddHire/Description";
+import PostCard from "../../components/AddSale/PostCard";
+import SearchableSelect from "../../components/AddSale/SearchableSelect";
+import ImageUpload from "../../components/AddSale/ImageUpload";
 import {
   CarFront,
   Bike,
@@ -9,10 +14,13 @@ import {
   Cog,
   Sprout,
   ClipboardList,
-  MapPin,
+  Factory,
+  BadgeCheck,
   CalendarDays,
-  ImagePlus,
-  X,
+  MapPin,
+  Building2,
+  ClipboardCheck,
+  
   FileText,
   CreditCard,
 } from "lucide-react";
@@ -27,7 +35,7 @@ const categories = [
 ];
 
 const initialFormData = {
-  vehicle_type: "car",
+  vehicle_type: "",
   type: "",
   subtype: "",
   condition: "",
@@ -60,92 +68,166 @@ const initialFormData = {
   description: "",
 };
 
-const fieldsByCategory = {
-  car: [
-    ["type", "Vehicle Type", "e.g. Sedan"],
-    ["subtype", "Subtype", "e.g. Compact Sedan"],
-    ["make", "Make", "Enter make"],
-    ["model", "Model", "Enter model"],
-    ["version", "Version", "Enter version"],
-    ["year", "Year", "e.g. 2024", "number"],
-    ["condition", "Condition", "select"],
-    ["mileage", "Mileage (km)", "Enter mileage", "number"],
-    ["registration_city", "Registration City", "Enter city"],
-    ["location", "Current Location", "Enter location"],
-    ["body_type", "Body Type", "e.g. SUV"],
-    ["color", "Color", "Enter color"],
-    ["transmission", "Transmission", "select-transmission"],
-    ["fuel_type", "Fuel Type", "select-fuel"],
-    ["engine_size", "Engine Size (cc)", "Enter engine size", "number"],
-    ["doors", "Doors", "e.g. 4", "number"],
-  ],
-  bike: [
-    ["type", "Bike Type", "e.g. Motorcycle"],
-    ["subtype", "Subtype", "e.g. Sports Bike"],
-    ["make", "Make", "Enter make"],
-    ["model", "Model", "Enter model"],
-    ["version", "Version", "Enter version"],
-    ["year", "Year", "e.g. 2024", "number"],
-    ["condition", "Condition", "select"],
-    ["mileage", "Mileage (km)", "Enter mileage", "number"],
-    ["registration_city", "Registration City", "Enter city"],
-    ["location", "Current Location", "Enter location"],
-    ["engine_size", "Engine Size (cc)", "Enter engine size", "number"],
-    ["engine_type", "Engine Type", "e.g. 4-stroke"],
-  ],
-  commercial: [
-    ["type", "Vehicle Type", "e.g. Truck, Bus"],
-    ["subtype", "Subtype", "Enter subtype"],
-    ["make", "Make", "Enter make"],
-    ["model", "Model", "Enter model"],
-    ["version", "Version", "Enter version"],
-    ["year", "Year", "e.g. 2024", "number"],
-    ["condition", "Condition", "select"],
-    ["mileage", "Mileage (km)", "Enter mileage", "number"],
-    ["registration_city", "Registration City", "Enter city"],
-    ["location", "Current Location", "Enter location"],
-    ["weight", "Weight", "Enter weight"],
-    ["fuel_type", "Fuel Type", "select-fuel"],
-    ["transmission", "Transmission", "select-transmission"],
-  ],
-  machinery: [
-    ["type", "Machinery Type", "e.g. Construction Machinery"],
-    ["subtype", "Subtype", "e.g. Excavator"],
-    ["make", "Make", "Enter make"],
-    ["model", "Model", "Enter model"],
-    ["version", "Version", "Enter version"],
-    ["year", "Year", "e.g. 2024", "number"],
-    ["condition", "Condition", "select"],
-    ["hours_used", "Hours Used", "Enter hours", "number"],
-    ["location", "Current Location", "Enter location"],
-    ["weight", "Weight", "Enter weight"],
-    ["serial_no", "Serial Number", "Enter serial number"],
-    ["dimensions", "Dimensions", "Enter dimensions"],
-  ],
-  plant: [
-    ["plant_name", "Plant Name", "Enter plant name"],
-    ["type", "Plant Type", "e.g. Power Plant"],
-    ["subtype", "Subtype", "Enter subtype"],
-    ["year", "Year", "e.g. 2024", "number"],
-    ["condition", "Condition", "select"],
-    ["hours_used", "Hours Used", "Enter hours", "number"],
-    ["location", "Current Location", "Enter location"],
-    ["parameter_type", "Parameter Type", "Enter parameter type"],
-    ["dimensions", "Dimensions", "Enter dimensions"],
-    ["serial_no", "Serial Number", "Enter serial number"],
-  ],
-};
-
-function formatLabel(value) {
-  return value
-    .replaceAll("_", " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
-}
-
-export default function AddHire() {
+function AddHire() {
   const [formData, setFormData] = useState(initialFormData);
   const [images, setImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [makes, setMakes] = useState([]);
+  const [models, setModels] = useState([]);
+  const [versions, setVersions] = useState([]);
+
+  const [loadingMakes, setLoadingMakes] = useState(false);
+  const [loadingModels, setLoadingModels] = useState(false);
+  const [loadingVersions, setLoadingVersions] = useState(false);
+
+  const [postingOption, setPostingOption] = useState("");
+  const [freeHireConfirmed, setFreeHireConfirmed] = useState(false);
+
+  // Load makes for the selected category.
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchMakes = async () => {
+      setMakes([]);
+      setModels([]);
+      setVersions([]);
+
+      if (!formData.vehicle_type) {
+        setLoadingMakes(false);
+        return;
+      }
+
+      try {
+        setLoadingMakes(true);
+
+        const response = await axios.get("/vehicle-makes", {
+          params: { vehicle_type: formData.vehicle_type },
+        });
+
+        if (!cancelled) {
+          const data = response.data?.data;
+          setMakes(Array.isArray(data) ? data : []);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error(
+            "Failed to fetch vehicle makes:",
+            error.response?.data || error.message
+          );
+          setMakes([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingMakes(false);
+        }
+      }
+    };
+
+    fetchMakes();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [formData.vehicle_type]);
+
+  // Load models after a make is selected.
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchModels = async () => {
+      setModels([]);
+      setVersions([]);
+
+      if (!formData.make) {
+        setLoadingModels(false);
+        return;
+      }
+
+      try {
+        setLoadingModels(true);
+
+        const response = await axios.get("/vehicle-models", {
+          params: { vehicle_make_id: formData.make },
+        });
+
+        if (cancelled) return;
+
+        const data = response.data?.data;
+        const list = Array.isArray(data) ? data : [];
+
+        setModels(
+          list.filter(
+            (item) =>
+              String(item.vehicle_make_id) === String(formData.make)
+          )
+        );
+      } catch (error) {
+        if (!cancelled) {
+          console.error(
+            "Failed to fetch vehicle models:",
+            error.response?.data || error.message
+          );
+          setModels([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingModels(false);
+        }
+      }
+    };
+
+    fetchModels();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [formData.make]);
+
+  // Load versions after a model is selected.
+  useEffect(() => {
+    let cancelled = false;
+
+    const fetchVersions = async () => {
+      setVersions([]);
+
+      if (!formData.model) {
+        setLoadingVersions(false);
+        return;
+      }
+
+      try {
+        setLoadingVersions(true);
+
+        const response = await axios.get(
+          `/version/model/${formData.model}`
+        );
+
+        if (!cancelled) {
+          const data = response.data?.data;
+          setVersions(Array.isArray(data) ? data : []);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error(
+            "Failed to fetch vehicle versions:",
+            error.response?.data || error.message
+          );
+          setVersions([]);
+        }
+      } finally {
+        if (!cancelled) {
+          setLoadingVersions(false);
+        }
+      }
+    };
+
+    fetchVersions();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [formData.model]);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -157,25 +239,53 @@ export default function AddHire() {
   };
 
   const handleCategoryChange = (category) => {
-    setFormData((previous) => ({
+    setFormData({
       ...initialFormData,
       vehicle_type: category,
-      country: previous.country || "Pakistan",
+    });
+
+    setMakes([]);
+    setModels([]);
+    setVersions([]);
+  };
+
+  const handleMakeChange = (makeId) => {
+    setFormData((previous) => ({
+      ...previous,
+      make: String(makeId),
+      model: "",
+      version: "",
     }));
+
+    setModels([]);
+    setVersions([]);
+  };
+
+  const handleModelChange = (modelId) => {
+    setFormData((previous) => ({
+      ...previous,
+      model: String(modelId),
+      version: "",
+    }));
+
+    setVersions([]);
   };
 
   const handleImageChange = (event) => {
     const selectedFiles = Array.from(event.target.files || []);
-    const remainingSlots = 30 - images.length;
+    const remainingSlots = Math.max(0, 30 - images.length);
 
-    if (selectedFiles.length > remainingSlots) {
-      alert(`You can upload up to 30 images. ${remainingSlots} slot(s) remaining.`);
-    }
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ];
 
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
     const validFiles = selectedFiles.filter((file) => {
       if (!allowedTypes.includes(file.type)) {
-        alert(`${file.name} is not supported. Use JPG, PNG, or WebP.`);
+        alert(
+          `${file.name} is not supported. Use JPG, PNG, or WebP.`
+        );
         return false;
       }
 
@@ -187,12 +297,17 @@ export default function AddHire() {
       return true;
     });
 
+    if (validFiles.length > remainingSlots) {
+      alert(
+        `You can upload up to 30 images. ${remainingSlots} slot(s) remaining.`
+      );
+    }
+
     setImages((previous) => [
       ...previous,
-      ...validFiles.slice(0, Math.max(0, remainingSlots)),
+      ...validFiles.slice(0, remainingSlots),
     ]);
 
-    // Allow selecting the same file again after removing it.
     event.target.value = "";
   };
 
@@ -202,76 +317,378 @@ export default function AddHire() {
     );
   };
 
-  const renderField = ([name, label, placeholder, type = "text"]) => {
-    const id = `hire-${name}`;
+  const renderInput = (
+    name,
+    label,
+    placeholder,
+    type = "text",
+    Icon = null
+  ) => (
+    <div className="form-group" key={name}>
+      <label
+        htmlFor={`hire-${name}`}
+        className="add-sale-field-label"
+      >
+        {Icon ? <Icon size={16} aria-hidden="true" /> : null}
+        <span>{label}</span>
+      </label>
 
-    return (
-      <div className="form-group" key={name}>
-        <label className="add-sale-field-label" htmlFor={id}>
-          {name === "location" ? (
-            <MapPin size={16} aria-hidden="true" />
-          ) : name === "year" ? (
-            <CalendarDays size={16} aria-hidden="true" />
-          ) : null}
-          <span>{label}</span>
-        </label>
+      <input
+        id={`hire-${name}`}
+        name={name}
+        type={type}
+        min={type === "number" ? "0" : undefined}
+        value={formData[name]}
+        onChange={handleChange}
+        placeholder={placeholder}
+      />
+    </div>
+  );
 
-        {placeholder === "select" ? (
-          <select
-            id={id}
-            name={name}
-            value={formData[name]}
-            onChange={handleChange}
-          >
-            <option value="">Select condition</option>
-            <option value="new">New</option>
-            <option value="used">Used</option>
-            {formData.vehicle_type === "bike" && (
-              <option value="re-conditioned">Re-Conditioned</option>
-            )}
-          </select>
-        ) : placeholder === "select-transmission" ? (
-          <select
-            id={id}
-            name={name}
-            value={formData[name]}
-            onChange={handleChange}
-          >
-            <option value="">Select transmission</option>
-            <option value="automatic">Automatic</option>
-            <option value="manual">Manual</option>
-          </select>
-        ) : placeholder === "select-fuel" ? (
-          <select
-            id={id}
-            name={name}
-            value={formData[name]}
-            onChange={handleChange}
-          >
-            <option value="">Select fuel type</option>
-            <option value="petrol">Petrol</option>
-            <option value="diesel">Diesel</option>
-            <option value="hybrid">Hybrid</option>
-            <option value="electric">Electric</option>
-            <option value="cng">CNG</option>
-          </select>
-        ) : (
-          <input
-            id={id}
-            name={name}
-            type={type}
-            min={type === "number" ? "0" : undefined}
-            value={formData[name]}
-            onChange={handleChange}
-            placeholder={placeholder}
-          />
+  const renderSelect = (name, label, options, Icon = null) => (
+    <div className="form-group" key={name}>
+      <label
+        htmlFor={`hire-${name}`}
+        className="add-sale-field-label"
+      >
+        {Icon ? <Icon size={16} aria-hidden="true" /> : null}
+        <span>{label}</span>
+      </label>
+
+      <select
+        id={`hire-${name}`}
+        name={name}
+        value={formData[name]}
+        onChange={handleChange}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value}>
+            {option.label}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+
+  const renderCommonFields = () => (
+    <>
+      <SearchableSelect
+        id="hire-make"
+        label="Make"
+        icon={Factory}
+        value={formData.make}
+        options={makes}
+        getOptionValue={(item) => item.vehicle_make_id}
+        getOptionLabel={(item) => item.make_name}
+        onChange={handleMakeChange}
+        placeholder={
+          loadingMakes ? "Loading makes..." : "Search or select make"
+        }
+        disabled={!formData.vehicle_type || loadingMakes}
+      />
+
+      <SearchableSelect
+        id="hire-model"
+        label="Model"
+        icon={CarFront}
+        value={formData.model}
+        options={models}
+        getOptionValue={(item) => item.vehicle_model_id}
+        getOptionLabel={(item) => item.model_name}
+        onChange={handleModelChange}
+        placeholder={
+          !formData.make
+            ? "Select make first"
+            : loadingModels
+              ? "Loading models..."
+              : "Search or select model"
+        }
+        disabled={!formData.make || loadingModels}
+      />
+
+      <SearchableSelect
+        id="hire-version"
+        label="Version"
+        icon={BadgeCheck}
+        value={formData.version}
+        options={versions}
+        getOptionValue={(item) => item.version_name}
+        getOptionLabel={(item) => item.version_name}
+        onChange={(value) =>
+          setFormData((previous) => ({
+            ...previous,
+            version: value,
+          }))
+        }
+        placeholder={
+          !formData.model
+            ? "Select model first"
+            : loadingVersions
+              ? "Loading versions..."
+              : versions.length
+                ? "Search or select version"
+                : "No versions available"
+        }
+        disabled={!formData.model || loadingVersions}
+      />
+
+      {renderInput("year", "Year", "e.g. 2024", "number", CalendarDays)}
+
+      {renderSelect(
+        "condition",
+        "Condition",
+        [
+          { value: "", label: "Select condition" },
+          { value: "new", label: "New" },
+          { value: "used", label: "Used" },
+          ...(formData.vehicle_type === "bike"
+            ? [
+                {
+                  value: "re-conditioned",
+                  label: "Re-Conditioned",
+                },
+              ]
+            : []),
+        ],
+        ClipboardCheck
+      )}
+
+      {renderInput(
+        "location",
+        "City / Location",
+        "Enter current location",
+        "text",
+        MapPin
+      )}
+
+      {!["machinery", "plant"].includes(formData.vehicle_type) &&
+        renderInput(
+          "registration_city",
+          "Registration City",
+          "Enter registration city",
+          "text",
+          Building2
         )}
-      </div>
-    );
+    </>
+  );
+
+  const renderCategoryDetails = () => {
+    switch (formData.vehicle_type) {
+      case "car":
+        return (
+          <section className="add-sale-section">
+            <h2 className="add-sale-section-heading">
+              <CarFront size={22} aria-hidden="true" />
+              <span>Car Details</span>
+            </h2>
+
+            <div className="add-sale-fields-grid">
+              {renderInput("type", "Vehicle Type", "e.g. Sedan")}
+              {renderInput("subtype", "Subtype", "e.g. Compact Sedan")}
+              {renderInput("body_type", "Body Type", "e.g. SUV")}
+              {renderInput("color", "Color", "Enter color")}
+
+              {renderSelect("transmission", "Transmission", [
+                { value: "", label: "Select transmission" },
+                { value: "automatic", label: "Automatic" },
+                { value: "manual", label: "Manual" },
+              ])}
+
+              {renderSelect("fuel_type", "Fuel Type", [
+                { value: "", label: "Select fuel type" },
+                { value: "petrol", label: "Petrol" },
+                { value: "diesel", label: "Diesel" },
+                { value: "hybrid", label: "Hybrid" },
+                { value: "electric", label: "Electric" },
+                { value: "cng", label: "CNG" },
+              ])}
+
+              {renderInput(
+                "mileage",
+                "Mileage (km)",
+                "Enter mileage",
+                "number"
+              )}
+
+              {renderInput(
+                "engine_size",
+                "Engine Size (cc)",
+                "Enter engine size",
+                "number"
+              )}
+
+              {renderInput("doors", "Doors", "e.g. 4", "number")}
+            </div>
+          </section>
+        );
+
+      case "bike":
+        return (
+          <section className="add-sale-section">
+            <h2 className="add-sale-section-heading">
+              <Bike size={22} aria-hidden="true" />
+              <span>Bike Details</span>
+            </h2>
+
+            <div className="add-sale-fields-grid">
+              {renderInput("type", "Bike Type", "e.g. Motorcycle")}
+              {renderInput("subtype", "Subtype", "e.g. Sports Bike")}
+
+              {renderInput(
+                "mileage",
+                "Mileage (km)",
+                "Enter mileage",
+                "number"
+              )}
+
+              {renderInput(
+                "engine_size",
+                "Engine Size (cc)",
+                "Enter engine size",
+                "number"
+              )}
+
+              {renderInput(
+                "engine_type",
+                "Engine Type",
+                "e.g. 4-stroke"
+              )}
+            </div>
+          </section>
+        );
+
+      case "commercial":
+        return (
+          <>
+            <CommercialFields
+              formData={formData}
+              handleChange={handleChange}
+            />
+
+            <section className="add-sale-section">
+              <h2 className="add-sale-section-heading">
+                <Truck size={22} aria-hidden="true" />
+                <span>Additional Commercial Details</span>
+              </h2>
+
+              <div className="add-sale-fields-grid">
+                {renderInput("type", "Vehicle Type", "e.g. Truck, Bus")}
+                {renderInput("subtype", "Subtype", "Enter subtype")}
+
+                {renderInput(
+                  "mileage",
+                  "Mileage (km)",
+                  "Enter mileage",
+                  "number"
+                )}
+
+                {renderInput("weight", "Weight", "Enter weight")}
+
+                {renderSelect("transmission", "Transmission", [
+                  { value: "", label: "Select transmission" },
+                  { value: "automatic", label: "Automatic" },
+                  { value: "manual", label: "Manual" },
+                ])}
+              </div>
+            </section>
+          </>
+        );
+
+      case "machinery":
+        return (
+          <section className="add-sale-section">
+            <h2 className="add-sale-section-heading">
+              <Cog size={22} aria-hidden="true" />
+              <span>Machinery Details</span>
+            </h2>
+
+            <div className="add-sale-fields-grid">
+              {renderInput(
+                "type",
+                "Machinery Type",
+                "e.g. Construction Machinery"
+              )}
+
+              {renderInput("subtype", "Subtype", "e.g. Excavator")}
+
+              {renderInput(
+                "hours_used",
+                "Hours Used",
+                "Enter hours used",
+                "number"
+              )}
+
+              {renderInput("weight", "Weight", "Enter weight")}
+              {renderInput("serial_no", "Serial Number", "Enter serial number")}
+              {renderInput("dimensions", "Dimensions", "Enter dimensions")}
+            </div>
+          </section>
+        );
+
+      case "plant":
+        return (
+          <section className="add-sale-section">
+            <h2 className="add-sale-section-heading">
+              <Sprout size={22} aria-hidden="true" />
+              <span>Plant Details</span>
+            </h2>
+
+            <div className="add-sale-fields-grid">
+              {renderInput("plant_name", "Plant Name", "Enter plant name")}
+              {renderInput("type", "Plant Type", "e.g. Power Plant")}
+              {renderInput("subtype", "Subtype", "Enter subtype")}
+
+              {renderInput(
+                "hours_used",
+                "Hours Used",
+                "Enter hours used",
+                "number"
+              )}
+
+              {renderInput(
+                "parameter_type",
+                "Parameter Type",
+                "Enter parameter type"
+              )}
+
+              {renderInput("dimensions", "Dimensions", "Enter dimensions")}
+              {renderInput("serial_no", "Serial Number", "Enter serial number")}
+            </div>
+          </section>
+        );
+
+      default:
+        return null;
+    }
+  };
+
+  const handlePostCardPayment = ({
+    packageName,
+    paymentType,
+    provider,
+    amount,
+  }) => {
+    // Payment processing must be verified by the backend.
+    console.log("Hire ad payment selection:", {
+      packageName,
+      paymentType,
+      provider,
+      amount,
+    });
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (postingOption !== "free") {
+      alert("Please select Add Free to submit a free hire advertisement.");
+      return;
+    }
+
+    if (!freeHireConfirmed) {
+      alert("Please confirm that you want to post this hire advertisement for free.");
+      return;
+    }
 
     if (!formData.vehicle_type) {
       alert("Please select a vehicle category.");
@@ -340,6 +757,7 @@ export default function AddHire() {
         </div>
 
         <form onSubmit={handleSubmit}>
+          {/* Vehicle category */}
           <section className="sale-form-section add-sale-section">
             <h2 className="add-sale-section-heading">
               <CarFront size={22} aria-hidden="true" />
@@ -364,22 +782,32 @@ export default function AddHire() {
             </div>
           </section>
 
-          <section className="add-sale-section">
-            <h2 className="add-sale-section-heading">
-              <ClipboardList size={22} aria-hidden="true" />
-              <span>
-                {categories.find(
-                  (category) => category.value === formData.vehicle_type
-                )?.label || "Vehicle"}{" "}
-                Basic Information
-              </span>
-            </h2>
+          {/* Basic and category-specific information */}
+          {formData.vehicle_type && (
+            <>
+              <section className="add-sale-section">
+                <h2 className="add-sale-section-heading">
+                  <ClipboardList size={22} aria-hidden="true" />
+                  <span>
+                    {
+                      categories.find(
+                        (item) => item.value === formData.vehicle_type
+                      )?.label
+                    }{" "}
+                    Basic Information
+                  </span>
+                </h2>
 
-            <div className="add-sale-fields-grid">
-              {fieldsByCategory[formData.vehicle_type].map(renderField)}
-            </div>
-          </section>
+                <div className="add-sale-fields-grid">
+                  {renderCommonFields()}
+                </div>
+              </section>
 
+              {renderCategoryDetails()}
+            </>
+          )}
+
+          {/* Rental information */}
           <section className="add-sale-section">
             <h2 className="add-sale-section-heading">
               <CreditCard size={22} aria-hidden="true" />
@@ -388,9 +816,13 @@ export default function AddHire() {
 
             <div className="add-sale-fields-grid">
               <div className="form-group">
-                <label className="add-sale-field-label" htmlFor="hire-charges">
+                <label
+                  className="add-sale-field-label"
+                  htmlFor="hire-charges"
+                >
                   Rental Charges (PKR)
                 </label>
+
                 <input
                   id="hire-charges"
                   name="charges"
@@ -410,6 +842,7 @@ export default function AddHire() {
                 >
                   Charging Period
                 </label>
+
                 <select
                   id="hire-charges-type"
                   name="charges_type"
@@ -426,10 +859,11 @@ export default function AddHire() {
             </div>
           </section>
 
+          {/* Features */}
           <section className="add-sale-section">
             <h2 className="add-sale-section-heading">
               <FileText size={22} aria-hidden="true" />
-              <span>Description and Features</span>
+              <span>Features</span>
             </h2>
 
             <div className="form-group">
@@ -439,6 +873,7 @@ export default function AddHire() {
               >
                 Features
               </label>
+
               <input
                 id="hire-features"
                 name="features"
@@ -447,81 +882,104 @@ export default function AddHire() {
                 placeholder="e.g. Air conditioning, GPS, driver available"
               />
             </div>
-
-            <div className="form-group">
-              <label
-                className="add-sale-field-label"
-                htmlFor="hire-description"
-              >
-                Description
-              </label>
-              <textarea
-                id="hire-description"
-                name="description"
-                rows={5}
-                value={formData.description}
-                onChange={handleChange}
-                placeholder="Describe the vehicle, rental conditions, and availability..."
-              />
-            </div>
           </section>
 
+          <Description
+            formData={formData}
+            handleChange={handleChange}
+          />
+            {/* Images */}
+            <ImageUpload images={images} setImages={setImages} />
+
+          {/* Posting options at the end of the form */}
           <section className="add-sale-section">
             <h2 className="add-sale-section-heading">
-              <ImagePlus size={22} aria-hidden="true" />
-              <span>Vehicle Images</span>
+              <CreditCard size={22} aria-hidden="true" />
+              <span>Choose Posting Option</span>
             </h2>
 
-            <div className="hire-image-upload">
-              <label htmlFor="hire-images" className="hire-image-picker">
-                <ImagePlus size={30} aria-hidden="true" />
-                <strong>Upload vehicle images</strong>
-                <span>JPG, PNG, or WebP · Maximum 5 MB per image</span>
-                <span>{images.length} of 30 images selected</span>
-              </label>
+            <div className="hire-posting-options-grid">
+              <button
+                type="button"
+                className={`hire-posting-option ${
+                  postingOption === "free" ? "active" : ""
+                }`}
+                aria-pressed={postingOption === "free"}
+                onClick={() => {
+                  setPostingOption("free");
+                  setFreeHireConfirmed(false);
+                }}
+              >
+                <BadgeCheck size={26} aria-hidden="true" />
+                <strong>Add Free</strong>
+                <span>Post your hire advertisement for free.</span>
+              </button>
 
-              <input
-                id="hire-images"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                multiple
-                onChange={handleImageChange}
-                disabled={images.length >= 30}
-              />
+              <button
+                type="button"
+                className={`hire-posting-option ${
+                  postingOption === "paid" ? "active" : ""
+                }`}
+                aria-pressed={postingOption === "paid"}
+                onClick={() => setPostingOption("paid")}
+              >
+                <CreditCard size={26} aria-hidden="true" />
+                <strong>Post Ad</strong>
+                <span>Choose a promotion package and payment option.</span>
+              </button>
             </div>
-
-            {images.length > 0 && (
-              <div className="hire-image-grid">
-                {images.map((image, index) => (
-                  <div className="hire-image-preview" key={`${image.name}-${index}`}>
-                    <img
-                      src={URL.createObjectURL(image)}
-                      alt={`Vehicle preview ${index + 1}`}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      aria-label={`Remove image ${index + 1}`}
-                    >
-                      <X size={16} aria-hidden="true" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
           </section>
 
-          <div className="hire-submit-actions">
-            <button
-              type="submit"
-              className="free-ad-submit-btn"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Submitting Hire Ad..." : "Submit Hire Ad"}
-            </button>
-          </div>
+          {/* Free posting confirmation and submission */}
+          {postingOption === "free" && (
+            <section className="add-sale-section free-hire-confirmation">
+              <label className="free-ad-checkbox">
+                <input
+                  type="checkbox"
+                  checked={freeHireConfirmed}
+                  onChange={(event) =>
+                    setFreeHireConfirmed(event.target.checked)
+                  }
+                />
+
+                <span>
+                  I confirm that I want to post this hire advertisement
+                  for free.
+                </span>
+              </label>
+
+              <div className="hire-submit-actions">
+                <button
+                  type="submit"
+                  className="free-ad-submit-btn"
+                  disabled={
+                    isSubmitting ||
+                    !formData.vehicle_type ||
+                    !formData.charges ||
+                    Number(formData.charges) <= 0 ||
+                    !freeHireConfirmed
+                  }
+                >
+                  {isSubmitting
+                    ? "Submitting Hire Ad..."
+                    : "Post Hire Ad Free"}
+                </button>
+              </div>
+            </section>
+          )}
+
+          {/* Paid posting */}
+          {postingOption === "paid" && (
+            <PostCard
+              walletBalance={0}
+              isLoadingWallet={false}
+              onPayment={handlePostCardPayment}
+            />
+          )}
         </form>
       </main>
     </>
   );
 }
+
+export default AddHire;

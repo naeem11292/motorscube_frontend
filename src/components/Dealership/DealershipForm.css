@@ -1,0 +1,164 @@
+.dealership-form {
+  width: 100%;
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 32px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  font-family: "Poppins", sans-serif;
+  color: #222222;
+}
+
+.dealership-form h2 {
+  margin: 0 0 24px;
+  font-size: 26px;
+  font-weight: 700;
+}
+
+.dealership-form h3 {
+  margin: 32px 0 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.dealership-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.dealership-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.dealership-form input,
+.dealership-form select,
+.dealership-form textarea {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 7px;
+  outline: none;
+  background: #ffffff;
+  color: #222222;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 400;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.dealership-form textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+.dealership-form input:focus,
+.dealership-form select:focus,
+.dealership-form textarea:focus {
+  border-color: #e5232b;
+  box-shadow: 0 0 0 3px rgba(229, 35, 43, 0.1);
+}
+
+.dealership-full-width {
+  grid-column: 1 / -1;
+}
+
+.dealership-form-error {
+  margin: 0 0 20px;
+  padding: 12px 14px;
+  border: 1px solid #fecaca;
+  border-radius: 7px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 14px;
+}
+
+.dealership-form button[type="submit"] {
+  display: block;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 30px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 7px;
+  background: #e5232b;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.dealership-form button[type="submit"]:hover {
+  background: #c81d24;
+}
+
+.dealership-form button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 700px) {
+  .dealership-form {
+    margin: 16px auto;
+    padding: 20px;
+  }
+
+  .dealership-form h2 {
+    font-size: 22px;
+  }
+
+  .dealership-form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .dealership-full-width {
+    grid-column: auto;
+  }
+}
+
+/* Dealership image upload previews */
+.dealership-image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 150px));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.dealership-image-grid img {
+  width: 100%;
+  height: 110px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.dealership-image-preview {
+  width: 150px;
+  height: 110px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.dealership-image-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 600px) {
+  .dealership-image-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}

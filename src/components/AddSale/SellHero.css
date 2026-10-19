@@ -1,15 +1,21 @@
 
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
 
-.sell-hero {
+/* ================================
+   Hire Hero Banner
+================================ */
+
+.hire-hero {
   position: relative;
   width: 1438px;
+  max-width: 100%;
   height: 400px;
   opacity: 1;
   margin: 0 auto 24px;
   overflow: hidden;
 }
-.sell-hero-banner {
+
+.hire-hero-banner {
   position: absolute;
   inset: 0;
   width: 100%;
@@ -18,7 +24,7 @@
   z-index: 0;
 }
 
-.sell-hero-content {
+.hire-hero-content {
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -32,7 +38,7 @@
   text-align: center;
 }
 
-.sell-hero-title {
+.hire-hero-title {
   width: 100%;
   margin: 0;
   color: #ffffff;
@@ -44,53 +50,34 @@
   text-align: center;
 }
 
-.sell-hero-description {
+.hire-hero-description {
   width: 100%;
   max-width: 909px;
   margin: 0;
   color: #cbcaca;
   font-family: "Poppins", sans-serif;
-  font-size: 27.01px;
+  font-size: 15.01px;
   font-weight: 400;
   line-height: 1.65;
   text-align: center;
 }
 
-@media (max-width: 768px) {
-  .sell-hero {
-    height: auto;
-    aspect-ratio: 909 / 350;
-  }
+/* Label and blue line */
 
-  .sell-hero-content {
-    gap: 10px;
-    padding: 12px;
-  }
-
-  .sell-hero-title {
-    font-size: clamp(28px, 7vw, 52px);
-    line-height: 1.15;
-  }
-
-  .sell-hero-description {
-    font-size: clamp(11px, 2.5vw, 16px);
-    line-height: 1.4;
-  }
-}
-.sell-hero-label-wrapper {
+.hire-hero-label-wrapper {
   display: flex;
   align-items: center;
   gap: 10px;
 }
 
-.sell-hero-line {
+.hire-hero-line {
   width: 41px;
   height: 0;
   border-top: 1px solid #0872fe;
-  background: #0872fe;
+  background: #f2f4f6;
 }
 
-.sell-hero-label {
+.hire-hero-label {
   margin: 0;
   color: #0872fe;
   font-family: "Poppins", sans-serif;
@@ -99,65 +86,49 @@
 }
 
 /* ================================
-   Add Sale - Responsive Layout
+   Laptop: up to 1440px
 ================================ */
 
-/* Laptop: 1024px–1440px */
 @media (max-width: 1440px) {
-  .add-sale-page {
-    width: 94%;
-    max-width: 1200px;
-    margin-left: auto;
-    margin-right: auto;
+  .hire-hero {
+    width: 100%;
   }
 }
 
-/* Tablet: 768px–1023px */
-@media (max-width: 1023px) {
-  .add-sale-page {
-    width: 92%;
-    padding: 20px 0;
-  }
+/* ================================
+   Tablet: 768px–1023px
+================================ */
 
-  .sell-hero {
+@media (max-width: 1023px) {
+  .hire-hero {
     width: 100%;
     height: auto;
     min-height: 280px;
     aspect-ratio: 909 / 350;
   }
 
-  .sell-hero-title {
+  .hire-hero-content {
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .hire-hero-title {
     font-size: clamp(36px, 6vw, 60px);
     line-height: 1.15;
   }
 
-  .sell-hero-description {
+  .hire-hero-description {
     font-size: clamp(14px, 2vw, 20px);
     line-height: 1.5;
   }
-
-  .add-sale-page .form-row,
-  .add-sale-page .fields-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .add-sale-page input,
-  .add-sale-page select,
-  .add-sale-page textarea {
-    max-width: 100%;
-    box-sizing: border-box;
-  }
 }
 
-/* Mobile: up to 767px */
-@media (max-width: 767px) {
-  .add-sale-page {
-    width: 100%;
-    padding: 16px;
-    box-sizing: border-box;
-  }
+/* ================================
+   Mobile: up to 767px
+================================ */
 
-  .sell-hero {
+@media (max-width: 767px) {
+  .hire-hero {
     width: 100%;
     height: auto;
     min-height: 220px;
@@ -165,59 +136,50 @@
     margin-bottom: 20px;
   }
 
-  .sell-hero-content {
+  .hire-hero-content {
     gap: 8px;
     padding: 12px;
   }
 
-  .sell-hero-label {
+  .hire-hero-label {
     font-size: 14px;
   }
 
-  .sell-hero-line {
+  .hire-hero-line {
     width: 24px;
   }
 
-  .sell-hero-title {
+  .hire-hero-title {
     font-size: clamp(25px, 7vw, 38px);
     line-height: 1.15;
   }
 
-  .sell-hero-description {
+  .hire-hero-description {
     font-size: clamp(11px, 3vw, 14px);
     line-height: 1.4;
   }
-
-  .add-sale-page .form-row,
-  .add-sale-page .fields-row {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .add-sale-page input,
-  .add-sale-page select,
-  .add-sale-page textarea,
-  .add-sale-page button {
-    max-width: 100%;
-    box-sizing: border-box;
-  }
-
-  .add-sale-page img {
-    max-width: 100%;
-    height: auto;
-  }
 }
 
-/* Very small mobile screens */
+/* ================================
+   Very small mobile: up to 380px
+================================ */
+
 @media (max-width: 380px) {
-  .add-sale-page {
-    padding: 12px;
+  .hire-hero-content {
+    gap: 6px;
+    padding: 10px;
   }
 
-  .sell-hero-title {
+  .hire-hero-label {
+    font-size: 12px;
+  }
+
+  .hire-hero-title {
     font-size: 25px;
   }
 
-  .sell-hero-description {
+  .hire-hero-description {
     font-size: 11px;
+    line-height: 1.3;
   }
 }
