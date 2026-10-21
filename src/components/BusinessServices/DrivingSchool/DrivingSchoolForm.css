@@ -1,0 +1,169 @@
+.driving-school-form {
+  width: 100%;
+  max-width: 1000px;
+  margin: 24px auto;
+  padding: 30px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
+}
+
+.driving-school-form h2 {
+  margin: 0 0 24px;
+  color: #222;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.driving-school-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.driving-school-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.driving-school-grid input,
+.driving-school-grid select,
+.driving-school-grid textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 11px 12px;
+  border: 1px solid #d5d9df;
+  border-radius: 7px;
+  background: #fff;
+  color: #222;
+  font: inherit;
+  font-weight: 400;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.driving-school-grid textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+.driving-school-grid input:focus,
+.driving-school-grid select:focus,
+.driving-school-grid textarea:focus {
+  border-color: #e5232b;
+  box-shadow: 0 0 0 3px rgba(229, 35, 43, 0.1);
+}
+
+.driving-school-grid input[type="file"] {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.driving-school-grid small {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.driving-school-grid .full-width {
+  grid-column: 1 / -1;
+}
+
+.driving-school-image-list {
+  display: grid;
+  gap: 10px;
+}
+
+.driving-school-image-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 7px;
+  color: #444;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.driving-school-image-item button {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  background: #fff0f0;
+  color: #d51f28;
+  cursor: pointer;
+}
+
+.driving-school-image-item button:hover {
+  background: #ffe0e0;
+}
+
+.driving-school-submit {
+  margin-top: 24px;
+  padding: 13px 24px;
+  border: none;
+  border-radius: 7px;
+  background: #e5232b;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.driving-school-submit:hover:not(:disabled) {
+  background: #bd1820;
+}
+
+.driving-school-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.driving-school-message {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+.driving-school-message.success {
+  background: #ecfdf3;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.driving-school-message.error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+@media (max-width: 650px) {
+  .driving-school-form {
+    padding: 20px 16px;
+  }
+
+  .driving-school-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .driving-school-grid .full-width {
+    grid-column: auto;
+  }
+
+  .driving-school-submit {
+    width: 100%;
+  }
+}

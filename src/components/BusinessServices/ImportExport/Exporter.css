@@ -1,0 +1,169 @@
+.exporter-form {
+  width: 100%;
+  max-width: 1000px;
+  margin: 24px auto;
+  padding: 30px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
+}
+
+.exporter-form h2 {
+  margin: 0 0 24px;
+  color: #222;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.exporter-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.exporter-form-grid label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #333;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.exporter-form-grid input,
+.exporter-form-grid select,
+.exporter-form-grid textarea {
+  width: 100%;
+  min-height: 44px;
+  padding: 11px 12px;
+  border: 1px solid #d5d9df;
+  border-radius: 7px;
+  background: #fff;
+  color: #222;
+  font: inherit;
+  font-weight: 400;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.exporter-form-grid textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+.exporter-form-grid input:focus,
+.exporter-form-grid select:focus,
+.exporter-form-grid textarea:focus {
+  border-color: #e5232b;
+  box-shadow: 0 0 0 3px rgba(229, 35, 43, 0.1);
+}
+
+.exporter-form-grid input[type="file"] {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.exporter-form-grid small {
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.exporter-form .full-width {
+  grid-column: 1 / -1;
+}
+
+.exporter-image-list {
+  display: grid;
+  gap: 10px;
+}
+
+.exporter-image-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 7px;
+  color: #444;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.exporter-image-item button {
+  flex-shrink: 0;
+  padding: 6px 10px;
+  border: none;
+  border-radius: 5px;
+  background: #fff0f0;
+  color: #d51f28;
+  cursor: pointer;
+}
+
+.exporter-image-item button:hover {
+  background: #ffe0e0;
+}
+
+.exporter-submit-button {
+  margin-top: 24px;
+  padding: 13px 24px;
+  border: none;
+  border-radius: 7px;
+  background: #e5232b;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.exporter-submit-button:hover:not(:disabled) {
+  background: #bd1820;
+}
+
+.exporter-submit-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.exporter-message {
+  margin-bottom: 20px;
+  padding: 12px 14px;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+.exporter-message.success {
+  background: #ecfdf3;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.exporter-message.error {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+@media (max-width: 650px) {
+  .exporter-form {
+    padding: 20px 16px;
+  }
+
+  .exporter-form-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .exporter-form .full-width {
+    grid-column: auto;
+  }
+
+  .exporter-submit-button {
+    width: 100%;
+  }
+}

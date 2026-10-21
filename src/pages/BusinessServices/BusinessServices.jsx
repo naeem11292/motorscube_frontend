@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import BusinessCategorySelector from "../../components/BusinessServices/BusinessCategorySelector";
 import DealershipForm from "../../components/Dealership/DealershipForm";
@@ -5,6 +6,8 @@ import InsuranceForm from "../../components/BusinessServices/Insurance/Insurance
 import LeasingForm from "../../components/BusinessServices/Leasing/LeasingForm";
 import WorkshopForm from "../../components/BusinessServices/Workshop/WorkshopForm";
 import ImporterForm from "../../components/BusinessServices/ImportExport/ImporterForm";
+import ExporterForm from "../../components/BusinessServices/ImportExport/Exporter";
+import DrivingSchoolForm from "../../components/BusinessServices/DrivingSchool/DrivingSchoolForm";
 import "./BusinessServices.css";
 
 function BusinessServices() {
@@ -61,7 +64,13 @@ function BusinessServices() {
         </section>
       )}
 
-      {/* Importer / Exporter choices */}
+      {selectedCategory === "drivingSchool" && (
+        <section className="business-service-form-section">
+          <h2>Driving School Form</h2>
+          <DrivingSchoolForm />
+        </section>
+      )}
+
       {selectedCategory === "importExport" && !importExportType && (
         <section className="business-service-form-section">
           <h2>Importer / Exporter</h2>
@@ -89,7 +98,6 @@ function BusinessServices() {
         </section>
       )}
 
-      {/* Selected Importer or Exporter */}
       {selectedCategory === "importExport" && importExportType && (
         <section className="business-service-form-section">
           <button
@@ -108,13 +116,12 @@ function BusinessServices() {
           ) : (
             <>
               <h2>Exporter Form</h2>
-              <p>The Exporter form will be created next.</p>
+              <ExporterForm />
             </>
           )}
         </section>
       )}
 
-      {/* Other business categories */}
       {selectedCategory &&
         ![
           "dealership",
@@ -122,6 +129,7 @@ function BusinessServices() {
           "leasing",
           "workshop",
           "importExport",
+          "drivingSchool",
         ].includes(selectedCategory) && (
           <section className="business-service-form-section">
             <h2>{categoryNames[selectedCategory]} Form</h2>
