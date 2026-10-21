@@ -1,0 +1,64 @@
+
+.business-services-page {
+  width: min(1200px, 94%);
+  margin: 0 auto;
+  padding: 24px 0 40px;
+}
+
+.business-service-form-section {
+  margin-top: 28px;
+  padding: 24px;
+  background: #fff;
+  border: 1px solid #e1e4e8;
+  border-radius: 12px;
+}
+
+.business-service-form-section h2 {
+  margin: 0 0 12px;
+  color: #222;
+}
+
+.business-service-form-section p {
+  margin: 0;
+  color: #666;
+}
+
+.import-export-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.import-export-choice-card {
+  padding: 28px 24px;
+  text-align: left;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+}
+
+.import-export-choice-card:hover {
+  border-color: #e5232b;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.import-export-choice-card h3 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+.import-export-choice-card p {
+  margin: 0;
+  color: #666;
+  line-height: 1.6;
+}
+
+@media (max-width: 600px) {
+  .import-export-choice-grid {
+    grid-template-columns: 1fr;
+  }
+}

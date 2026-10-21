@@ -1,3 +1,4 @@
+
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
@@ -53,6 +54,7 @@ function Navbar() {
         type="button"
         className="navbar-burger"
         aria-label="Menu"
+        aria-expanded={menuOpen}
         onClick={() => setMenuOpen((previous) => !previous)}
       >
         <svg viewBox="0 0 24 24">
@@ -118,7 +120,10 @@ function Navbar() {
           Selling
         </Link>
 
-        <Link to="#" onClick={closeMenu}>
+        <Link
+          to="/dashboard/add-hire"
+          onClick={closeMenu}
+        >
           Hire
         </Link>
 

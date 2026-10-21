@@ -13,6 +13,7 @@ import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import AddSale from "./pages/AddSale/AddSale";
 import AddHire from "./pages/AddHire/AddHire";
 import Dealership from "./pages/Dealership/Dealership";
+import BusinessServices from "./pages/BusinessServices/BusinessServices";
 import Navbar from "./components/Navbar/Navbar";
 
 function App() {
@@ -83,6 +84,15 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+         path="/dashboard/business-services"
+         element={
+         <ProtectedRoute>
+         <Navbar />
+         <BusinessServices />
+          </ProtectedRoute>
+         }
+       />
       </Routes>
     </BrowserRouter>
   );
