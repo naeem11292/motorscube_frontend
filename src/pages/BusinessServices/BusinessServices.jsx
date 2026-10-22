@@ -8,6 +8,7 @@ import WorkshopForm from "../../components/BusinessServices/Workshop/WorkshopFor
 import ImporterForm from "../../components/BusinessServices/ImportExport/ImporterForm";
 import ExporterForm from "../../components/BusinessServices/ImportExport/Exporter";
 import DrivingSchoolForm from "../../components/BusinessServices/DrivingSchool/DrivingSchoolForm";
+import ShowroomForm from "../../components/BusinessServices/Showroom/Showroom";
 import "./BusinessServices.css";
 
 function BusinessServices() {
@@ -71,6 +72,13 @@ function BusinessServices() {
         </section>
       )}
 
+      {selectedCategory === "showroom" && (
+        <section className="business-service-form-section">
+          <h2>Showroom Form</h2>
+          <ShowroomForm />
+        </section>
+      )}
+
       {selectedCategory === "importExport" && !importExportType && (
         <section className="business-service-form-section">
           <h2>Importer / Exporter</h2>
@@ -121,21 +129,6 @@ function BusinessServices() {
           )}
         </section>
       )}
-
-      {selectedCategory &&
-        ![
-          "dealership",
-          "insurance",
-          "leasing",
-          "workshop",
-          "importExport",
-          "drivingSchool",
-        ].includes(selectedCategory) && (
-          <section className="business-service-form-section">
-            <h2>{categoryNames[selectedCategory]} Form</h2>
-            <p>This form will be implemented next.</p>
-          </section>
-        )}
     </main>
   );
 }
