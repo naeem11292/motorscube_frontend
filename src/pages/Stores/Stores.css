@@ -1,0 +1,139 @@
+
+.stores-page {
+  min-height: 100vh;
+  padding: 32px 24px 48px;
+  box-sizing: border-box;
+  background: #f9fafb;
+}
+
+.stores-page-header {
+  max-width: 1000px;
+  margin: 0 auto 24px;
+}
+
+.stores-page-header h1 {
+  margin: 0 0 8px;
+  color: #111827;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.stores-page-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 16px;
+}
+
+@media (max-width: 650px) {
+  .stores-page {
+    padding: 20px 12px 32px;
+  }
+
+  .stores-page-header h1 {
+    font-size: 25px;
+  }
+}
+
+.stores-list-section {
+  max-width: 1000px;
+  margin: 40px auto 0;
+}
+
+.stores-list-section h2 {
+  margin: 0 0 20px;
+  color: #111827;
+  font-size: 24px;
+  font-weight: 700;
+}
+
+.stores-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.store-payment-card {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgb(0 0 0 / 5%);
+}
+
+.store-cover-image {
+  display: block;
+  width: 100%;
+  height: 170px;
+  object-fit: cover;
+  background: #f3f4f6;
+}
+
+.store-card-content {
+  padding: 20px;
+}
+
+.store-card-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.store-logo {
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+}
+
+.store-card-heading h3 {
+  margin: 0 0 6px;
+  color: #111827;
+  font-size: 20px;
+  overflow-wrap: anywhere;
+}
+
+.store-location,
+.store-description {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+.store-description {
+  margin-bottom: 20px;
+}
+
+.store-payment-details {
+  padding: 16px;
+  background: #f9fafb;
+  border-radius: 10px;
+}
+
+.store-payment-details h4 {
+  margin: 0 0 12px;
+  color: #111827;
+  font-size: 16px;
+}
+
+.store-payment-details p {
+  margin: 8px 0;
+  color: #4b5563;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 700px) {
+  .stores-cards-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .stores-list-section {
+    margin-top: 30px;
+  }
+}

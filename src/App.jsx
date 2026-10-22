@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import SignIn from "./pages/Auth/Login";
@@ -14,6 +15,7 @@ import AddSale from "./pages/AddSale/AddSale";
 import AddHire from "./pages/AddHire/AddHire";
 import Dealership from "./pages/Dealership/Dealership";
 import BusinessServices from "./pages/BusinessServices/BusinessServices";
+import Stores from "./pages/Stores/Stores";
 import Navbar from "./components/Navbar/Navbar";
 
 function App() {
@@ -67,14 +69,16 @@ function App() {
             </ProtectedRoute>
           }
         />
-         <Route
-         path="/dashboard/dealership"
-           element={
-          <ProtectedRoute>
-          <Dealership />
-         </ProtectedRoute>
-         }
-       />
+
+        <Route
+          path="/dashboard/dealership"
+          element={
+            <ProtectedRoute>
+              <Dealership />
+            </ProtectedRoute>
+          }
+        />
+
         <Route
           path="/dashboard/add-hire"
           element={
@@ -84,15 +88,26 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         <Route
-         path="/dashboard/business-services"
-         element={
-         <ProtectedRoute>
-         <Navbar />
-         <BusinessServices />
-          </ProtectedRoute>
-         }
-       />
+          path="/dashboard/business-services"
+          element={
+            <ProtectedRoute>
+              <Navbar />
+              <BusinessServices />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/stores"
+          element={
+            <ProtectedRoute>
+              <Navbar />
+              <Stores />
+            </ProtectedRoute>
+          }
+        />
       </Routes>
     </BrowserRouter>
   );
