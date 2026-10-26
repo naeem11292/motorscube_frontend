@@ -99,9 +99,11 @@ function StoresForm({ onStoreCreated }) {
   return (
     <form className="stores-form" onSubmit={handleSubmit}>
       <div className="stores-form-heading">
-        <h2>Create Your Store</h2>
-        <p>Enter your store information and payment details.</p>
-      </div>
+        <p>
+          Set up your shop to showcase your business and sell products
+        on MotorsCube.
+        </p>
+       </div>
 
       <div className="stores-form-grid">
         <label>

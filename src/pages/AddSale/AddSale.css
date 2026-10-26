@@ -1,5 +1,30 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+/* Full-width car hero banner */
+.sell-hero {
+  width: 100%;
+  max-width: none;
+  margin-left: 0;
+  margin-right: 0;
+  box-sizing: border-box;
 
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.sell-hero-content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
+/* Hero text */
+.sell-hero-content {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  box-sizing: border-box;
+}
 /* ---------- Page background ---------- */
 .add-sale-page {
   --red: #e5232b;

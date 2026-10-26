@@ -10,101 +10,124 @@ import PasswordResetSuccess from "./pages/Auth/PasswordResetSuccess";
 
 import Dashboard from "./pages/Dashboard/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
+import DashboardLayout from "./components/Layout/DashboardLayout";
 
 import AddSale from "./pages/AddSale/AddSale";
 import AddHire from "./pages/AddHire/AddHire";
 import Dealership from "./pages/Dealership/Dealership";
 import BusinessServices from "./pages/BusinessServices/BusinessServices";
 import Stores from "./pages/Stores/Stores";
-import Navbar from "./components/Navbar/Navbar";
+import AdAccessories from "./pages/AdAccessories/AdAccessories";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* Authentication */}
         <Route path="/" element={<SignIn />} />
         <Route path="/login" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
-
         <Route
           path="/verify-registration"
           element={<OTPVerification />}
         />
-
         <Route
           path="/forgot-password"
           element={<ForgotPassword />}
         />
-
         <Route
           path="/otp-verification"
           element={<OTPVerification />}
         />
-
         <Route
           path="/reset-password"
           element={<ResetPassword />}
         />
-
         <Route
           path="/password-reset-success"
           element={<PasswordResetSuccess />}
         />
 
+        {/* Dashboard */}
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <DashboardLayout>
+                <Dashboard />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
 
+        {/* Sale */}
         <Route
           path="/dashboard/add-sale"
           element={
             <ProtectedRoute>
-              <Navbar />
-              <AddSale />
+              <DashboardLayout>
+                <AddSale />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
 
-        <Route
-          path="/dashboard/dealership"
-          element={
-            <ProtectedRoute>
-              <Dealership />
-            </ProtectedRoute>
-          }
-        />
-
+        {/* Hire */}
         <Route
           path="/dashboard/add-hire"
           element={
             <ProtectedRoute>
-              <Navbar />
-              <AddHire />
+              <DashboardLayout>
+                <AddHire />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
 
+        {/* Dealership */}
+        <Route
+          path="/dashboard/dealership"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Dealership />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Business Services */}
         <Route
           path="/dashboard/business-services"
           element={
             <ProtectedRoute>
-              <Navbar />
-              <BusinessServices />
+              <DashboardLayout>
+                <BusinessServices />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
 
+        {/* Stores */}
         <Route
           path="/dashboard/stores"
           element={
             <ProtectedRoute>
-              <Navbar />
-              <Stores />
+              <DashboardLayout>
+                <Stores />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Accessories */}
+        <Route
+          path="/dashboard/ad-accessories"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <AdAccessories />
+              </DashboardLayout>
             </ProtectedRoute>
           }
         />
