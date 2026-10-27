@@ -1,0 +1,159 @@
+
+.my-items-page {
+  min-height: 100vh;
+  padding: 30px;
+  background: #f7f8fa;
+  color: #172033;
+  font-family: "Poppins", sans-serif;
+}
+
+.my-items-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.my-items-eyebrow {
+  margin: 0 0 8px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.my-items-header h1 {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+}
+
+.my-items-header > div > p:last-child {
+  margin: 8px 0 0;
+  color: #64748b;
+  font-size: 14px;
+}
+
+.my-items-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+  padding: 16px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+}
+
+.my-items-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.my-items-tab {
+  padding: 10px 16px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  background: transparent;
+  color: #64748b;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+
+.my-items-tab:hover {
+  background: #f1f5f9;
+  color: #172033;
+}
+
+.my-items-tab.active {
+  background: #172033;
+  color: #fff;
+}
+
+.my-items-status-filter {
+  min-width: 150px;
+  padding: 10px 12px;
+  border: 1px solid #dbe1e8;
+  border-radius: 9px;
+  background: #fff;
+  color: #172033;
+  font-size: 14px;
+  outline: none;
+}
+
+.my-items-status-filter:focus {
+  border-color: #64748b;
+}
+
+.my-items-content {
+  display: flex;
+  min-height: 300px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 20px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  text-align: center;
+}
+
+.my-items-empty-icon {
+  display: flex;
+  width: 68px;
+  height: 68px;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+  border-radius: 18px;
+  background: #f1f5f9;
+  font-size: 32px;
+}
+
+.my-items-content h2 {
+  margin: 0 0 10px;
+  font-size: 20px;
+}
+
+.my-items-content p {
+  max-width: 430px;
+  margin: 0;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.7;
+}
+
+@media (max-width: 640px) {
+  .my-items-page {
+    padding: 18px;
+  }
+
+  .my-items-header h1 {
+    font-size: 25px;
+  }
+
+  .my-items-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .my-items-tabs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .my-items-tab {
+    padding: 10px 6px;
+    font-size: 12px;
+  }
+
+  .my-items-status-filter {
+    width: 100%;
+  }
+}

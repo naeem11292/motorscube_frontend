@@ -18,6 +18,8 @@ import Dealership from "./pages/Dealership/Dealership";
 import BusinessServices from "./pages/BusinessServices/BusinessServices";
 import Stores from "./pages/Stores/Stores";
 import AdAccessories from "./pages/AdAccessories/AdAccessories";
+import Messages from "./pages/Messages/Messages";
+import MyItems from "./pages/MyItems/MyItems";
 
 function App() {
   return (
@@ -27,22 +29,27 @@ function App() {
         <Route path="/" element={<SignIn />} />
         <Route path="/login" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+
         <Route
           path="/verify-registration"
           element={<OTPVerification />}
         />
+
         <Route
           path="/forgot-password"
           element={<ForgotPassword />}
         />
+
         <Route
           path="/otp-verification"
           element={<OTPVerification />}
         />
+
         <Route
           path="/reset-password"
           element={<ResetPassword />}
         />
+
         <Route
           path="/password-reset-success"
           element={<PasswordResetSuccess />}
@@ -127,6 +134,30 @@ function App() {
             <ProtectedRoute>
               <DashboardLayout>
                 <AdAccessories />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Messages */}
+        <Route
+          path="/dashboard/messages"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Messages />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* My Items */}
+        <Route
+          path="/dashboard/my-items"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <MyItems />
               </DashboardLayout>
             </ProtectedRoute>
           }
