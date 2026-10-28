@@ -9,6 +9,7 @@ const navigationGroups = [
     items: [
       { label: "Dashboard", icon: "⌂", path: "/dashboard" },
       { label: "Messages", icon: "💬", path: "/dashboard/messages" },
+      { label: "My Profile", icon: "👤", path: "/dashboard/profile" },
     ],
   },
   {

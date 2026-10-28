@@ -1,6 +1,6 @@
 
-import { useState } from "react";
-import { createStore } from "../../api/stores.api";
+import { useEffect, useState } from "react";
+import { createStore, updateStore } from "../../api/stores.api";
 import "./StoresForm.css";
 
 const initialForm = {
@@ -15,7 +15,16 @@ const initialForm = {
   jazzcash: "",
 };
 
-function StoresForm({ onStoreCreated }) {
+const API_BASE = "http://localhost:5000";
+
+function StoresForm({
+  initialStore = null,
+  onStoreCreated,
+  onStoreUpdated,
+  onCancel,
+}) {
+  const isEditing = Boolean(initialStore);
+
   const [formData, setFormData] = useState(initialForm);
   const [logo, setLogo] = useState(null);
   const [coverImage, setCoverImage] = useState(null);
@@ -23,18 +32,59 @@ function StoresForm({ onStoreCreated }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  // Populate the form whenever a store is selected for editing.
+  useEffect(() => {
+    if (initialStore) {
+      setFormData({
+        store_name: initialStore.store_name || "",
+        city: initialStore.city || "",
+        adress: initialStore.adress || "",
+        store_detail: initialStore.store_detail || "",
+        select_option: initialStore.select_option || "",
+        bank_name: initialStore.bank_name || "",
+        account: initialStore.account || "",
+        mobile: initialStore.mobile || "",
+        jazzcash: initialStore.jazzcash || "",
+      });
+    } else {
+      setFormData(initialForm);
+    }
+
+    setLogo(null);
+    setCoverImage(null);
+    setMessage("");
+    setError("");
+
+    const logoInput = document.getElementById("store-logo");
+    const coverInput = document.getElementById("store-cover-image");
+
+    if (logoInput) logoInput.value = "";
+    if (coverInput) coverInput.value = "";
+  }, [initialStore]);
+
+  const getImageUrl = (filename) => {
+    if (!filename) return "";
+
+    if (filename.startsWith("http://") || filename.startsWith("https://")) {
+      return filename;
+    }
+
+    return `${API_BASE}/uploads/${filename}`;
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+
+    setFormData((previous) => ({
+      ...previous,
+      [name]: value,
+    }));
   };
 
   const handleImageChange = (e, setter) => {
     const file = e.target.files?.[0];
 
-    if (!file) {
-      setter(null);
-      return;
-    }
+    if (!file) return;
 
     const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
 
@@ -69,27 +119,38 @@ function StoresForm({ onStoreCreated }) {
         payload.append(key, value);
       });
 
+      // Only upload new images if the user selected replacements.
       if (logo) payload.append("logo", logo);
       if (coverImage) payload.append("cover_image", coverImage);
 
-      const response = await createStore(payload);
+      let response;
 
-      setMessage(response.data?.message || "Store created successfully.");
-      await onStoreCreated?.();
+      if (isEditing) {
+        const storeId =
+          initialStore.id ??
+          initialStore.store_id;
 
-      setFormData(initialForm);
-      setLogo(null);
-      setCoverImage(null);
+        if (storeId == null) {
+          throw new Error(
+            "Store ID is missing. Unable to update this store."
+          );
+        }
 
-      const logoInput = document.getElementById("store-logo");
-      const coverInput = document.getElementById("store-cover-image");
+        response = await updateStore(storeId, payload);
+        setMessage(response.data?.message || "Store updated successfully.");
 
-      if (logoInput) logoInput.value = "";
-      if (coverInput) coverInput.value = "";
+        await onStoreUpdated?.();
+      } else {
+        response = await createStore(payload);
+        setMessage(response.data?.message || "Store created successfully.");
+
+        await onStoreCreated?.();
+      }
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          "Unable to create store. Please check the details and try again."
+          err.message ||
+          `Unable to ${isEditing ? "update" : "create"} store. Please check the details and try again.`
       );
     } finally {
       setLoading(false);
@@ -99,11 +160,13 @@ function StoresForm({ onStoreCreated }) {
   return (
     <form className="stores-form" onSubmit={handleSubmit}>
       <div className="stores-form-heading">
+        <h2>{isEditing ? "Edit Your Store" : "Create Your Store"}</h2>
         <p>
-          Set up your shop to showcase your business and sell products
-        on MotorsCube.
+          {isEditing
+            ? "Update your store information and payment details."
+            : "Set up your shop to showcase your business and sell products on MotorsCube."}
         </p>
-       </div>
+      </div>
 
       <div className="stores-form-grid">
         <label>
@@ -158,7 +221,7 @@ function StoresForm({ onStoreCreated }) {
           />
         </label>
 
-        <div className="stores-payment-card">
+        <div className="stores-payment-card stores-full-width">
           <div className="stores-payment-card-heading">
             <h3>Payment Details</h3>
             <p>Configure how customers can pay your store.</p>
@@ -185,7 +248,7 @@ function StoresForm({ onStoreCreated }) {
                 name="bank_name"
                 value={formData.bank_name}
                 onChange={handleChange}
-                maxLength={11}
+                maxLength={255}
               />
             </label>
 
@@ -214,6 +277,16 @@ function StoresForm({ onStoreCreated }) {
 
         <label>
           Store Logo
+          {isEditing && initialStore.logo && (
+            <div className="stores-current-image">
+              <img
+                src={getImageUrl(initialStore.logo)}
+                alt="Current store logo"
+                style={{ width: 90, height: 90, objectFit: "contain" }}
+              />
+              <small>Current logo — choose a file only to replace it.</small>
+            </div>
+          )}
           <input
             id="store-logo"
             type="file"
@@ -225,6 +298,21 @@ function StoresForm({ onStoreCreated }) {
 
         <label>
           Cover Image
+          {isEditing && initialStore.cover_image && (
+            <div className="stores-current-image">
+              <img
+                src={getImageUrl(initialStore.cover_image)}
+                alt="Current store cover"
+                style={{
+                  width: "100%",
+                  maxWidth: 220,
+                  height: 100,
+                  objectFit: "cover",
+                }}
+              />
+              <small>Current cover — choose a file only to replace it.</small>
+            </div>
+          )}
           <input
             id="store-cover-image"
             type="file"
@@ -238,9 +326,32 @@ function StoresForm({ onStoreCreated }) {
       {error && <p className="stores-error">{error}</p>}
       {message && <p className="stores-success">{message}</p>}
 
-      <button className="stores-submit" type="submit" disabled={loading}>
-        {loading ? "Submitting..." : "Create Store"}
-      </button>
+      <div className="stores-form-actions">
+        <button
+          className="stores-submit"
+          type="submit"
+          disabled={loading}
+        >
+          {loading
+            ? isEditing
+              ? "Saving Changes..."
+              : "Creating Store..."
+            : isEditing
+              ? "Save Changes"
+              : "Create Store"}
+        </button>
+
+        {isEditing && onCancel && (
+          <button
+            className="stores-cancel"
+            type="button"
+            onClick={onCancel}
+            disabled={loading}
+          >
+            Cancel
+          </button>
+        )}
+      </div>
     </form>
   );
 }

@@ -12,17 +12,29 @@ function Dashboard() {
       path: "/dashboard/stores",
     },
     {
-      name: "My Items",
+      name: "My ADS",
       description: "View and manage all your sale and hire ads.",
       icon: "🚘",
       path: "/dashboard/my-items",
     },
     {
-      name:"User Wallet",
-      description:"View and manage",
-      icon:"🚘",
-      path:"/dashboard/my-items",
-    }
+      name: "My Orders",
+      description: "View and track orders you have placed.",
+      icon: "📦",
+      path: "/dashboard/orders",
+    },
+    {
+      name: "Store Orders",
+      description: "View and manage orders for your store.",
+      icon: "🏪",
+      path: "/dashboard/store-orders",
+    },
+    {
+      name: "User Wallet",
+      description: "View and manage your wallet balance and transactions.",
+      icon: "💳",
+      path: null,
+    },
   ];
 
   return (
@@ -34,6 +46,7 @@ function Dashboard() {
       }}
     >
       <h1>MotorsCube Dashboard</h1>
+
       <p style={{ color: "#64748b", marginBottom: "25px" }}>
         Manage your MotorsCube activities from one place.
       </p>
@@ -48,25 +61,36 @@ function Dashboard() {
         {modules.map((module) => (
           <div
             key={module.name}
-            onClick={() => navigate(module.path)}
+            onClick={() => {
+              if (module.path) {
+                navigate(module.path);
+              }
+            }}
             onKeyDown={(event) => {
-              if (event.key === "Enter" || event.key === " ") {
+              if (
+                module.path &&
+                (event.key === "Enter" || event.key === " ")
+              ) {
                 event.preventDefault();
                 navigate(module.path);
               }
             }}
             role="button"
-            tabIndex={0}
+            aria-disabled={!module.path}
+            tabIndex={module.path ? 0 : -1}
             style={{
               background: "#fff",
               padding: "28px",
               border: "1px solid #e5e7eb",
               borderRadius: "12px",
               color: "#172033",
-              cursor: "pointer",
+              cursor: module.path ? "pointer" : "not-allowed",
+              opacity: module.path ? 1 : 0.65,
               transition: "box-shadow 0.2s, transform 0.2s",
             }}
             onMouseEnter={(event) => {
+              if (!module.path) return;
+
               event.currentTarget.style.boxShadow =
                 "0 8px 24px rgba(15, 23, 42, 0.08)";
               event.currentTarget.style.transform = "translateY(-3px)";

@@ -1,3 +1,4 @@
+
 import { useCallback, useEffect, useMemo, useState } from "react";
 import messagesAPI from "../../api/messages.api";
 import "./Messages.css";
@@ -21,15 +22,104 @@ function getCurrentUserId() {
     if (!token) return null;
 
     const payload = token.split(".")[1];
-    const decoded = JSON.parse(atob(payload.replace(/-/g, "+").replace(/_/g, "/")));
+    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const decoded = JSON.parse(atob(normalized));
+
     return Number(decoded.sub ?? decoded.id ?? decoded.user_id) || null;
   } catch {
     return null;
   }
 }
 
+function getUserName(value) {
+  if (!value) return "";
+  if (typeof value === "string") return value.trim();
+
+  if (typeof value !== "object") return "";
+
+  const directName =
+    value.full_name ||
+    value.fullName ||
+    value.name ||
+    value.username ||
+    value.display_name ||
+    value.displayName;
+
+  if (directName) return String(directName).trim();
+
+  return [
+    value.first_name || value.firstname || "",
+    value.last_name || value.lastname || "",
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
+}
+
+function getNameFromFields(message, fields) {
+  for (const field of fields) {
+    const name = getUserName(message?.[field]);
+    if (name) return name;
+  }
+
+  return "";
+}
+
+function getSenderName(message) {
+  return getNameFromFields(message, [
+    "sender_name",
+    "sender_full_name",
+    "sender_username",
+    "sender",
+    "sender_user",
+    "sender_details",
+    "senderUser",
+  ]);
+}
+
+function getReceiverName(message) {
+  return getNameFromFields(message, [
+    "receiver_name",
+    "receiver_full_name",
+    "receiver_username",
+    "receiver",
+    "receiver_user",
+    "receiver_details",
+    "receiverUser",
+  ]);
+}
+
+function getPeerName(message, peerId, currentUserId) {
+  if (Number(message?.sender_id) === Number(currentUserId)) {
+    return getReceiverName(message);
+  }
+
+  if (Number(message?.receiver_id) === Number(currentUserId)) {
+    return getSenderName(message);
+  }
+
+  if (Number(message?.sender_id) === Number(peerId)) {
+    return getSenderName(message);
+  }
+
+  if (Number(message?.receiver_id) === Number(peerId)) {
+    return getReceiverName(message);
+  }
+
+  return "";
+}
+
+function getDisplayName(name, userId) {
+  return name || (userId ? `User #${userId}` : "Unknown user");
+}
+
+function getInitial(name) {
+  return String(name || "U").trim().charAt(0).toUpperCase() || "U";
+}
+
 function formatDate(value) {
   if (!value) return "";
+
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "";
 
@@ -54,6 +144,13 @@ export default function Messages() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [showNewChat, setShowNewChat] = useState(false);
+  const [newReceiverId, setNewReceiverId] = useState("");
+  const [newPostType, setNewPostType] = useState("sale");
+  const [newPostId, setNewPostId] = useState("");
+  const [newChatMessage, setNewChatMessage] = useState("");
+  const [newChatTitle, setNewChatTitle] = useState("");
+  const [creatingChat, setCreatingChat] = useState(false);
 
   const loadMessages = useCallback(async () => {
     setLoading(true);
@@ -62,6 +159,7 @@ export default function Messages() {
     try {
       const response = await messagesAPI.getMyMessages();
       const rows = getArray(response);
+
       setMessages(rows);
 
       if (selectedChatId !== null) {
@@ -98,9 +196,11 @@ export default function Messages() {
 
       const senderId = Number(message.sender_id);
       const receiverId = Number(message.receiver_id);
-      const peerId =
-        senderId === currentUserId ? receiverId : senderId;
 
+      const peerId =
+        senderId === Number(currentUserId) ? receiverId : senderId;
+
+      const peerName = getPeerName(message, peerId, currentUserId);
       const key = String(chatId);
       const existing = grouped.get(key);
 
@@ -108,11 +208,16 @@ export default function Messages() {
         grouped.set(key, {
           chatId,
           peerId,
+          peerName,
           lastMessage: message,
           messages: [message],
         });
       } else {
         existing.messages.push(message);
+
+        if (!existing.peerName && peerName) {
+          existing.peerName = peerName;
+        }
 
         if (
           new Date(message.message_time_date || 0).getTime() >
@@ -120,6 +225,10 @@ export default function Messages() {
         ) {
           existing.lastMessage = message;
           existing.peerId = peerId;
+
+          if (peerName) {
+            existing.peerName = peerName;
+          }
         }
       }
     }
@@ -131,6 +240,31 @@ export default function Messages() {
     );
   }, [messages, currentUserId]);
 
+  const activeConversation = conversations.find(
+    (conversation) =>
+      Number(conversation.chatId) === Number(selectedChatId)
+  );
+
+  const activePeerName = useMemo(() => {
+    if (!activeConversation) return "";
+
+    if (activeConversation.peerName) {
+      return activeConversation.peerName;
+    }
+
+    for (const message of [...chatMessages].reverse()) {
+      const name = getPeerName(
+        message,
+        activeConversation.peerId,
+        currentUserId
+      );
+
+      if (name) return name;
+    }
+
+    return "";
+  }, [activeConversation, chatMessages, currentUserId]);
+
   const openConversation = async (conversation) => {
     setSelectedChatId(conversation.chatId);
     setChatLoading(true);
@@ -141,12 +275,13 @@ export default function Messages() {
       const response = await messagesAPI.getMessagesByChat(
         conversation.chatId
       );
+
       const rows = getArray(response);
       setChatMessages(rows);
 
       const unread = rows.filter(
         (message) =>
-          Number(message.receiver_id) === currentUserId &&
+          Number(message.receiver_id) === Number(currentUserId) &&
           Number(message.message_viewed) === 0 &&
           Number(message.receiver_deleted) === 0
       );
@@ -162,6 +297,7 @@ export default function Messages() {
       }
     } catch (err) {
       setChatMessages([]);
+
       setError(
         err?.response?.data?.message ||
           err?.response?.data?.error ||
@@ -171,11 +307,6 @@ export default function Messages() {
       setChatLoading(false);
     }
   };
-
-  const activeConversation = conversations.find(
-    (conversation) =>
-      Number(conversation.chatId) === Number(selectedChatId)
-  );
 
   const sendMessage = async (event) => {
     event.preventDefault();
@@ -206,6 +337,7 @@ export default function Messages() {
       const response = await messagesAPI.getMessagesByChat(
         activeConversation.chatId
       );
+
       setChatMessages(getArray(response));
       await loadMessages();
       setNotice("Message sent.");
@@ -220,10 +352,92 @@ export default function Messages() {
     }
   };
 
+  const startNewChat = async (event) => {
+    event.preventDefault();
+
+    const receiverId = Number(newReceiverId);
+    const postId = Number(newPostId);
+    const firstMessage = newChatMessage.trim();
+
+    if (!Number.isInteger(receiverId) || receiverId <= 0) {
+      setError("Enter a valid recipient user ID.");
+      return;
+    }
+
+    if (currentUserId && receiverId === currentUserId) {
+      setError("You cannot start a chat with yourself.");
+      return;
+    }
+
+    if (!Number.isInteger(postId) || postId <= 0) {
+      setError("Enter a valid listing post ID.");
+      return;
+    }
+
+    if (!firstMessage) {
+      setError("Write the first message to start the conversation.");
+      return;
+    }
+
+    if (firstMessage.length > 300) {
+      setError("Messages cannot exceed 300 characters.");
+      return;
+    }
+
+    setCreatingChat(true);
+    setError("");
+    setNotice("");
+
+    try {
+      const response = await messagesAPI.createChat({
+        user_id_receiver: receiverId,
+        post_type: newPostType,
+        post_id: postId,
+      });
+
+      const chat = response?.data?.data ?? response?.data ?? response;
+      const chatId = Number(chat?.id ?? chat?.chat_id);
+
+      if (!chatId) {
+        throw new Error(
+          "Chat was created, but the API did not return a chat ID."
+        );
+      }
+
+      await messagesAPI.sendMessage({
+        chat_id: chatId,
+        receiver_id: receiverId,
+        message_title: newChatTitle,
+        sender_message: firstMessage,
+      });
+
+      setNewReceiverId("");
+      setNewPostType("sale");
+      setNewPostId("");
+      setNewChatMessage("");
+      setNewChatTitle("");
+      setShowNewChat(false);
+
+      await loadMessages();
+      setSelectedChatId(chatId);
+
+      const chatResponse = await messagesAPI.getMessagesByChat(chatId);
+      setChatMessages(getArray(chatResponse));
+      setNotice("Conversation started. Your message has been sent.");
+    } catch (err) {
+      setError(
+        err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          err?.message ||
+          "Could not start the conversation. Please try again."
+      );
+    } finally {
+      setCreatingChat(false);
+    }
+  };
+
   const deleteMessage = async (message) => {
-    const confirmed = window.confirm(
-      "Delete this message from your view?"
-    );
+    const confirmed = window.confirm("Delete this message from your view?");
     if (!confirmed) return;
 
     try {
@@ -267,7 +481,10 @@ export default function Messages() {
         </button>
       </header>
 
-      {error && <div className="messages-alert messages-alert-error">{error}</div>}
+      {error && (
+        <div className="messages-alert messages-alert-error">{error}</div>
+      )}
+
       {notice && (
         <div className="messages-alert messages-alert-success">{notice}</div>
       )}
@@ -278,6 +495,78 @@ export default function Messages() {
             <h2>Conversations</h2>
             <span>{conversations.length}</span>
           </div>
+
+          <button
+            type="button"
+            className="messages-refresh-button"
+            onClick={() => {
+              setShowNewChat((open) => !open);
+              setError("");
+              setNotice("");
+            }}
+          >
+            {showNewChat ? "Cancel New Chat" : "+ New Chat"}
+          </button>
+
+          {showNewChat && (
+            <form className="messages-compose" onSubmit={startNewChat}>
+              <input
+                type="number"
+                min="1"
+                value={newReceiverId}
+                onChange={(event) => setNewReceiverId(event.target.value)}
+                placeholder="Recipient user ID"
+                required
+                aria-label="Recipient user ID"
+              />
+
+              <select
+                value={newPostType}
+                onChange={(event) => setNewPostType(event.target.value)}
+                required
+                aria-label="Listing type"
+              >
+                <option value="sale">Sale listing</option>
+                <option value="hire">Hire listing</option>
+              </select>
+
+              <input
+                type="number"
+                min="1"
+                value={newPostId}
+                onChange={(event) => setNewPostId(event.target.value)}
+                placeholder="Listing post ID"
+                required
+                aria-label="Listing post ID"
+              />
+
+              <input
+                type="text"
+                value={newChatTitle}
+                onChange={(event) => setNewChatTitle(event.target.value)}
+                placeholder="Subject (optional)"
+                maxLength={255}
+                aria-label="First message subject"
+              />
+
+              <textarea
+                value={newChatMessage}
+                onChange={(event) => setNewChatMessage(event.target.value)}
+                placeholder="Write your first message..."
+                maxLength={300}
+                rows={3}
+                required
+                aria-label="First message"
+              />
+
+              <button
+                type="submit"
+                disabled={creatingChat || !newChatMessage.trim()}
+              >
+                {creatingChat ? "Starting chat..." : "Start Chat & Send"}
+              </button>
+            </form>
+          )}
 
           {loading ? (
             <p className="messages-empty">Loading messages...</p>
@@ -297,6 +586,10 @@ export default function Messages() {
                 const isSelected =
                   Number(selectedChatId) === Number(conversation.chatId);
                 const preview = last.sender_message || "No message text";
+                const displayName = getDisplayName(
+                  conversation.peerName,
+                  conversation.peerId
+                );
 
                 return (
                   <button
@@ -308,12 +601,12 @@ export default function Messages() {
                     onClick={() => openConversation(conversation)}
                   >
                     <span className="messages-avatar">
-                      {String(conversation.peerId || "?").slice(0, 1)}
+                      {getInitial(displayName)}
                     </span>
 
                     <span className="messages-conversation-content">
                       <span className="messages-conversation-title">
-                        User #{conversation.peerId ?? "Unknown"}
+                        {displayName}
                       </span>
                       <span className="messages-preview">{preview}</span>
                     </span>
@@ -339,10 +632,18 @@ export default function Messages() {
             <>
               <header className="messages-chat-header">
                 <span className="messages-avatar">
-                  {String(activeConversation.peerId || "?").slice(0, 1)}
+                  {getInitial(
+                    getDisplayName(activePeerName, activeConversation.peerId)
+                  )}
                 </span>
+
                 <div>
-                  <h2>User #{activeConversation.peerId ?? "Unknown"}</h2>
+                  <h2>
+                    {getDisplayName(
+                      activePeerName,
+                      activeConversation.peerId
+                    )}
+                  </h2>
                   <p>Conversation #{activeConversation.chatId}</p>
                 </div>
               </header>
@@ -351,11 +652,21 @@ export default function Messages() {
                 {chatLoading ? (
                   <p className="messages-empty">Loading conversation...</p>
                 ) : chatMessages.length === 0 ? (
-                  <p className="messages-empty">No visible messages in this conversation.</p>
+                  <p className="messages-empty">
+                    No visible messages in this conversation.
+                  </p>
                 ) : (
                   chatMessages.map((message) => {
                     const isMine =
-                      Number(message.sender_id) === currentUserId;
+                      Number(message.sender_id) === Number(currentUserId);
+
+                    const senderName = isMine
+                      ? "You"
+                      : getSenderName(message) ||
+                        getDisplayName(
+                          activePeerName,
+                          activeConversation.peerId
+                        );
 
                     return (
                       <article
@@ -365,6 +676,10 @@ export default function Messages() {
                         }`}
                       >
                         <div className="messages-bubble">
+                          <span className="messages-sender-name">
+                            {senderName}
+                          </span>
+
                           {message.message_title && (
                             <strong className="messages-bubble-title">
                               {message.message_title}
@@ -377,6 +692,7 @@ export default function Messages() {
                             <time>
                               {formatDate(message.message_time_date)}
                             </time>
+
                             <button
                               type="button"
                               onClick={() => deleteMessage(message)}
@@ -412,6 +728,7 @@ export default function Messages() {
                     required
                     aria-label="Message text"
                   />
+
                   <button
                     type="submit"
                     disabled={sending || !draft.trim() || chatLoading}

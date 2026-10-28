@@ -1,6 +1,7 @@
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+// Authentication
 import SignIn from "./pages/Auth/Login";
 import SignUp from "./pages/Auth/Register";
 import OTPVerification from "./pages/Auth/OTPVerification";
@@ -8,24 +9,39 @@ import ForgotPassword from "./pages/Auth/ForgotPassword";
 import ResetPassword from "./pages/Auth/ResetPassword";
 import PasswordResetSuccess from "./pages/Auth/PasswordResetSuccess";
 
+// Dashboard
 import Dashboard from "./pages/Dashboard/Dashboard";
 import ProtectedRoute from "./components/ProtectedRoute/ProtectedRoute";
 import DashboardLayout from "./components/Layout/DashboardLayout";
 
+// Sale and Hire
 import AddSale from "./pages/AddSale/AddSale";
 import AddHire from "./pages/AddHire/AddHire";
+
+// Business Services
 import Dealership from "./pages/Dealership/Dealership";
 import BusinessServices from "./pages/BusinessServices/BusinessServices";
+
+// Store and Marketplace
 import Stores from "./pages/Stores/Stores";
 import AdAccessories from "./pages/AdAccessories/AdAccessories";
 import Messages from "./pages/Messages/Messages";
 import MyItems from "./pages/MyItems/MyItems";
 
+// Profile
+import Profile from "./pages/Profile/Profile";
+
+// Orders
+import MyOrders from "./pages/Orders/MyOrders";
+import StoreOrders from "./pages/Orders/StoreOrders";
+import OrderDetails from "./pages/Orders/OrderDetails";
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Authentication */}
+        {/* ==================== AUTHENTICATION ==================== */}
+
         <Route path="/" element={<SignIn />} />
         <Route path="/login" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
@@ -55,7 +71,8 @@ function App() {
           element={<PasswordResetSuccess />}
         />
 
-        {/* Dashboard */}
+        {/* ==================== DASHBOARD ==================== */}
+
         <Route
           path="/dashboard"
           element={
@@ -67,7 +84,21 @@ function App() {
           }
         />
 
-        {/* Sale */}
+        {/* ==================== PROFILE ==================== */}
+
+        <Route
+          path="/dashboard/profile"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Profile />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ==================== SALE ==================== */}
+
         <Route
           path="/dashboard/add-sale"
           element={
@@ -79,7 +110,8 @@ function App() {
           }
         />
 
-        {/* Hire */}
+        {/* ==================== HIRE ==================== */}
+
         <Route
           path="/dashboard/add-hire"
           element={
@@ -91,7 +123,8 @@ function App() {
           }
         />
 
-        {/* Dealership */}
+        {/* ==================== DEALERSHIP ==================== */}
+
         <Route
           path="/dashboard/dealership"
           element={
@@ -103,7 +136,8 @@ function App() {
           }
         />
 
-        {/* Business Services */}
+        {/* ==================== BUSINESS SERVICES ==================== */}
+
         <Route
           path="/dashboard/business-services"
           element={
@@ -115,7 +149,8 @@ function App() {
           }
         />
 
-        {/* Stores */}
+        {/* ==================== STORES ==================== */}
+
         <Route
           path="/dashboard/stores"
           element={
@@ -127,7 +162,8 @@ function App() {
           }
         />
 
-        {/* Accessories */}
+        {/* ==================== ACCESSORIES ==================== */}
+
         <Route
           path="/dashboard/ad-accessories"
           element={
@@ -139,7 +175,8 @@ function App() {
           }
         />
 
-        {/* Messages */}
+        {/* ==================== MESSAGES ==================== */}
+
         <Route
           path="/dashboard/messages"
           element={
@@ -151,13 +188,50 @@ function App() {
           }
         />
 
-        {/* My Items */}
+        {/* ==================== MY ITEMS ==================== */}
+
         <Route
           path="/dashboard/my-items"
           element={
             <ProtectedRoute>
               <DashboardLayout>
                 <MyItems />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* ==================== ORDERS ==================== */}
+
+        <Route
+          path="/dashboard/orders"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <MyOrders />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/dashboard/orders/:id"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <OrderDetails />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Store owner's order management */}
+        <Route
+          path="/dashboard/store-orders"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <StoreOrders />
               </DashboardLayout>
             </ProtectedRoute>
           }

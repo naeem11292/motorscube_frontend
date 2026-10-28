@@ -1,8 +1,21 @@
+
 import axiosInstance from "./axios";
 
 const MESSAGES_URL = "/messages";
+const CHAT_BOX_URL = "/chat-box";
 
 const messagesAPI = {
+  // Create a new chat or retrieve an existing chat
+  createChat: async ({ user_id_receiver, post_type, post_id }) => {
+    const response = await axiosInstance.post(CHAT_BOX_URL, {
+      user_id_receiver: Number(user_id_receiver),
+      post_type: post_type.trim(),
+      post_id: Number(post_id),
+    });
+
+    return response.data;
+  },
+
   // Get all messages belonging to the logged-in user
   getMyMessages: async () => {
     const response = await axiosInstance.get(MESSAGES_URL);
