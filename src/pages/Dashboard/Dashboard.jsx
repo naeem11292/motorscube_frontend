@@ -17,6 +17,12 @@ function Dashboard() {
       icon: "🚘",
       path: "/dashboard/my-items",
     },
+    {
+      name:"User Wallet",
+      description:"View and manage",
+      icon:"🚘",
+      path:"/dashboard/my-items",
+    }
   ];
 
   return (
