@@ -1,0 +1,235 @@
+
+.wallet-transactions-section {
+  width: 100%;
+  box-sizing: border-box;
+  margin-top: 28px;
+  padding: 28px;
+  background: #ffffff;
+  border: 1px solid #e8eaf0;
+  border-radius: 16px;
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.04);
+  font-family: "Poppins", sans-serif;
+}
+
+.wallet-transactions-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.wallet-transactions-header h2 {
+  margin: 0;
+  color: #14213d;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.wallet-transactions-header p {
+  margin: 7px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.wallet-transaction-count {
+  padding: 8px 12px;
+  color: #475569;
+  background: #f1f5f9;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.wallet-transactions-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.wallet-transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.wallet-transactions-table thead {
+  background: #f8fafc;
+}
+
+.wallet-transactions-table th {
+  padding: 15px 14px;
+  color: #64748b;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.wallet-transactions-table td {
+  padding: 18px 14px;
+  border-bottom: 1px solid #edf0f5;
+  color: #475569;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.wallet-transactions-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.wallet-transactions-table tbody tr:hover {
+  background: #fbfcfe;
+}
+
+.wallet-transaction-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 200px;
+}
+
+.wallet-transaction-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 11px;
+  font-size: 21px;
+  font-weight: 600;
+}
+
+.wallet-transaction-icon.credit {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.wallet-transaction-icon.debit {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.wallet-transaction-title {
+  display: block;
+  color: #1e293b;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.wallet-transaction-description {
+  display: block;
+  margin-top: 4px;
+  color: #94a3b8;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+.wallet-transaction-date {
+  white-space: nowrap;
+  color: #64748b;
+}
+
+.wallet-transaction-amount {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.wallet-transaction-amount.credit {
+  color: #15803d;
+}
+
+.wallet-transaction-amount.debit {
+  color: #dc2626;
+}
+
+.wallet-transaction-status {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.wallet-transaction-status.completed {
+  color: #15803d;
+  background: #dcfce7;
+}
+
+.wallet-transaction-status.pending {
+  color: #a16207;
+  background: #fef3c7;
+}
+
+.wallet-transaction-status.failed {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.wallet-transactions-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 45px 20px;
+  text-align: center;
+}
+
+.wallet-empty-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 16px;
+  color: #64748b;
+  background: #f1f5f9;
+  border-radius: 50%;
+  font-size: 28px;
+}
+
+.wallet-transactions-empty h3 {
+  margin: 0;
+  color: #1e293b;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.wallet-transactions-empty p {
+  max-width: 380px;
+  margin: 9px 0 0;
+  color: #64748b;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+@media (max-width: 768px) {
+  .wallet-transactions-section {
+    padding: 20px;
+  }
+
+  .wallet-transactions-table {
+    min-width: 650px;
+  }
+
+  .wallet-transactions-header h2 {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wallet-transactions-section {
+    padding: 16px;
+    margin-top: 20px;
+  }
+
+  .wallet-transactions-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

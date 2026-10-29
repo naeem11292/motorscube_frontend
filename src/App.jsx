@@ -31,18 +31,22 @@ import MyItems from "./pages/MyItems/MyItems";
 // Profile
 import Profile from "./pages/Profile/Profile";
 
+// Wallet
+import Wallet from "./pages/Wallet/Wallet";
+
 // Orders
 import MyOrders from "./pages/Orders/MyOrders";
 import StoreOrders from "./pages/Orders/StoreOrders";
 import OrderDetails from "./pages/Orders/OrderDetails";
 
+// Career
 import Career from "./pages/Career/Career";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* ==================== AUTHENTICATION ==================== */}
+        {/* AUTHENTICATION */}
 
         <Route path="/" element={<SignIn />} />
         <Route path="/login" element={<SignIn />} />
@@ -73,7 +77,7 @@ function App() {
           element={<PasswordResetSuccess />}
         />
 
-        {/* ==================== DASHBOARD ==================== */}
+        {/* DASHBOARD */}
 
         <Route
           path="/dashboard"
@@ -86,7 +90,7 @@ function App() {
           }
         />
 
-        {/* ==================== PROFILE ==================== */}
+        {/* PROFILE */}
 
         <Route
           path="/dashboard/profile"
@@ -99,7 +103,20 @@ function App() {
           }
         />
 
-        {/* ==================== SALE ==================== */}
+        {/* WALLET */}
+
+        <Route
+          path="/dashboard/wallet"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout>
+                <Wallet />
+              </DashboardLayout>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* SALE */}
 
         <Route
           path="/dashboard/add-sale"
@@ -112,7 +129,7 @@ function App() {
           }
         />
 
-        {/* ==================== HIRE ==================== */}
+        {/* HIRE */}
 
         <Route
           path="/dashboard/add-hire"
@@ -125,7 +142,7 @@ function App() {
           }
         />
 
-        {/* ==================== DEALERSHIP ==================== */}
+        {/* DEALERSHIP */}
 
         <Route
           path="/dashboard/dealership"
@@ -138,7 +155,7 @@ function App() {
           }
         />
 
-        {/* ==================== BUSINESS SERVICES ==================== */}
+        {/* BUSINESS SERVICES */}
 
         <Route
           path="/dashboard/business-services"
@@ -151,7 +168,7 @@ function App() {
           }
         />
 
-        {/* ==================== STORES ==================== */}
+        {/* STORES */}
 
         <Route
           path="/dashboard/stores"
@@ -164,7 +181,7 @@ function App() {
           }
         />
 
-        {/* ==================== ACCESSORIES ==================== */}
+        {/* ACCESSORIES */}
 
         <Route
           path="/dashboard/ad-accessories"
@@ -177,7 +194,7 @@ function App() {
           }
         />
 
-        {/* ==================== MESSAGES ==================== */}
+        {/* MESSAGES */}
 
         <Route
           path="/dashboard/messages"
@@ -190,7 +207,7 @@ function App() {
           }
         />
 
-        {/* ==================== MY ITEMS ==================== */}
+        {/* MY ITEMS */}
 
         <Route
           path="/dashboard/my-items"
@@ -203,7 +220,7 @@ function App() {
           }
         />
 
-        {/* ==================== ORDERS ==================== */}
+        {/* ORDERS */}
 
         <Route
           path="/dashboard/orders"
@@ -226,8 +243,13 @@ function App() {
             </ProtectedRoute>
           }
         />
-            <Route path="/careers" element={<Career />} />
-        {/* Store owner's order management */}
+
+        {/* CAREER */}
+
+        <Route path="/careers" element={<Career />} />
+
+        {/* STORE OWNER ORDERS */}
+
         <Route
           path="/dashboard/store-orders"
           element={

@@ -22,8 +22,9 @@ function getCurrentUserId() {
     if (!token) return null;
 
     const payload = token.split(".")[1];
-    const normalized = payload.replace(/-/g, "+").replace(/_/g, "/");
-    const decoded = JSON.parse(atob(normalized));
+    const decoded = JSON.parse(
+      atob(payload.replace(/-/g, "+").replace(/_/g, "/"))
+    );
 
     return Number(decoded.sub ?? decoded.id ?? decoded.user_id) || null;
   } catch {
@@ -34,10 +35,9 @@ function getCurrentUserId() {
 function getUserName(value) {
   if (!value) return "";
   if (typeof value === "string") return value.trim();
-
   if (typeof value !== "object") return "";
 
-  const directName =
+  const name =
     value.full_name ||
     value.fullName ||
     value.name ||
@@ -45,7 +45,7 @@ function getUserName(value) {
     value.display_name ||
     value.displayName;
 
-  if (directName) return String(directName).trim();
+  if (name) return String(name).trim();
 
   return [
     value.first_name || value.firstname || "",
@@ -61,7 +61,6 @@ function getNameFromFields(message, fields) {
     const name = getUserName(message?.[field]);
     if (name) return name;
   }
-
   return "";
 }
 
@@ -139,6 +138,7 @@ export default function Messages() {
   const [chatMessages, setChatMessages] = useState([]);
   const [draft, setDraft] = useState("");
   const [title, setTitle] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [chatLoading, setChatLoading] = useState(false);
   const [sending, setSending] = useState(false);
@@ -159,15 +159,15 @@ export default function Messages() {
     try {
       const response = await messagesAPI.getMyMessages();
       const rows = getArray(response);
-
       setMessages(rows);
 
       if (selectedChatId !== null) {
-        const stillExists = rows.some(
-          (message) => Number(message.chat_id) === Number(selectedChatId)
+        const exists = rows.some(
+          (message) =>
+            Number(message.chat_id) === Number(selectedChatId)
         );
 
-        if (!stillExists) {
+        if (!exists) {
           setSelectedChatId(null);
           setChatMessages([]);
         }
@@ -196,7 +196,6 @@ export default function Messages() {
 
       const senderId = Number(message.sender_id);
       const receiverId = Number(message.receiver_id);
-
       const peerId =
         senderId === Number(currentUserId) ? receiverId : senderId;
 
@@ -210,11 +209,8 @@ export default function Messages() {
           peerId,
           peerName,
           lastMessage: message,
-          messages: [message],
         });
       } else {
-        existing.messages.push(message);
-
         if (!existing.peerName && peerName) {
           existing.peerName = peerName;
         }
@@ -225,10 +221,7 @@ export default function Messages() {
         ) {
           existing.lastMessage = message;
           existing.peerId = peerId;
-
-          if (peerName) {
-            existing.peerName = peerName;
-          }
+          if (peerName) existing.peerName = peerName;
         }
       }
     }
@@ -239,6 +232,27 @@ export default function Messages() {
         new Date(a.lastMessage.message_time_date || 0).getTime()
     );
   }, [messages, currentUserId]);
+
+  const filteredConversations = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    if (!query) return conversations;
+
+    return conversations.filter((conversation) => {
+      const name = getDisplayName(
+        conversation.peerName,
+        conversation.peerId
+      );
+
+      const text = conversation.lastMessage?.sender_message || "";
+
+      return (
+        name.toLowerCase().includes(query) ||
+        String(text).toLowerCase().includes(query) ||
+        String(conversation.chatId).includes(query)
+      );
+    });
+  }, [conversations, searchQuery]);
 
   const activeConversation = conversations.find(
     (conversation) =>
@@ -258,7 +272,6 @@ export default function Messages() {
         activeConversation.peerId,
         currentUserId
       );
-
       if (name) return name;
     }
 
@@ -275,7 +288,6 @@ export default function Messages() {
       const response = await messagesAPI.getMessagesByChat(
         conversation.chatId
       );
-
       const rows = getArray(response);
       setChatMessages(rows);
 
@@ -292,12 +304,9 @@ export default function Messages() {
         )
       );
 
-      if (unread.length) {
-        await loadMessages();
-      }
+      if (unread.length) await loadMessages();
     } catch (err) {
       setChatMessages([]);
-
       setError(
         err?.response?.data?.message ||
           err?.response?.data?.error ||
@@ -437,8 +446,7 @@ export default function Messages() {
   };
 
   const deleteMessage = async (message) => {
-    const confirmed = window.confirm("Delete this message from your view?");
-    if (!confirmed) return;
+    if (!window.confirm("Delete this message from your view?")) return;
 
     try {
       await messagesAPI.deleteMessage(message.message_id);
@@ -460,6 +468,28 @@ export default function Messages() {
     }
   };
 
+  const viewAd = () => {
+    const message = activeConversation?.lastMessage;
+
+    const postType = message?.post_type;
+    const postId = message?.post_id;
+
+    if (postType && postId) {
+      const type = String(postType).toLowerCase();
+      const route =
+        type === "hire"
+          ? `/hire/${postId}`
+          : `/sale/${postId}`;
+
+      window.location.assign(route);
+      return;
+    }
+
+    setNotice(
+      "The listing link is not available in the message data yet."
+    );
+  };
+
   return (
     <main className="messages-page">
       <header className="messages-page-header">
@@ -467,7 +497,7 @@ export default function Messages() {
           <p className="messages-eyebrow">MOTORSCUBE DASHBOARD</p>
           <h1>Messages</h1>
           <p className="messages-subtitle">
-            View your conversations and communicate with other users.
+            Chat with buyers and sellers about their vehicle listings.
           </p>
         </div>
 
@@ -482,34 +512,51 @@ export default function Messages() {
       </header>
 
       {error && (
-        <div className="messages-alert messages-alert-error">{error}</div>
+        <div className="messages-alert messages-alert-error" role="alert">
+          {error}
+        </div>
       )}
 
       {notice && (
-        <div className="messages-alert messages-alert-success">{notice}</div>
+        <div className="messages-alert messages-alert-success" role="status">
+          {notice}
+        </div>
       )}
 
       <section className="messages-workspace">
         <aside className="messages-sidebar">
           <div className="messages-sidebar-heading">
-            <h2>Conversations</h2>
+            <h2>Messages</h2>
             <span>{conversations.length}</span>
           </div>
 
-          <button
-            type="button"
-            className="messages-refresh-button"
-            onClick={() => {
-              setShowNewChat((open) => !open);
-              setError("");
-              setNotice("");
-            }}
-          >
-            {showNewChat ? "Cancel New Chat" : "+ New Chat"}
-          </button>
+          <label className="messages-search">
+            <span aria-hidden="true">⌕</span>
+            <input
+              type="search"
+              placeholder="Search chats..."
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              aria-label="Search conversations"
+            />
+          </label>
+
+          <div className="messages-new-chat-row">
+            <button
+              type="button"
+              className="messages-new-chat-button"
+              onClick={() => {
+                setShowNewChat((open) => !open);
+                setError("");
+                setNotice("");
+              }}
+            >
+              {showNewChat ? "Cancel" : "+ New Chat"}
+            </button>
+          </div>
 
           {showNewChat && (
-            <form className="messages-compose" onSubmit={startNewChat}>
+            <form className="messages-new-chat-form" onSubmit={startNewChat}>
               <input
                 type="number"
                 min="1"
@@ -517,14 +564,13 @@ export default function Messages() {
                 onChange={(event) => setNewReceiverId(event.target.value)}
                 placeholder="Recipient user ID"
                 required
-                aria-label="Recipient user ID"
               />
 
               <select
                 value={newPostType}
                 onChange={(event) => setNewPostType(event.target.value)}
-                required
                 aria-label="Listing type"
+                required
               >
                 <option value="sale">Sale listing</option>
                 <option value="hire">Hire listing</option>
@@ -537,7 +583,6 @@ export default function Messages() {
                 onChange={(event) => setNewPostId(event.target.value)}
                 placeholder="Listing post ID"
                 required
-                aria-label="Listing post ID"
               />
 
               <input
@@ -546,7 +591,6 @@ export default function Messages() {
                 onChange={(event) => setNewChatTitle(event.target.value)}
                 placeholder="Subject (optional)"
                 maxLength={255}
-                aria-label="First message subject"
               />
 
               <textarea
@@ -556,36 +600,34 @@ export default function Messages() {
                 maxLength={300}
                 rows={3}
                 required
-                aria-label="First message"
               />
 
-              <button
-                type="submit"
-                disabled={creatingChat || !newChatMessage.trim()}
-              >
-                {creatingChat ? "Starting chat..." : "Start Chat & Send"}
+              <button type="submit" disabled={creatingChat}>
+                {creatingChat ? "Starting..." : "Start Chat & Send"}
               </button>
             </form>
           )}
 
           {loading ? (
             <p className="messages-empty">Loading messages...</p>
-          ) : conversations.length === 0 ? (
+          ) : filteredConversations.length === 0 ? (
             <div className="messages-empty">
-              <span className="messages-empty-icon">💬</span>
-              <strong>No conversations yet</strong>
+              <span className="messages-empty-icon">✉</span>
+              <strong>
+                {searchQuery ? "No matching chats" : "No conversations yet"}
+              </strong>
               <p>
-                Conversations will appear here when messages are associated
-                with a chat.
+                {searchQuery
+                  ? "Try another name, message, or chat ID."
+                  : "Start a new chat to contact another user."}
               </p>
             </div>
           ) : (
             <div className="messages-conversation-list">
-              {conversations.map((conversation) => {
+              {filteredConversations.map((conversation) => {
                 const last = conversation.lastMessage;
                 const isSelected =
                   Number(selectedChatId) === Number(conversation.chatId);
-                const preview = last.sender_message || "No message text";
                 const displayName = getDisplayName(
                   conversation.peerName,
                   conversation.peerId
@@ -608,7 +650,9 @@ export default function Messages() {
                       <span className="messages-conversation-title">
                         {displayName}
                       </span>
-                      <span className="messages-preview">{preview}</span>
+                      <span className="messages-preview">
+                        {last.sender_message || "No message text"}
+                      </span>
                     </span>
 
                     <span className="messages-conversation-time">
@@ -637,7 +681,7 @@ export default function Messages() {
                   )}
                 </span>
 
-                <div>
+                <div className="messages-chat-contact">
                   <h2>
                     {getDisplayName(
                       activePeerName,
@@ -646,6 +690,14 @@ export default function Messages() {
                   </h2>
                   <p>Conversation #{activeConversation.chatId}</p>
                 </div>
+
+                <button
+                  type="button"
+                  className="messages-view-ad-button"
+                  onClick={viewAd}
+                >
+                  View Ad
+                </button>
               </header>
 
               <div className="messages-chat-body">
@@ -733,7 +785,7 @@ export default function Messages() {
                     type="submit"
                     disabled={sending || !draft.trim() || chatLoading}
                   >
-                    {sending ? "Sending..." : "Send"}
+                    {sending ? "Sending..." : "Send ➤"}
                   </button>
                 </div>
 

@@ -33,7 +33,7 @@ function Dashboard() {
       name: "User Wallet",
       description: "View and manage your wallet balance and transactions.",
       icon: "💳",
-      path: null,
+      path: "/dashboard/wallet",
     },
   ];
 
@@ -61,43 +61,35 @@ function Dashboard() {
         {modules.map((module) => (
           <div
             key={module.name}
-            onClick={() => {
-              if (module.path) {
-                navigate(module.path);
-              }
-            }}
+            onClick={() => navigate(module.path)}
             onKeyDown={(event) => {
-              if (
-                module.path &&
-                (event.key === "Enter" || event.key === " ")
-              ) {
+              if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
                 navigate(module.path);
               }
             }}
             role="button"
-            aria-disabled={!module.path}
-            tabIndex={module.path ? 0 : -1}
+            tabIndex={0}
             style={{
               background: "#fff",
               padding: "28px",
               border: "1px solid #e5e7eb",
               borderRadius: "12px",
               color: "#172033",
-              cursor: module.path ? "pointer" : "not-allowed",
-              opacity: module.path ? 1 : 0.65,
-              transition: "box-shadow 0.2s, transform 0.2s",
+              cursor: "pointer",
+              transition:
+                "box-shadow 0.2s, transform 0.2s",
             }}
             onMouseEnter={(event) => {
-              if (!module.path) return;
-
               event.currentTarget.style.boxShadow =
                 "0 8px 24px rgba(15, 23, 42, 0.08)";
-              event.currentTarget.style.transform = "translateY(-3px)";
+              event.currentTarget.style.transform =
+                "translateY(-3px)";
             }}
             onMouseLeave={(event) => {
               event.currentTarget.style.boxShadow = "none";
-              event.currentTarget.style.transform = "translateY(0)";
+              event.currentTarget.style.transform =
+                "translateY(0)";
             }}
           >
             <div style={{ fontSize: "32px", marginBottom: "16px" }}>
