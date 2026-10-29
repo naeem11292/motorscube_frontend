@@ -1,0 +1,367 @@
+
+/* =========================
+   CAREER HERO
+========================= */
+
+.career-hero {
+  position: relative;
+  width: 100%;
+  min-height: 480px;
+  overflow: hidden;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(10, 20, 35, 0.94) 0%,
+      rgba(10, 20, 35, 0.78) 50%,
+      rgba(10, 20, 35, 0.35) 100%
+    ),
+    url("/career-banner.jpg") center / cover no-repeat;
+  color: #ffffff;
+}
+
+.career-hero-overlay {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 480px;
+  padding: 70px 7%;
+  box-sizing: border-box;
+}
+
+.career-hero-content {
+  width: 100%;
+  max-width: 760px;
+}
+
+.career-hero-label,
+.career-form-label {
+  display: inline-block;
+  margin-bottom: 16px;
+  color: #e9a23b;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.career-hero-title {
+  margin: 0 0 20px;
+}
+
+.career-hero-content h1 {
+  margin: 0 0 22px;
+  color: #ffffff;
+  font-size: clamp(36px, 5vw, 58px);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.career-hero-content p {
+  max-width: 610px;
+  margin: 0 0 30px;
+  color: #e1e6ed;
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+.career-hero-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 25px;
+  border: 0;
+  border-radius: 6px;
+  background: #e9a23b;
+  color: #172033;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.career-hero-button:hover {
+  background: #f5b653;
+  transform: translateY(-2px);
+}
+
+/* =========================
+   CAREER APPLICATION SECTION
+========================= */
+
+.career-form-section {
+  width: 100%;
+  padding: 75px 20px;
+  box-sizing: border-box;
+  background: #f7f8fa;
+}
+
+.career-form-container {
+  width: 100%;
+  max-width: 1050px;
+  margin: 0 auto;
+}
+
+.career-form-heading {
+  max-width: 680px;
+  margin: 0 auto 38px;
+  text-align: center;
+}
+
+.career-form-heading h2 {
+  margin: 0 0 15px;
+  color: #182335;
+  font-size: clamp(27px, 4vw, 38px);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.career-form-heading p {
+  margin: 0;
+  color: #687386;
+  font-size: 15px;
+  line-height: 1.8;
+}
+
+/* =========================
+   FORM LAYOUT
+========================= */
+
+.career-form {
+  padding: 38px;
+  border: 1px solid #e7eaf0;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 12px 35px rgba(20, 35, 55, 0.06);
+}
+
+.career-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.career-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.career-field-full {
+  grid-column: 1 / -1;
+}
+
+.career-field label {
+  color: #263247;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.career-field label span:not(.career-optional) {
+  color: #d94841;
+}
+
+.career-optional {
+  color: #7a8495;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.career-field input,
+.career-field select,
+.career-field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 13px 14px;
+  border: 1px solid #dce1e8;
+  border-radius: 6px;
+  outline: none;
+  background: #ffffff;
+  color: #202b3c;
+  font: inherit;
+  font-size: 14px;
+  box-sizing: border-box;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.career-field input,
+.career-field select {
+  min-height: 48px;
+}
+
+.career-field textarea {
+  min-height: 130px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.career-field input::placeholder,
+.career-field textarea::placeholder {
+  color: #9aa3b1;
+}
+
+.career-field input:focus,
+.career-field select:focus,
+.career-field textarea:focus {
+  border-color: #e9a23b;
+  box-shadow: 0 0 0 3px rgba(233, 162, 59, 0.15);
+}
+
+/* =========================
+   CV UPLOAD
+========================= */
+
+.career-file-upload {
+  padding: 18px;
+  border: 1px dashed #cbd3df;
+  border-radius: 8px;
+  background: #fafbfc;
+}
+
+.career-file-upload input[type="file"] {
+  padding: 8px;
+  border: none;
+  background: transparent;
+}
+
+.career-file-upload input[type="file"]:focus {
+  box-shadow: none;
+}
+
+.career-file-upload p {
+  margin: 10px 0 0;
+  color: #566174;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.career-file-note {
+  color: #7a8495;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* =========================
+   SUCCESS AND ERROR MESSAGES
+========================= */
+
+.career-message {
+  margin-bottom: 22px;
+  padding: 14px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.career-message-success {
+  border: 1px solid #b7e4c7;
+  background: #effaf2;
+  color: #176b37;
+}
+
+.career-message-error {
+  border: 1px solid #f2c2c0;
+  background: #fff2f1;
+  color: #a62d29;
+}
+
+/* =========================
+   SUBMIT BUTTON
+========================= */
+
+.career-submit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 50px;
+  margin-top: 28px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 6px;
+  background: #182335;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.career-submit-button:hover:not(:disabled) {
+  background: #e9a23b;
+  color: #182335;
+  transform: translateY(-1px);
+}
+
+.career-submit-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* =========================
+   RESPONSIVE DESIGN
+========================= */
+
+@media (max-width: 768px) {
+  .career-hero,
+  .career-hero-overlay {
+    min-height: 400px;
+  }
+
+  .career-hero-overlay {
+    padding: 55px 24px;
+  }
+
+  .career-hero-content p {
+    font-size: 14px;
+  }
+
+  .career-form-section {
+    padding: 55px 16px;
+  }
+
+  .career-form {
+    padding: 26px 20px;
+  }
+
+  .career-form-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .career-field-full {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .career-hero,
+  .career-hero-overlay {
+    min-height: 360px;
+  }
+
+  .career-hero-overlay {
+    padding: 42px 20px;
+  }
+
+  .career-hero-content h1 {
+    font-size: 34px;
+  }
+
+  .career-form-section {
+    padding: 42px 12px;
+  }
+
+  .career-form {
+    padding: 22px 16px;
+  }
+
+  .career-submit-button {
+    width: 100%;
+  }
+}

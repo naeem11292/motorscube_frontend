@@ -1,0 +1,49 @@
+
+/* =========================
+   CAREER PAGE
+========================= */
+
+.career-page {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background: #ffffff;
+  font-family: "Poppins", Arial, sans-serif;
+  color: #182335;
+  box-sizing: border-box;
+}
+
+.career-page *,
+.career-page *::before,
+.career-page *::after {
+  box-sizing: border-box;
+}
+
+/* Smooth scrolling to the application form */
+html {
+  scroll-behavior: smooth;
+}
+
+#career-application {
+  scroll-margin-top: 30px;
+}
+
+/* Remove default heading and paragraph spacing issues */
+.career-page h1,
+.career-page h2,
+.career-page p {
+  overflow-wrap: break-word;
+}
+
+/* Responsive layout */
+@media (max-width: 768px) {
+  .career-page {
+    min-height: auto;
+  }
+
+  #career-application {
+    scroll-margin-top: 16px;
+  }
+}

@@ -36,6 +36,8 @@ import MyOrders from "./pages/Orders/MyOrders";
 import StoreOrders from "./pages/Orders/StoreOrders";
 import OrderDetails from "./pages/Orders/OrderDetails";
 
+import Career from "./pages/Career/Career";
+
 function App() {
   return (
     <BrowserRouter>
@@ -224,7 +226,7 @@ function App() {
             </ProtectedRoute>
           }
         />
-
+            <Route path="/careers" element={<Career />} />
         {/* Store owner's order management */}
         <Route
           path="/dashboard/store-orders"
