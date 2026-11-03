@@ -689,3 +689,132 @@
     grid-column: auto;
   }
 }
+
+/* =========================================
+   MARKETPLACE FILTER BAR
+========================================= */
+
+.listing-filter-wrapper {
+  background: #ffffff;
+  border: 1px solid #e8e8e8;
+  border-radius: 10px;
+  padding: 18px;
+  margin: 30px 0;
+}
+
+.listing-filters {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.2fr 1fr auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.listing-filters input,
+.listing-filters select,
+.listing-advanced-filters input,
+.listing-advanced-filters select {
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  padding: 0 14px;
+  border: 1px solid #dedede;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #333333;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.listing-filters input:focus,
+.listing-filters select:focus,
+.listing-advanced-filters input:focus,
+.listing-advanced-filters select:focus {
+  border-color: #e32636;
+}
+
+/* MORE FILTERS BUTTON */
+
+.listing-more-filters-button {
+  height: 48px;
+  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  white-space: nowrap;
+  border: 1px solid #e32636;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #e32636;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.listing-more-filters-button:hover,
+.listing-more-filters-button.active {
+  background: #e32636;
+  color: #ffffff;
+}
+
+.listing-filter-arrow {
+  font-size: 18px;
+}
+
+/* ADVANCED FILTERS */
+
+.listing-advanced-filters {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+  padding-top: 20px;
+  margin-top: 18px;
+  border-top: 1px solid #eeeeee;
+}
+
+.listing-clear-filters {
+  min-height: 45px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 6px;
+  background: #222222;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s ease;
+}
+
+.listing-clear-filters:hover {
+  background: #e32636;
+}
+
+/* TABLET */
+
+@media (max-width: 1000px) {
+  .listing-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .listing-advanced-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* MOBILE */
+
+@media (max-width: 550px) {
+  .listing-filter-wrapper {
+    padding: 12px;
+  }
+
+  .listing-filters,
+  .listing-advanced-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .listing-more-filters-button {
+    width: 100%;
+  }
+}
