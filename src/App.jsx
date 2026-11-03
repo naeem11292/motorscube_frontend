@@ -42,6 +42,9 @@ import OrderDetails from "./pages/Orders/OrderDetails";
 // Career
 import Career from "./pages/Career/Career";
 
+// Listing
+import Listing from "./pages/Listing/Listing";
+
 function App() {
   return (
     <BrowserRouter>
@@ -206,7 +209,12 @@ function App() {
             </ProtectedRoute>
           }
         />
+                 {/* PUBLIC VEHICLE LISTINGS */}
 
+                 <Route
+                      path="/listing"
+                          element={<Listing />}
+                         />
         {/* MY ITEMS */}
 
         <Route

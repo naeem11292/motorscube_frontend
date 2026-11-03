@@ -1,0 +1,458 @@
+
+/* =========================================
+   ACCESSORIES FORM - MAIN CONTAINER
+========================================= */
+
+.accessories-form {
+  width: 100%;
+  max-width: 1100px;
+  margin: 25px auto;
+  padding: 35px;
+  background: #ffffff;
+  border: 1px solid #e7ecf3;
+  border-radius: 18px;
+  box-shadow: 0 10px 35px rgba(22, 48, 87, 0.06);
+  font-family: "Poppins", sans-serif;
+  box-sizing: border-box;
+}
+
+.accessories-form *,
+.accessories-form *::before,
+.accessories-form *::after {
+  box-sizing: border-box;
+}
+
+/* =========================================
+   HEADER
+========================================= */
+
+.accessories-form-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-bottom: 28px;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #e9edf4;
+}
+
+.accessories-heading-label {
+  display: inline-block;
+  margin-bottom: 9px;
+  color: #2878df;
+  font-size: 11px;
+  font-weight: 750;
+  letter-spacing: 1.5px;
+}
+
+.accessories-heading-content h2 {
+  margin: 0 0 9px;
+  color: #172b4d;
+  font-size: 27px;
+  font-weight: 750;
+  letter-spacing: -0.7px;
+}
+
+.accessories-heading-content p {
+  max-width: 550px;
+  margin: 0;
+  color: #7b8798;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* Store badge */
+
+.accessories-store-badge {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 175px;
+  padding: 13px 17px;
+  border: 1px solid #dceaff;
+  border-radius: 11px;
+  background: linear-gradient(135deg, #f3f8ff, #eaf3ff);
+}
+
+.accessories-store-badge-label {
+  color: #8191a8;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.accessories-store-badge strong {
+  overflow-wrap: anywhere;
+  color: #1769d2;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* =========================================
+   FORM SECTIONS
+========================================= */
+
+.accessories-form-section {
+  margin-top: 27px;
+  padding: 25px;
+  border: 1px solid #e9edf4;
+  border-radius: 13px;
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.accessories-form-section:hover {
+  border-color: #d8e5f7;
+  box-shadow: 0 4px 15px rgba(25, 65, 120, 0.035);
+}
+
+/* Section heading */
+
+.accessories-section-heading {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 23px;
+}
+
+.accessories-section-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 39px;
+  height: 39px;
+  border-radius: 10px;
+  background: #edf5ff;
+  color: #1769d2;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.accessories-section-heading h3 {
+  margin: 0 0 5px;
+  color: #24344d;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.accessories-section-heading p {
+  margin: 0;
+  color: #8993a3;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================================
+   FORM GRID
+========================================= */
+
+.accessories-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 23px;
+}
+
+.accessories-form-grid label,
+.accessories-description-field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  color: #35445a;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.accessories-form .required {
+  color: #e34d4d;
+  margin-left: 3px;
+}
+
+/* =========================================
+   INPUTS, SELECTS AND TEXTAREA
+========================================= */
+
+.accessories-form input,
+.accessories-form select,
+.accessories-form textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #dfe5ee;
+  border-radius: 8px;
+  outline: none;
+  background: #ffffff;
+  color: #26364d;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.accessories-form input::placeholder,
+.accessories-form textarea::placeholder {
+  color: #a5afbd;
+  font-weight: 400;
+}
+
+.accessories-form input:hover,
+.accessories-form select:hover,
+.accessories-form textarea:hover {
+  border-color: #b7ccec;
+}
+
+.accessories-form input:focus,
+.accessories-form select:focus,
+.accessories-form textarea:focus {
+  border-color: #2878df;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(40, 120, 223, 0.10);
+}
+
+.accessories-form select {
+  cursor: pointer;
+}
+
+.accessories-form textarea {
+  min-height: 135px;
+  resize: vertical;
+  line-height: 1.7;
+}
+
+/* =========================================
+   PRICE INPUT
+========================================= */
+
+.accessories-price-input {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  overflow: hidden;
+  border: 1px solid #dfe5ee;
+  border-radius: 8px;
+  background: #ffffff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.accessories-price-input:focus-within {
+  border-color: #2878df;
+  box-shadow: 0 0 0 4px rgba(40, 120, 223, 0.10);
+}
+
+.accessories-price-input span {
+  display: flex;
+  align-items: center;
+  align-self: stretch;
+  padding: 0 14px;
+  border-right: 1px solid #e6ebf2;
+  background: #f6f9fd;
+  color: #1769d2;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.accessories-price-input input {
+  min-height: 46px;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.accessories-price-input input:focus {
+  border: none;
+  box-shadow: none;
+}
+
+/* =========================================
+   DESCRIPTION
+========================================= */
+
+.accessories-description-field {
+  width: 100%;
+}
+
+.accessories-description-field textarea {
+  width: 100%;
+}
+
+/* =========================================
+   ERROR AND SUCCESS MESSAGES
+========================================= */
+
+.accessories-error,
+.accessories-success {
+  width: 100%;
+  margin: 20px 0 0;
+  padding: 13px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.accessories-error {
+  border: 1px solid #f1cccc;
+  background: #fff5f5;
+  color: #c62828;
+}
+
+.accessories-success {
+  border: 1px solid #ccebd7;
+  background: #f0fbf4;
+  color: #208344;
+}
+
+/* =========================================
+   ACTION BUTTONS
+========================================= */
+
+.accessories-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 13px;
+  margin-top: 28px;
+  padding-top: 25px;
+  border-top: 1px solid #e9edf4;
+}
+
+.accessories-form-actions button {
+  min-width: 145px;
+  min-height: 47px;
+  padding: 12px 23px;
+  border: none;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.accessories-submit-button {
+  background: linear-gradient(135deg, #2878df, #1458b5);
+  color: #ffffff;
+  box-shadow: 0 5px 13px rgba(23, 105, 210, 0.18);
+}
+
+.accessories-submit-button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #1769d2, #104b9d);
+  box-shadow: 0 7px 17px rgba(23, 105, 210, 0.25);
+  transform: translateY(-2px);
+}
+
+.accessories-cancel-button {
+  background: #f0f2f6;
+  color: #4c596c;
+}
+
+.accessories-cancel-button:hover:not(:disabled) {
+  background: #e3e7ee;
+}
+
+.accessories-form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* =========================================
+   RESPONSIVE DESIGN - TABLETS
+========================================= */
+
+@media (max-width: 768px) {
+  .accessories-form {
+    padding: 23px;
+    border-radius: 14px;
+  }
+
+  .accessories-form-heading {
+    align-items: flex-start;
+  }
+
+  .accessories-heading-content h2 {
+    font-size: 23px;
+  }
+
+  .accessories-store-badge {
+    min-width: 150px;
+  }
+
+  .accessories-form-section {
+    padding: 20px;
+    margin-top: 20px;
+  }
+
+  .accessories-form-grid {
+    gap: 17px;
+  }
+}
+
+/* =========================================
+   RESPONSIVE DESIGN - MOBILE
+========================================= */
+
+@media (max-width: 520px) {
+  .accessories-form {
+    margin: 15px auto;
+    padding: 17px;
+    border-radius: 11px;
+  }
+
+  .accessories-form-heading {
+    flex-direction: column;
+    gap: 17px;
+    padding-bottom: 20px;
+  }
+
+  .accessories-heading-content h2 {
+    font-size: 21px;
+  }
+
+  .accessories-heading-content p {
+    font-size: 12px;
+  }
+
+  .accessories-store-badge {
+    width: 100%;
+  }
+
+  .accessories-form-section {
+    padding: 17px 14px;
+  }
+
+  .accessories-form-grid {
+    grid-template-columns: 1fr;
+    gap: 17px;
+  }
+
+  .accessories-section-heading {
+    gap: 10px;
+  }
+
+  .accessories-section-number {
+    width: 34px;
+    height: 34px;
+    font-size: 12px;
+  }
+
+  .accessories-section-heading h3 {
+    font-size: 14px;
+  }
+
+  .accessories-section-heading p {
+    font-size: 11px;
+  }
+
+  .accessories-form-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
+  }
+
+  .accessories-form-actions button {
+    width: 100%;
+  }
+}
