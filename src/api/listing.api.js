@@ -54,3 +54,15 @@ export const getAllListings = async () => {
       new Date(a.post_created_date || 0).getTime()
   );
 };
+
+// Get one sale listing by ID
+export const getSaleById = async (id) => {
+  const response = await api.get(`/items-ad-sale/${id}`);
+  return response.data;
+};
+
+// Get one hire listing by ID
+export const getHireById = async (id) => {
+  const response = await api.get(`/items-ad-hire/${id}`);
+  return response.data;
+};

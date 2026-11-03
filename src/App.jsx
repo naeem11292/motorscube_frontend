@@ -42,46 +42,40 @@ import OrderDetails from "./pages/Orders/OrderDetails";
 // Career
 import Career from "./pages/Career/Career";
 
-// Listing
+// Public Listings
 import Listing from "./pages/Listing/Listing";
+import ListingDetails from "./pages/Listing/ListingDetails";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         {/* AUTHENTICATION */}
-
         <Route path="/" element={<SignIn />} />
         <Route path="/login" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
-
         <Route
           path="/verify-registration"
           element={<OTPVerification />}
         />
-
         <Route
           path="/forgot-password"
           element={<ForgotPassword />}
         />
-
         <Route
           path="/otp-verification"
           element={<OTPVerification />}
         />
-
         <Route
           path="/reset-password"
           element={<ResetPassword />}
         />
-
         <Route
           path="/password-reset-success"
           element={<PasswordResetSuccess />}
         />
 
         {/* DASHBOARD */}
-
         <Route
           path="/dashboard"
           element={
@@ -94,7 +88,6 @@ function App() {
         />
 
         {/* PROFILE */}
-
         <Route
           path="/dashboard/profile"
           element={
@@ -107,7 +100,6 @@ function App() {
         />
 
         {/* WALLET */}
-
         <Route
           path="/dashboard/wallet"
           element={
@@ -119,8 +111,7 @@ function App() {
           }
         />
 
-        {/* SALE */}
-
+        {/* ADD SALE */}
         <Route
           path="/dashboard/add-sale"
           element={
@@ -132,8 +123,7 @@ function App() {
           }
         />
 
-        {/* HIRE */}
-
+        {/* ADD HIRE */}
         <Route
           path="/dashboard/add-hire"
           element={
@@ -146,7 +136,6 @@ function App() {
         />
 
         {/* DEALERSHIP */}
-
         <Route
           path="/dashboard/dealership"
           element={
@@ -159,7 +148,6 @@ function App() {
         />
 
         {/* BUSINESS SERVICES */}
-
         <Route
           path="/dashboard/business-services"
           element={
@@ -172,7 +160,6 @@ function App() {
         />
 
         {/* STORES */}
-
         <Route
           path="/dashboard/stores"
           element={
@@ -185,7 +172,6 @@ function App() {
         />
 
         {/* ACCESSORIES */}
-
         <Route
           path="/dashboard/ad-accessories"
           element={
@@ -198,7 +184,6 @@ function App() {
         />
 
         {/* MESSAGES */}
-
         <Route
           path="/dashboard/messages"
           element={
@@ -209,14 +194,26 @@ function App() {
             </ProtectedRoute>
           }
         />
-                 {/* PUBLIC VEHICLE LISTINGS */}
 
-                 <Route
-                      path="/listing"
-                          element={<Listing />}
-                         />
+        {/* PUBLIC VEHICLE LISTINGS */}
+        <Route
+          path="/listing"
+          element={<Listing />}
+        />
+
+        {/* PUBLIC SALE DETAILS */}
+        <Route
+          path="/listing/sale/:id"
+          element={<ListingDetails type="sale" />}
+        />
+
+        {/* PUBLIC HIRE DETAILS */}
+        <Route
+          path="/listing/hire/:id"
+          element={<ListingDetails type="hire" />}
+        />
+
         {/* MY ITEMS */}
-
         <Route
           path="/dashboard/my-items"
           element={
@@ -229,7 +226,6 @@ function App() {
         />
 
         {/* ORDERS */}
-
         <Route
           path="/dashboard/orders"
           element={
@@ -252,12 +248,13 @@ function App() {
           }
         />
 
-        {/* CAREER */}
-
-        <Route path="/careers" element={<Career />} />
+        {/* CAREERS */}
+        <Route
+          path="/careers"
+          element={<Career />}
+        />
 
         {/* STORE OWNER ORDERS */}
-
         <Route
           path="/dashboard/store-orders"
           element={
