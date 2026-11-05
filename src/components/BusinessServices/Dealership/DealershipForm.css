@@ -1,0 +1,245 @@
+
+/* ================================
+   DEALERSHIP FORM
+================================ */
+
+.dealership-form {
+  width: 100%;
+  max-width: 1100px;
+  margin: 30px auto;
+  padding: 32px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+  font-family: "Poppins", sans-serif;
+  box-sizing: border-box;
+}
+
+.dealership-form *,
+.dealership-form *::before,
+.dealership-form *::after {
+  box-sizing: border-box;
+}
+
+.dealership-form h2 {
+  margin: 0 0 28px;
+  color: #172554;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+/* ================================
+   FORM GRID
+================================ */
+
+.dealership-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 25px;
+}
+
+.dealership-form .form-group {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.dealership-form .form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+/* ================================
+   LABELS
+================================ */
+
+.dealership-form .form-group label {
+  margin-bottom: 9px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ================================
+   INPUTS AND SELECTS
+================================ */
+
+.dealership-form input,
+.dealership-form select,
+.dealership-form textarea {
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  background: #ffffff;
+  color: #111827;
+  font-family: inherit;
+  font-size: 14px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dealership-form input::placeholder,
+.dealership-form textarea::placeholder {
+  color: #9ca3af;
+}
+
+.dealership-form input:focus,
+.dealership-form select:focus,
+.dealership-form textarea:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.dealership-form input:disabled,
+.dealership-form select:disabled,
+.dealership-form textarea:disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+/* ================================
+   TEXTAREA
+================================ */
+
+.dealership-form textarea {
+  min-height: 130px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+/* ================================
+   IMAGE UPLOAD
+================================ */
+
+.dealership-form input[type="file"] {
+  min-height: auto;
+  padding: 12px;
+  border: 1px dashed #93c5fd;
+  background: #f8fbff;
+  cursor: pointer;
+}
+
+.dealership-form input[type="file"]::file-selector-button {
+  margin-right: 12px;
+  padding: 9px 14px;
+  border: none;
+  border-radius: 6px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.dealership-form input[type="file"]::file-selector-button:hover {
+  background: #bfdbfe;
+}
+
+.dealership-form .form-group p {
+  margin: 8px 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* ================================
+   ERROR MESSAGE
+================================ */
+
+.dealership-form .form-error {
+  margin: 0 0 22px;
+  padding: 12px 15px;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 13px;
+}
+
+/* ================================
+   ACTION BUTTONS
+================================ */
+
+.dealership-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.dealership-form-actions button {
+  min-height: 46px;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.dealership-form-actions button:hover:not(:disabled) {
+  background: #1d4ed8;
+  transform: translateY(-1px);
+}
+
+.dealership-form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dealership-form-actions button[type="button"] {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+}
+
+.dealership-form-actions button[type="button"]:hover:not(:disabled) {
+  background: #f3f4f6;
+}
+
+/* ================================
+   RESPONSIVE DESIGN
+================================ */
+
+@media (max-width: 768px) {
+  .dealership-form {
+    margin: 20px auto;
+    padding: 22px;
+  }
+
+  .dealership-form-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .dealership-form .form-group.full-width {
+    grid-column: auto;
+  }
+
+  .dealership-form h2 {
+    font-size: 21px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dealership-form {
+    margin: 12px auto;
+    padding: 17px;
+    border-radius: 10px;
+  }
+
+  .dealership-form-actions {
+    flex-direction: column;
+  }
+
+  .dealership-form-actions button {
+    width: 100%;
+  }
+}

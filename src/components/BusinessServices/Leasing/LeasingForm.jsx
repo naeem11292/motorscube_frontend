@@ -1,6 +1,5 @@
 
-import { useState } from "react";
-import { createLeasing } from "../../../api/leasing.api";
+import { useEffect, useState } from "react";
 import "./LeasingForm.css";
 
 const initialFormData = {
@@ -18,12 +17,61 @@ const initialFormData = {
   ad_for: "leasing",
 };
 
-function LeasingForm() {
+const getImageUrl = (path) => {
+  if (!path) return "";
+
+  if (path.startsWith("http://") || path.startsWith("https://")) {
+    return path;
+  }
+
+  const filename = path.split(/[\\/]/).pop();
+  return `http://localhost:5000/uploads/${encodeURIComponent(filename)}`;
+};
+
+function LeasingForm({
+  initialData = null,
+  selectedVehicleType = "",
+  onSubmit,
+  disabled = false,
+  onCancel,
+}) {
+  const isEditing = Boolean(initialData?.id);
+
   const [formData, setFormData] = useState(initialFormData);
   const [images, setImages] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState("error");
+
+  useEffect(() => {
+    if (initialData) {
+      const populatedData = {};
+
+      Object.keys(initialFormData).forEach((key) => {
+        populatedData[key] =
+          initialData[key] ?? initialFormData[key];
+      });
+
+      setFormData(populatedData);
+    } else {
+      setFormData({
+        ...initialFormData,
+        vehicle_type: selectedVehicleType,
+      });
+    }
+
+    setImages([]);
+    setMessage("");
+
+    const fileInput = document.getElementById("leasing-images");
+    if (fileInput) fileInput.value = "";
+  }, [initialData, selectedVehicleType]);
+
+  const existingImages = initialData
+    ? Array.from({ length: 8 }, (_, index) =>
+        initialData[`leasing_img${index + 1}`]
+      ).filter(Boolean)
+    : [];
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -37,8 +85,9 @@ function LeasingForm() {
   const handleImagesChange = (event) => {
     const selected = Array.from(event.target.files || []);
 
-    if (selected.length !== 8) {
-      setImages(selected);
+    if (selected.length !== 0 && selected.length !== 8) {
+      setImages([]);
+      event.target.value = "";
       setMessage("Please select exactly 8 images.");
       setMessageType("error");
       return;
@@ -64,10 +113,24 @@ function LeasingForm() {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (submitting) return;
+    if (submitting || disabled) return;
 
-    if (images.length !== 8) {
+    if (!formData.vehicle_type) {
+      setMessage("Please select a vehicle type.");
+      setMessageType("error");
+      return;
+    }
+
+    if (!isEditing && images.length !== 8) {
       setMessage("Please select exactly 8 images.");
+      setMessageType("error");
+      return;
+    }
+
+    if (isEditing && images.length !== 0 && images.length !== 8) {
+      setMessage(
+        "Select exactly 8 replacement images, or leave images unchanged."
+      );
       setMessageType("error");
       return;
     }
@@ -78,10 +141,16 @@ function LeasingForm() {
       return;
     }
 
+    if (typeof onSubmit !== "function") {
+      setMessage("Form submission is not configured.");
+      setMessageType("error");
+      return;
+    }
+
     const payload = new FormData();
 
     Object.entries(formData).forEach(([key, value]) => {
-      payload.append(key, value);
+      payload.append(key, value ?? "");
     });
 
     images.forEach((file) => {
@@ -92,27 +161,33 @@ function LeasingForm() {
     setMessage("");
 
     try {
-      const response = await createLeasing(payload);
+      await onSubmit(payload);
 
       setMessage(
-        response.message || "Leasing listing created successfully."
+        isEditing
+          ? "Leasing registration updated successfully."
+          : "Leasing registration created successfully."
       );
       setMessageType("success");
-      setFormData(initialFormData);
-      setImages([]);
 
-      const fileInput = document.getElementById("leasing-images");
-      if (fileInput) fileInput.value = "";
+      if (!isEditing) {
+        setFormData({
+          ...initialFormData,
+          vehicle_type: selectedVehicleType,
+        });
+
+        setImages([]);
+
+        const fileInput = document.getElementById("leasing-images");
+        if (fileInput) fileInput.value = "";
+      }
     } catch (error) {
       console.error("LEASING SUBMISSION FAILED:", error);
-      console.error("API status:", error.response?.status);
-      console.error("API response:", error.response?.data);
 
       setMessage(
         error.response?.data?.message ||
-          error.response?.data?.error ||
           error.message ||
-          "Failed to submit leasing listing."
+          "Failed to save leasing registration."
       );
       setMessageType("error");
     } finally {
@@ -122,7 +197,11 @@ function LeasingForm() {
 
   return (
     <form className="leasing-form" onSubmit={handleSubmit}>
-      <h3>Leasing Business Information</h3>
+      <h3>
+        {isEditing
+          ? "Update Leasing Business Information"
+          : "Leasing Business Information"}
+      </h3>
 
       {message && (
         <p
@@ -153,6 +232,7 @@ function LeasingForm() {
             value={formData.vehicle_type}
             onChange={handleChange}
             required
+            disabled={Boolean(selectedVehicleType) || isEditing}
           >
             <option value="">Select vehicle type</option>
             <option value="car">Car</option>
@@ -275,27 +355,72 @@ function LeasingForm() {
           />
         </label>
 
+        {isEditing && existingImages.length > 0 && (
+          <div className="leasing-full-width">
+            <p>Current Business Images</p>
+
+            <div className="leasing-current-images">
+              {existingImages.map((image, index) => (
+                <img
+                  key={index}
+                  src={getImageUrl(image)}
+                  alt={`Leasing business ${index + 1}`}
+                  style={{
+                    width: "100px",
+                    height: "85px",
+                    objectFit: "cover",
+                    margin: "5px",
+                    borderRadius: "6px",
+                  }}
+                />
+              ))}
+            </div>
+
+            <small>
+              Leave the image selection empty to keep existing images.
+            </small>
+          </div>
+        )}
+
         <label className="leasing-full-width">
-          Business Images (exactly 8) *
+          Business Images {isEditing ? "(optional replacement)" : "(exactly 8)"} *
           <input
             id="leasing-images"
             type="file"
             accept="image/jpeg,image/png,image/webp"
             multiple
             onChange={handleImagesChange}
-            required
+            required={!isEditing}
           />
-          <small>{images.length} of 8 images selected</small>
+          <small>
+            {images.length} replacement images selected
+            {isEditing && " — select 8 to replace existing images"}
+          </small>
         </label>
       </div>
 
       <button
         type="submit"
         className="leasing-submit-button"
-        disabled={submitting}
+        disabled={submitting || disabled}
       >
-        {submitting ? "Submitting..." : "Submit Leasing Details"}
+        {submitting || disabled
+          ? "Saving..."
+          : isEditing
+            ? "Update Leasing Details"
+            : "Submit Leasing Details"}
       </button>
+
+      {isEditing && onCancel && (
+        <button
+          type="button"
+          className="business-service-cancel-button"
+          onClick={onCancel}
+          disabled={submitting || disabled}
+        >
+          Cancel Editing
+        </button>
+      )}
     </form>
   );
 }
