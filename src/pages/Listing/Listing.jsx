@@ -9,6 +9,76 @@ import "./Listing.css";
 const API_BASE = "http://localhost:5000";
 const ITEMS_PER_PAGE = 6;
 
+// TEMPORARY DEMO ADS — REMOVE BEFORE PRODUCTION
+const DEMO_PROMOTION_ADS = [
+  {
+    listing_id: "demo-hotspot-001",
+    listing_type: "sale",
+    promotion_plan: "hotspot",
+    make: "Toyota",
+    model: "Fortuner",
+    version: "2.8 Sigma 4",
+    vehicle_type: "car",
+    year: 2023,
+    condition: "Used",
+    transmission: "Automatic",
+    fuel_type: "Diesel",
+    mileage: 18000,
+    registration_city: "Islamabad",
+    display_price: 14500000,
+    description:
+      "Well-maintained Toyota Fortuner with excellent condition, comfortable interior, powerful diesel engine and complete service history. Ready for its next owner.",
+    images: [
+      "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1000&q=85"
+    ]
+  },
+  {
+    listing_id: "demo-supreme-001",
+    listing_type: "sale",
+    promotion_plan: "supreme",
+    make: "BMW",
+    model: "5 Series",
+    version: "530i M Sport",
+    vehicle_type: "car",
+    year: 2024,
+    condition: "Used",
+    transmission: "Automatic",
+    fuel_type: "Petrol",
+    mileage: 8500,
+    registration_city: "Lahore",
+    display_price: 28500000,
+    description:
+      "Experience premium German engineering with this stunning BMW 530i M Sport. Featuring a luxurious interior, advanced technology, powerful performance, elegant exterior styling and exceptional comfort. Carefully maintained with an excellent service record. A premium driving experience for those who appreciate performance and sophistication.",
+    images: [
+      "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=85",
+      "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=900&q=85",
+      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=85"
+    ]
+  },
+  {
+    listing_id: "demo-hotspot-002",
+    listing_type: "sale",
+    promotion_plan: "hotspot",
+    make: "Honda",
+    model: "Civic",
+    version: "RS Turbo",
+    vehicle_type: "car",
+    year: 2022,
+    condition: "Used",
+    transmission: "Automatic",
+    fuel_type: "Petrol",
+    mileage: 25000,
+    registration_city: "Rawalpindi",
+    display_price: 9200000,
+    description:
+      "Honda Civic RS Turbo in excellent condition with a comfortable interior, sporty design and smooth automatic transmission.",
+    images: [
+      "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1000&q=85"
+    ]
+  }
+];
+
+
 const EMPTY_ADVANCED_FILTERS = {
   condition: [],
   city: [],
@@ -34,41 +104,41 @@ const EMPTY_ADVANCED_FILTERS = {
   withPictures: false,
 };
 
-const getImageUrl = (images) => {
-  if (!images) return "";
+// GET IMAGE URLS
+const getImageUrls = (images) => {
+  if (!images) return [];
 
-  let image = images;
+  let parsedImages = images;
 
-  if (typeof image === "string") {
+  if (typeof parsedImages === "string") {
     try {
-      image = JSON.parse(image);
+      parsedImages = JSON.parse(parsedImages);
     } catch {
-      image = [image];
+      parsedImages = [parsedImages];
     }
   }
 
-  if (!Array.isArray(image)) {
-    image = [image];
+  if (!Array.isArray(parsedImages)) {
+    parsedImages = [parsedImages];
   }
 
-  const filename = image.find(
-    (item) => typeof item === "string" && item.trim()
-  );
+  return parsedImages
+    .filter((image) => typeof image === "string" && image.trim())
+    .map((filename) => {
+      if (/^https?:\/\//i.test(filename)) {
+        return filename;
+      }
 
-  if (!filename) return "";
+      const cleanFilename = filename
+        .replace(/\\/g, "/")
+        .replace(/^\/+/, "")
+        .replace(/^uploads\//, "");
 
-  if (/^https?:\/\//i.test(filename)) {
-    return filename;
-  }
-
-  const cleanFilename = filename
-    .replace(/\\/g, "/")
-    .replace(/^\/+/, "")
-    .replace(/^uploads\//, "");
-
-  return `${API_BASE}/uploads/${cleanFilename}`;
+      return `${API_BASE}/uploads/${cleanFilename}`;
+    });
 };
 
+// FORMAT PRICE
 const formatPrice = (value) => {
   if (value === null || value === undefined || value === "") {
     return "Price on request";
@@ -83,28 +153,59 @@ const formatPrice = (value) => {
   return `PKR ${number.toLocaleString("en-PK")}`;
 };
 
-const hasPictures = (images) => {
-  if (!images) return false;
+// CHECK PICTURES
+const hasPictures = (images) => getImageUrls(images).length > 0;
 
-  if (Array.isArray(images)) {
-    return images.some(Boolean);
+// GET PROMOTION PLAN
+const getListingPlan = (item) => {
+  const plan = String(
+    item.promotion_plan ||
+      item.ad_plan ||
+      item.listing_plan ||
+      "normal"
+  )
+    .trim()
+    .toLowerCase()
+    .replace(/[\s_-]+/g, "");
+
+  if (plan === "hotspot") return "hotspot";
+  if (plan === "supreme") return "supreme";
+
+  return "normal";
+};
+
+// GET DESCRIPTION
+const getListingDescription = (item) => {
+  return (
+    item.description ||
+    item.ad_description ||
+    item.item_description ||
+    item.vehicle_description ||
+    ""
+  );
+};
+
+// LIMIT DESCRIPTION CHARACTERS
+const limitDescription = (description, limit) => {
+  const text = String(description || "").trim();
+
+  if (text.length <= limit) {
+    return text;
   }
 
-  if (typeof images === "string") {
-    try {
-      const parsed = JSON.parse(images);
+  return `${text.slice(0, limit).trimEnd()}...`;
+};
 
-      if (Array.isArray(parsed)) {
-        return parsed.some(Boolean);
-      }
+// SHUFFLE LISTINGS ONCE
+const shuffleListings = (items) => {
+  const shuffled = [...items];
 
-      return Boolean(parsed);
-    } catch {
-      return images.trim() !== "" && images !== "null";
-    }
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
   }
 
-  return false;
+  return shuffled;
 };
 
 const Listing = () => {
@@ -139,14 +240,19 @@ const Listing = () => {
 
         const response = await getAllListings();
 
-        // Supports an array or backend { success, data: [...] } response.
         const data = Array.isArray(response)
           ? response
           : Array.isArray(response?.data)
             ? response.data
             : [];
 
-        setListings(data);
+        // Mix Normal, Hotspot and Supreme in one feed.
+       setListings(
+  shuffleListings([
+    ...data,
+    ...DEMO_PROMOTION_ADS,
+  ])
+);
       } catch (err) {
         console.error("Loading listings failed:", err);
 
@@ -203,13 +309,11 @@ const Listing = () => {
         condition === "all" ||
         itemCondition === condition.toLowerCase();
 
-      // ADVANCED CHIP FILTERS
+      // ADVANCED FILTERS
       const matchesSelected = (key, value) => {
         const selectedValues = advancedFilters[key] || [];
 
-        if (!selectedValues.length) {
-          return true;
-        }
+        if (!selectedValues.length) return true;
 
         return selectedValues.some(
           (selectedValue) =>
@@ -265,7 +369,6 @@ const Listing = () => {
         matchesMakeModel &&
         matchesLocation &&
         matchesCondition &&
-
         matchesSelected("condition", item.condition) &&
         matchesSelected("city", item.city) &&
         matchesSelected("registrationCity", item.registration_city) &&
@@ -279,7 +382,6 @@ const Listing = () => {
         matchesSelected("color", item.color) &&
         matchesSelected("adType", item.ad_type) &&
         matchesSelected("doors", item.doors) &&
-
         matchesYearMin &&
         matchesYearMax &&
         matchesPriceMin &&
@@ -341,7 +443,8 @@ const Listing = () => {
 
   // VEHICLE CARD
   const renderVehicleCard = (item) => {
-    const imageUrl = getImageUrl(item.images);
+    const plan = getListingPlan(item);
+    const imageUrls = getImageUrls(item.images);
 
     const title = [
       item.make,
@@ -365,23 +468,75 @@ const Listing = () => {
         ? item.charges_type
         : "";
 
+    const description = getListingDescription(item);
+
+    const descriptionLimit =
+      plan === "hotspot" ? 200 : 350;
+
+    const limitedDescription = limitDescription(
+      description,
+      descriptionLimit
+    );
+
+    const renderImage = (url, alt, className = "") => (
+      <div className={className || "listing-card-image"}>
+        {url ? (
+          <img src={url} alt={alt} />
+        ) : (
+          <div className="listing-image-placeholder">
+            <span>No Image</span>
+          </div>
+        )}
+      </div>
+    );
+
     return (
       <article
-        className="listing-card"
+        className={`listing-card ${plan}-ad`}
         key={`${item.listing_type}-${item.listing_id}`}
         onClick={() => openListing(item)}
       >
-        <div className="listing-card-image">
-          {imageUrl ? (
-            <img src={imageUrl} alt={title} />
-          ) : (
-            <div className="listing-image-placeholder">
-              <span>No Image</span>
-            </div>
-          )}
-        </div>
+        {/* NORMAL AND HOTSPOT: ONE IMAGE */}
+        {plan !== "supreme" &&
+          renderImage(imageUrls[0], title)}
+
+        {/* SUPREME: ONE LARGE + TWO SMALL IMAGES */}
+        {plan === "supreme" && (
+          <div className="listing-card-gallery">
+            {renderImage(
+              imageUrls[0],
+              `${title} main image`,
+              "gallery-main"
+            )}
+
+            {imageUrls[1] && (
+              renderImage(
+                imageUrls[1],
+                `${title} second image`,
+                "gallery-small"
+              )
+            )}
+
+            {imageUrls[2] && (
+              renderImage(
+                imageUrls[2],
+                `${title} third image`,
+                "gallery-small"
+              )
+            )}
+          </div>
+        )}
 
         <div className="listing-card-content">
+          {/* PLAN BADGE */}
+          <span className="listing-plan-badge">
+            {plan === "normal"
+              ? "Normal Ad"
+              : plan === "hotspot"
+                ? "Hotspot Ad"
+                : "Supreme Ad"}
+          </span>
+
           <div className="listing-card-topline">
             <span
               className={`listing-type-badge ${item.listing_type}`}
@@ -398,19 +553,30 @@ const Listing = () => {
 
           <h3>{title}</h3>
 
-          <div className="listing-card-specs">
-            {item.year && <span>{item.year}</span>}
-            {item.condition && <span>{item.condition}</span>}
-            {item.transmission && <span>{item.transmission}</span>}
-            {item.fuel_type && <span>{item.fuel_type}</span>}
-            {item.mileage && <span>{item.mileage} km</span>}
-          </div>
+          {/* SPECIFICATIONS: HOTSPOT AND SUPREME */}
+          {plan !== "normal" && (
+            <div className="listing-card-specs">
+              {item.year && <span>{item.year}</span>}
+              {item.condition && <span>{item.condition}</span>}
+              {item.transmission && <span>{item.transmission}</span>}
+              {item.fuel_type && <span>{item.fuel_type}</span>}
+              {item.mileage && <span>{item.mileage} km</span>}
+            </div>
+          )}
+
+          {/* DESCRIPTION: HOTSPOT AND SUPREME */}
+          {plan !== "normal" && limitedDescription && (
+            <p className="listing-description">
+              {limitedDescription}
+            </p>
+          )}
 
           <p className="listing-card-location">
             <span>⌖</span> {itemLocation}
           </p>
         </div>
 
+        {/* PRICE AND ACTIONS */}
         <div className="listing-card-right">
           <button
             className="listing-favorite"
