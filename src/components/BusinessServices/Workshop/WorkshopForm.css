@@ -1,42 +1,74 @@
 
-.workshop-form {
+.workshop-form-wrapper {
   width: 100%;
   max-width: 1100px;
   margin: 24px auto;
   padding: 32px;
-  background: #fff;
+  background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
   font-family: "Poppins", sans-serif;
-  color: #222;
+  color: #222222;
   box-sizing: border-box;
 }
 
-.workshop-form h2 {
-  margin: 0 0 24px;
-  font-size: 26px;
-  font-weight: 700;
+.workshop-form-heading {
+  margin-bottom: 24px;
 }
 
-.workshop-form-grid {
+.workshop-form-eyebrow {
+  margin: 0 0 8px;
+  color: #e5232b;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.workshop-form-heading h2 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: #222222;
+}
+
+.workshop-section {
+  margin-top: 32px;
+}
+
+.workshop-section h3 {
+  margin: 0 0 18px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 20px;
+  font-weight: 600;
+  color: #222222;
+}
+
+.workshop-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
 
-.workshop-form label {
+.workshop-field {
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-width: 0;
   font-size: 14px;
   font-weight: 600;
+  color: #222222;
 }
 
-.workshop-form input,
-.workshop-form select,
-.workshop-form textarea {
+.workshop-field-full {
+  grid-column: 1 / -1;
+}
+
+.workshop-field input,
+.workshop-field select,
+.workshop-field textarea {
   box-sizing: border-box;
   width: 100%;
   min-height: 46px;
@@ -44,128 +76,151 @@
   border: 1px solid #d1d5db;
   border-radius: 7px;
   outline: none;
-  background: #fff;
-  color: #222;
-  font: inherit;
+  background: #ffffff;
+  color: #222222;
+  font-family: inherit;
   font-size: 14px;
   font-weight: 400;
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.workshop-form textarea {
+.workshop-field textarea {
   min-height: 130px;
   resize: vertical;
 }
 
-.workshop-form input:focus,
-.workshop-form select:focus,
-.workshop-form textarea:focus {
+.workshop-field input:focus,
+.workshop-field select:focus,
+.workshop-field textarea:focus {
   border-color: #e5232b;
   box-shadow: 0 0 0 3px rgba(229, 35, 43, 0.1);
 }
 
-.workshop-form input[readonly] {
-  background: #f9fafb;
-  color: #6b7280;
-}
-
-.workshop-full-width {
-  grid-column: 1 / -1;
-}
-
-.workshop-form small {
-  color: #6b7280;
-  font-size: 12px;
-  font-weight: 400;
-}
-
-.workshop-form button[type="submit"] {
-  display: block;
-  width: 100%;
-  min-height: 48px;
-  margin-top: 30px;
-  padding: 12px 20px;
-  border: none;
-  border-radius: 7px;
-  background: #e5232b;
-  color: #fff;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.workshop-form button[type="submit"]:hover {
-  background: #c81d24;
-}
-
-.workshop-form button[type="submit"]:disabled {
-  opacity: 0.6;
+.workshop-field input:disabled,
+.workshop-field select:disabled,
+.workshop-field textarea:disabled {
+  background: #f3f4f6;
   cursor: not-allowed;
 }
 
-.workshop-message {
-  margin: 0 0 20px;
-  padding: 12px 14px;
-  border: 1px solid;
-  border-radius: 7px;
-  font-size: 14px;
+.workshop-image-help {
+  margin: 8px 0 0;
+  color: #6b7280;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
 }
 
-.workshop-message.error {
-  border-color: #fecaca;
-  background: #fef2f2;
-  color: #b91c1c;
-}
-
-.workshop-message.success {
-  border-color: #bbf7d0;
-  background: #f0fdf4;
-  color: #166534;
-}
-
-.workshop-image-grid {
+.workshop-image-preview {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(120px, 150px));
   gap: 12px;
   margin-top: 16px;
 }
 
-.workshop-image-preview {
+.workshop-image-preview img {
+  display: block;
   width: 100%;
   height: 110px;
-  overflow: hidden;
+  object-fit: cover;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
 }
 
-.workshop-image-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+.workshop-message {
+  margin: 16px 0;
+  padding: 12px 14px;
+  border-radius: 7px;
+  font-size: 14px;
+}
+
+.workshop-error {
+  border: 1px solid #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+.workshop-success {
+  border: 1px solid #bbf7d0;
+  background: #f0fdf4;
+  color: #15803d;
+}
+
+.workshop-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 30px;
+}
+
+.workshop-form-actions button {
+  min-height: 48px;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 7px;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, opacity 0.2s;
+}
+
+.workshop-submit-btn {
+  flex: 1;
+  background: #e5232b;
+  color: #ffffff;
+}
+
+.workshop-submit-btn:hover {
+  background: #c81d24;
+}
+
+.workshop-cancel-btn {
+  background: #f3f4f6;
+  color: #222222;
+  border: 1px solid #d1d5db !important;
+}
+
+.workshop-cancel-btn:hover {
+  background: #e5e7eb;
+}
+
+.workshop-form-actions button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 @media (max-width: 700px) {
-  .workshop-form {
+  .workshop-form-wrapper {
     margin: 16px auto;
     padding: 20px;
   }
 
-  .workshop-form h2 {
+  .workshop-form-heading h2 {
     font-size: 22px;
   }
 
-  .workshop-form-grid {
+  .workshop-section h3 {
+    font-size: 18px;
+  }
+
+  .workshop-grid {
     grid-template-columns: 1fr;
     gap: 16px;
   }
 
-  .workshop-full-width {
+  .workshop-field-full {
     grid-column: auto;
   }
-}
 
-@media (max-width: 600px) {
-  .workshop-image-grid {
+  .workshop-image-preview {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .workshop-form-actions {
+    flex-direction: column;
+  }
+
+  .workshop-form-actions button {
+    width: 100%;
   }
 }

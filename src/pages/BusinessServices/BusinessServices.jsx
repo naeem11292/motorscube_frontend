@@ -34,9 +34,19 @@ import {
   updateLeasing,
 } from "../../api/leasing.api";
 
+import {
+  createWorkshop,
+  updateWorkshop,
+} from "../../api/workshop.api";
+
 import "./BusinessServices.css";
 
-const VEHICLE_TYPE_SERVICES = ["dealership", "insurance", "leasing"];
+const VEHICLE_TYPE_SERVICES = [
+  "dealership",
+  "insurance",
+  "leasing",
+  "workshop",
+];
 
 function BusinessServices() {
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -57,6 +67,9 @@ function BusinessServices() {
   const [editingLeasing, setEditingLeasing] = useState(null);
   const [leasingRefreshKey, setLeasingRefreshKey] = useState(0);
 
+  // Workshop
+  const [editingWorkshop, setEditingWorkshop] = useState(null);
+
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -71,6 +84,7 @@ function BusinessServices() {
     setEditingDealership(null);
     setEditingInsurance(null);
     setEditingLeasing(null);
+    setEditingWorkshop(null);
 
     setSelectedVehicleType("");
     setMessage("");
@@ -97,6 +111,10 @@ function BusinessServices() {
       setEditingLeasing(registration || null);
     }
 
+    if (selectedCategory === "workshop") {
+      setEditingWorkshop(registration || null);
+    }
+
     setMessage("");
     setShowVehiclePopup(false);
 
@@ -110,6 +128,7 @@ function BusinessServices() {
     setEditingDealership(null);
     setEditingInsurance(null);
     setEditingLeasing(null);
+    setEditingWorkshop(null);
 
     setSelectedVehicleType("");
     setMessage("");
@@ -120,6 +139,7 @@ function BusinessServices() {
     setShowVehiclePopup(false);
     setSelectedCategory("");
     setSelectedVehicleType("");
+    setEditingWorkshop(null);
     setMessage("");
   };
 
@@ -268,6 +288,47 @@ function BusinessServices() {
   const cancelLeasingEdit = () => {
     setEditingLeasing(null);
     setMessage("");
+  };
+
+  // =========================
+  // WORKSHOP
+  // =========================
+
+  const handleWorkshopSubmit = async (formData) => {
+    try {
+      setSaving(true);
+      setMessage("");
+
+      if (editingWorkshop?.id) {
+        await updateWorkshop(editingWorkshop.id, formData);
+        setMessage("Workshop updated successfully.");
+      } else {
+        await createWorkshop(formData);
+        setMessage("Workshop registered successfully.");
+      }
+
+      setEditingWorkshop(null);
+      setSelectedVehicleType("");
+      setShowVehiclePopup(true);
+    } catch (error) {
+      console.error("Workshop submission error:", error);
+
+      setMessage(
+        error.response?.data?.message ||
+          "Unable to save workshop. Please try again."
+      );
+
+      throw error;
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const cancelWorkshopForm = () => {
+    setEditingWorkshop(null);
+    setSelectedVehicleType("");
+    setMessage("");
+    setShowVehiclePopup(true);
   };
 
   // =========================
@@ -432,12 +493,41 @@ function BusinessServices() {
         )}
 
       {/* WORKSHOP */}
-      {selectedCategory === "workshop" && (
-        <section className="business-service-form-section">
-          <h2>Workshop Form</h2>
-          <WorkshopForm />
-        </section>
-      )}
+      {selectedCategory === "workshop" &&
+        selectedVehicleType &&
+        !showVehiclePopup && (
+          <section className="business-service-form-section">
+            <button
+              type="button"
+              className="business-service-cancel-button"
+              onClick={openVehicleTypePopup}
+              disabled={saving}
+            >
+              ← Change Vehicle Type
+            </button>
+
+            <h2>
+              {editingWorkshop
+                ? "Update Workshop"
+                : "Workshop Registration"}
+            </h2>
+
+            {message && (
+              <div className="business-service-message" role="status">
+                {message}
+              </div>
+            )}
+
+            <WorkshopForm
+              key={`${editingWorkshop?.id ?? "new"}-${selectedVehicleType}`}
+              initialData={editingWorkshop}
+              selectedVehicleType={selectedVehicleType}
+              onSubmit={handleWorkshopSubmit}
+              onCancel={cancelWorkshopForm}
+              disabled={saving}
+            />
+          </section>
+        )}
 
       {/* DRIVING SCHOOL */}
       {selectedCategory === "drivingSchool" && (

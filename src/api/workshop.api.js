@@ -1,4 +1,5 @@
-import api from "axios";
+import api from "./axios";
+
 export const createWorkshop = async (data) => {
   const response = await api.post("/workshop", data);
   return response.data;

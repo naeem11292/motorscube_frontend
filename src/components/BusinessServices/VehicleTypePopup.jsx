@@ -1,8 +1,8 @@
-
 import { useEffect, useState } from "react";
 import { getDealerships } from "../../api/dealership.api";
 import { getInsuranceListings } from "../../api/insurance.api";
 import { getLeasingListings } from "../../api/leasing.api";
+import { getWorkshopListings } from "../../api/workshop.api";
 import "./VehicleTypePopup.css";
 
 const VEHICLE_TYPES = [
@@ -26,13 +26,13 @@ const SERVICE_CONFIG = {
     title: "Leasing",
     fetch: getLeasingListings,
   },
+  workshop: {
+    title: "Workshop",
+    fetch: getWorkshopListings,
+  },
 };
 
-function VehicleTypePopup({
-  category,
-  onSelect,
-  onClose,
-}) {
+function VehicleTypePopup({ category, onSelect, onClose }) {
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -92,10 +92,7 @@ function VehicleTypePopup({
   if (!service) return null;
 
   return (
-    <div
-      className="vehicle-popup-overlay"
-      onClick={onClose}
-    >
+    <div className="vehicle-popup-overlay" onClick={onClose}>
       <section
         className="vehicle-popup"
         onClick={(event) => event.stopPropagation()}
@@ -129,10 +126,7 @@ function VehicleTypePopup({
         {error && (
           <div className="vehicle-popup-error">
             <p>{error}</p>
-            <button
-              type="button"
-              onClick={() => window.location.reload()}
-            >
+            <button type="button" onClick={() => window.location.reload()}>
               Retry
             </button>
           </div>
@@ -176,6 +170,7 @@ function VehicleTypePopup({
                 <i className="legend-blue" />
                 Registered
               </span>
+
               <span>
                 <i className="legend-grey" />
                 Available
