@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./Register.css";
 import { useNavigate, Link } from "react-router-dom";
 import axios from "axios";
@@ -19,15 +19,73 @@ function SignUp() {
     email: "",
     password: "",
     confirmPassword: "",
+    user_picture: null,
   });
+
+  const [picturePreview, setPicturePreview] = useState("");
+
+  // Clean up preview URL when component unmounts or image changes
+  useEffect(() => {
+    if (!formData.user_picture) {
+      setPicturePreview("");
+      return;
+    }
+
+    const previewURL = URL.createObjectURL(formData.user_picture);
+    setPicturePreview(previewURL);
+
+    return () => URL.revokeObjectURL(previewURL);
+  }, [formData.user_picture]);
 
   function handleChange(event) {
     const { name, value } = event.target;
 
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
+  }
+
+  function handlePictureChange(event) {
+    const file = event.target.files?.[0] || null;
+
+    if (!file) return;
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+    ];
+
+    if (!allowedTypes.includes(file.type)) {
+      alert("Only JPEG, PNG, and WebP images are allowed.");
+      event.target.value = "";
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Profile picture must not exceed 5 MB.");
+      event.target.value = "";
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      user_picture: file,
+    }));
+  }
+
+  function removePicture() {
+    setFormData((prev) => ({
+      ...prev,
+      user_picture: null,
+    }));
+
+    const fileInput = document.getElementById("user_picture");
+
+    if (fileInput) {
+      fileInput.value = "";
+    }
   }
 
   async function handleSubmit(event) {
@@ -51,14 +109,24 @@ function SignUp() {
       return;
     }
 
-    const registrationData = {
-      user_type: formData.accountType,
-      user_name: formData.fullName,
-      user_email: formData.email,
-      user_country_code: formData.countryCode,
-      user_mobile: formData.mobile,
-      user_password: formData.password,
-    };
+    const registrationData = new FormData();
+
+    registrationData.append("user_type", formData.accountType);
+    registrationData.append("user_name", formData.fullName);
+    registrationData.append("user_email", formData.email);
+    registrationData.append(
+      "user_country_code",
+      formData.countryCode
+    );
+    registrationData.append("user_mobile", formData.mobile);
+    registrationData.append("user_password", formData.password);
+
+    if (formData.user_picture) {
+      registrationData.append(
+        "user_picture",
+        formData.user_picture
+      );
+    }
 
     try {
       setLoading(true);
@@ -117,12 +185,64 @@ function SignUp() {
           </p>
 
           <form onSubmit={handleSubmit}>
+            {/* Profile Picture */}
+            <div className="profile-picture-section">
+              <label htmlFor="user_picture">
+                Profile Picture
+              </label>
+
+              <div className="profile-picture-upload">
+                {picturePreview ? (
+                  <img
+                    src={picturePreview}
+                    alt="Profile preview"
+                    className="profile-picture-preview"
+                  />
+                ) : (
+                  <div className="profile-picture-placeholder">
+                    <span>+</span>
+                    <small>Add Photo</small>
+                  </div>
+                )}
+
+                <div className="profile-picture-actions">
+                  <label
+                    htmlFor="user_picture"
+                    className="profile-picture-button"
+                  >
+                    {picturePreview ? "Change Photo" : "Upload Photo"}
+                  </label>
+
+                  {picturePreview && (
+                    <button
+                      type="button"
+                      className="remove-picture-button"
+                      onClick={removePicture}
+                    >
+                      Remove
+                    </button>
+                  )}
+
+                  <small>
+                    JPEG, PNG or WebP. Maximum size 5 MB.
+                  </small>
+                </div>
+              </div>
+
+              <input
+                id="user_picture"
+                name="user_picture"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handlePictureChange}
+                hidden
+              />
+            </div>
+
             {/* Row 1 */}
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="fullName">
-                  Full Name
-                </label>
+                <label htmlFor="fullName">Full Name</label>
 
                 <input
                   id="fullName"
@@ -138,9 +258,7 @@ function SignUp() {
               </div>
 
               <div className="form-group">
-                <label htmlFor="accountType">
-                  Account Type
-                </label>
+                <label htmlFor="accountType">Account Type</label>
 
                 <select
                   id="accountType"
@@ -153,13 +271,8 @@ function SignUp() {
                     Private or Trader / Business
                   </option>
 
-                  <option value="private">
-                    Private
-                  </option>
-
-                  <option value="trader">
-                    Trader / Business
-                  </option>
+                  <option value="private">Private</option>
+                  <option value="trader">Trader / Business</option>
                 </select>
               </div>
             </div>
@@ -167,9 +280,7 @@ function SignUp() {
             {/* Row 2 */}
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="countryCode">
-                  Country Code
-                </label>
+                <label htmlFor="countryCode">Country Code</label>
 
                 <select
                   id="countryCode"
@@ -178,24 +289,14 @@ function SignUp() {
                   onChange={handleChange}
                   required
                 >
-                  <option value="+92">
-                    Pakistan +92
-                  </option>
-
-                  <option value="+1">
-                    USA +1
-                  </option>
-
-                  <option value="+44">
-                    UK +44
-                  </option>
+                  <option value="+92">Pakistan +92</option>
+                  <option value="+1">USA +1</option>
+                  <option value="+44">UK +44</option>
                 </select>
               </div>
 
               <div className="form-group">
-                <label htmlFor="mobile">
-                  Mobile Number
-                </label>
+                <label htmlFor="mobile">Mobile Number</label>
 
                 <input
                   id="mobile"
@@ -212,9 +313,7 @@ function SignUp() {
 
             {/* Email */}
             <div className="form-group full-width">
-              <label htmlFor="email">
-                Email Address
-              </label>
+              <label htmlFor="email">Email Address</label>
 
               <input
                 id="email"
@@ -230,9 +329,7 @@ function SignUp() {
             {/* Password Row */}
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="password">
-                  Password
-                </label>
+                <label htmlFor="password">Password</label>
 
                 <div className="password-wrapper">
                   <input
@@ -249,9 +346,7 @@ function SignUp() {
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowPassword(!showPassword)
-                    }
+                    onClick={() => setShowPassword(!showPassword)}
                     className="password-toggle"
                   >
                     {showPassword ? "Hide" : "Show"}

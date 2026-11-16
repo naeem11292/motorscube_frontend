@@ -1,34 +1,55 @@
 
 import api from "./axios";
 
-export const getSaleListings = async () => {
-  const response = await api.get("/items-ad-sale/");
+// Fetch Sale listings, optionally filtered by vehicle category
+export const getSaleListings = async (vehicle_type = "") => {
+  const response = await api.get("/items-ad-sale/", {
+    params: vehicle_type ? { vehicle_type } : {},
+  });
+
   return response.data?.data ?? [];
 };
 
-export const getHireListings = async () => {
-  const response = await api.get("/items-ad-hire/");
+// Fetch Hire listings, optionally filtered by vehicle category
+export const getHireListings = async (vehicle_type = "") => {
+  const response = await api.get("/items-ad-hire/", {
+    params: vehicle_type ? { vehicle_type } : {},
+  });
+
   return response.data?.data ?? [];
 };
 
-export const getAllListings = async () => {
-  const [saleResult, hireResult] = await Promise.allSettled([
-    getSaleListings(),
-    getHireListings(),
-  ]);
+// Fetch listings according to the selected Sale/Hire type and category
+export const getAllListings = async ({
+  listing_type = "",
+  vehicle_type = "",
+} = {}) => {
+  let sales = [];
+  let hires = [];
 
-  if (
-    saleResult.status === "rejected" &&
-    hireResult.status === "rejected"
-  ) {
-    throw new Error("Unable to load vehicle listings.");
+  if (listing_type === "sale") {
+    sales = await getSaleListings(vehicle_type);
+  } else if (listing_type === "hire") {
+    hires = await getHireListings(vehicle_type);
+  } else {
+    const [saleResult, hireResult] = await Promise.allSettled([
+      getSaleListings(vehicle_type),
+      getHireListings(vehicle_type),
+    ]);
+
+    if (
+      saleResult.status === "rejected" &&
+      hireResult.status === "rejected"
+    ) {
+      throw new Error("Unable to load vehicle listings.");
+    }
+
+    sales =
+      saleResult.status === "fulfilled" ? saleResult.value : [];
+
+    hires =
+      hireResult.status === "fulfilled" ? hireResult.value : [];
   }
-
-  const sales =
-    saleResult.status === "fulfilled" ? saleResult.value : [];
-
-  const hires =
-    hireResult.status === "fulfilled" ? hireResult.value : [];
 
   const normalizedSales = (Array.isArray(sales) ? sales : []).map(
     (item) => ({

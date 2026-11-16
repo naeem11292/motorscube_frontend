@@ -210,7 +210,16 @@ const shuffleListings = (items) => {
 
 const Listing = () => {
   const navigate = useNavigate();
+   const [selectedListingType, setSelectedListingType] = useState("");
+const [selectedVehicleType, setSelectedVehicleType] = useState("");
 
+const vehicleCategories = [
+  { label: "Car", value: "car", icon: "🚗" },
+  { label: "Bike", value: "bike", icon: "🏍️" },
+  { label: "Commercial", value: "commercial", icon: "🚚" },
+  { label: "Plant", value: "plant", icon: "🏗️" },
+  { label: "Machinery", value: "machinery", icon: "⚙️" },
+];
   // LISTINGS
   const [listings, setListings] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -231,43 +240,70 @@ const Listing = () => {
   // PAGINATION
   const [currentPage, setCurrentPage] = useState(1);
 
-  // LOAD LISTINGS
-  useEffect(() => {
-    const loadListings = async () => {
-      try {
-        setLoading(true);
-        setError("");
+// LOAD LISTINGS WHEN SALE/HIRE AND CATEGORY ARE SELECTED
+useEffect(() => {
+  if (!selectedListingType || !selectedVehicleType) {
+    setListings([]);
+    setLoading(false);
+    setError("");
+    return;
+  }
 
-        const response = await getAllListings();
+  let isActive = true;
 
-        const data = Array.isArray(response)
-          ? response
-          : Array.isArray(response?.data)
-            ? response.data
-            : [];
+  const loadListings = async () => {
+    try {
+      setLoading(true);
+      setError("");
 
-        // Mix Normal, Hotspot and Supreme in one feed.
-       setListings(
-  shuffleListings([
-    ...data,
-    ...DEMO_PROMOTION_ADS,
-  ])
-);
-      } catch (err) {
-        console.error("Loading listings failed:", err);
+      const response = await getAllListings({
+        listing_type: selectedListingType,
+        vehicle_type: selectedVehicleType,
+      });
 
+      const data = Array.isArray(response)
+        ? response
+        : Array.isArray(response?.data)
+          ? response.data
+          : [];
+
+      // Keep the demo promotional ads only for Sale > Car in development.
+      const demoAds =
+        import.meta.env.DEV &&
+        selectedListingType === "sale" &&
+        selectedVehicleType === "car"
+          ? DEMO_PROMOTION_ADS
+          : [];
+
+      if (isActive) {
+        setListings(
+          shuffleListings([...data, ...demoAds])
+        );
+      }
+    } catch (err) {
+      console.error("Loading listings failed:", err);
+
+      if (isActive) {
+        setListings([]);
         setError(
           err.response?.data?.message ||
-            err.message ||
-            "Failed to load listings."
+          err.message ||
+          "Failed to load listings."
         );
-      } finally {
+      }
+    } finally {
+      if (isActive) {
         setLoading(false);
       }
-    };
+    }
+  };
 
-    loadListings();
-  }, []);
+  loadListings();
+
+  return () => {
+    isActive = false;
+  };
+}, [selectedListingType, selectedVehicleType]);
 
   // FILTER LISTINGS
   const filteredListings = useMemo(() => {
@@ -427,6 +463,24 @@ const Listing = () => {
     });
 
     setCurrentPage(1);
+  };
+
+  // CHANGE SALE / HIRE SELECTION
+  const handleListingTypeChange = (type) => {
+    setSelectedListingType(type);
+    setSelectedVehicleType("");
+    setListings([]);
+    setCurrentPage(1);
+    clearFilters();
+    setShowMoreFilters(false);
+  };
+
+  // CHANGE VEHICLE CATEGORY
+  const handleVehicleTypeChange = (type) => {
+    setSelectedVehicleType(type);
+    setCurrentPage(1);
+    clearFilters();
+    setShowMoreFilters(false);
   };
 
   // OPEN LISTING DETAILS
@@ -664,12 +718,88 @@ const Listing = () => {
           </div>
 
           <span className="listing-count">
-            {filteredListings.length} Listings
+            {selectedListingType && selectedVehicleType
+              ? `${filteredListings.length} Listings`
+              : "Choose a category"}
           </span>
         </div>
 
-        {/* MAIN FILTER BAR */}
-        <div className="listing-filter-wrapper">
+        {/* SALE AND HIRE SELECTION */}
+        <div className="listing-selection-section">
+          <div className="listing-selection-heading">
+            <span className="listing-eyebrow">CHOOSE YOUR REQUIREMENT</span>
+            <h2>What are you looking for?</h2>
+            <p>Select Sale or Hire to explore available listings.</p>
+          </div>
+
+          <div className="listing-type-options">
+            <button
+              type="button"
+              className={`listing-type-option ${
+                selectedListingType === "sale" ? "selected" : ""
+              }`}
+              aria-pressed={selectedListingType === "sale"}
+              onClick={() => handleListingTypeChange("sale")}
+            >
+              <span className="listing-option-icon">🏷️</span>
+              <span className="listing-option-content">
+                <strong>Sale</strong>
+                <small>Find vehicles available for purchase</small>
+              </span>
+              <span className="listing-option-arrow">→</span>
+            </button>
+
+            <button
+              type="button"
+              className={`listing-type-option ${
+                selectedListingType === "hire" ? "selected" : ""
+              }`}
+              aria-pressed={selectedListingType === "hire"}
+              onClick={() => handleListingTypeChange("hire")}
+            >
+              <span className="listing-option-icon">🔑</span>
+              <span className="listing-option-content">
+                <strong>Hire</strong>
+                <small>Find vehicles available for hire</small>
+              </span>
+              <span className="listing-option-arrow">→</span>
+            </button>
+          </div>
+
+          {selectedListingType && (
+            <div className="listing-category-section">
+              <h3>
+                Select a category for{" "}
+                {selectedListingType === "sale" ? "Sale" : "Hire"}
+              </h3>
+              <p>Choose the type of vehicle you want.</p>
+
+              <div className="listing-category-options">
+                {vehicleCategories.map((category) => (
+                  <button
+                    type="button"
+                    key={category.value}
+                    className={`listing-category-option ${
+                      selectedVehicleType === category.value ? "selected" : ""
+                    }`}
+                    aria-pressed={selectedVehicleType === category.value}
+                    onClick={() => handleVehicleTypeChange(category.value)}
+                  >
+                    <span className="listing-category-icon">
+                      {category.icon}
+                    </span>
+                    <strong>{category.label}</strong>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {selectedListingType && selectedVehicleType && (
+          <>
+            {/* MAIN FILTER BAR */}
+            <div className="listing-filter-wrapper">
           <div className="listing-filters">
             <input
               type="text"
@@ -780,6 +910,8 @@ const Listing = () => {
             </button>
           </div>
         )}
+          </>
+        )}
       </section>
 
       {/* PROMOTIONAL BANNER */}
@@ -795,7 +927,7 @@ const Listing = () => {
 
           <button
             onClick={() => {
-              clearFilters();
+              handleListingTypeChange("sale");
               document
                 .getElementById("vehicle-listings")
                 ?.scrollIntoView({ behavior: "smooth" });
@@ -807,7 +939,9 @@ const Listing = () => {
       </section>
 
       {/* SECOND LISTING GROUP */}
-      {!loading &&
+      {selectedListingType &&
+        selectedVehicleType &&
+        !loading &&
         !error &&
         filteredListings.length > ITEMS_PER_PAGE && (
           <section className="listing-secondary-section">
