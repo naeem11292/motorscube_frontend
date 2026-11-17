@@ -3,13 +3,14 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { getAllListings } from "../../api/listing.api";
+import FeaturedDealerships from "../../components/Dealership/FeaturedDealerships";
 import MoreFilters from "./MoreFilters";
 import "./Listing.css";
 
 const API_BASE = "http://localhost:5000";
 const ITEMS_PER_PAGE = 6;
 
-// TEMPORARY DEMO ADS — REMOVE BEFORE PRODUCTION
+// TEMPORARY DEMO PROMOTION ADS
 const DEMO_PROMOTION_ADS = [
   {
     listing_id: "demo-hotspot-001",
@@ -27,10 +28,10 @@ const DEMO_PROMOTION_ADS = [
     registration_city: "Islamabad",
     display_price: 14500000,
     description:
-      "Well-maintained Toyota Fortuner with excellent condition, comfortable interior, powerful diesel engine and complete service history. Ready for its next owner.",
+      "Well-maintained Toyota Fortuner with excellent condition, comfortable interior, powerful diesel engine and complete service history.",
     images: [
-      "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1000&q=85"
-    ]
+      "https://images.unsplash.com/photo-1519641471654-76ce0107ad1b?auto=format&fit=crop&w=1000&q=85",
+    ],
   },
   {
     listing_id: "demo-supreme-001",
@@ -48,12 +49,12 @@ const DEMO_PROMOTION_ADS = [
     registration_city: "Lahore",
     display_price: 28500000,
     description:
-      "Experience premium German engineering with this stunning BMW 530i M Sport. Featuring a luxurious interior, advanced technology, powerful performance, elegant exterior styling and exceptional comfort. Carefully maintained with an excellent service record. A premium driving experience for those who appreciate performance and sophistication.",
+      "Experience premium German engineering with this stunning BMW 530i M Sport. Featuring a luxurious interior, advanced technology, powerful performance, elegant exterior styling and exceptional comfort. Carefully maintained with an excellent service record.",
     images: [
       "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=85",
       "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=900&q=85",
-      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=85"
-    ]
+      "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=900&q=85",
+    ],
   },
   {
     listing_id: "demo-hotspot-002",
@@ -73,11 +74,10 @@ const DEMO_PROMOTION_ADS = [
     description:
       "Honda Civic RS Turbo in excellent condition with a comfortable interior, sporty design and smooth automatic transmission.",
     images: [
-      "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1000&q=85"
-    ]
-  }
+      "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?auto=format&fit=crop&w=1000&q=85",
+    ],
+  },
 ];
-
 
 const EMPTY_ADVANCED_FILTERS = {
   condition: [],
@@ -104,7 +104,7 @@ const EMPTY_ADVANCED_FILTERS = {
   withPictures: false,
 };
 
-// GET IMAGE URLS
+// IMAGE URLS
 const getImageUrls = (images) => {
   if (!images) return [];
 
@@ -123,7 +123,10 @@ const getImageUrls = (images) => {
   }
 
   return parsedImages
-    .filter((image) => typeof image === "string" && image.trim())
+    .filter(
+      (image) =>
+        typeof image === "string" && image.trim()
+    )
     .map((filename) => {
       if (/^https?:\/\//i.test(filename)) {
         return filename;
@@ -138,9 +141,13 @@ const getImageUrls = (images) => {
     });
 };
 
-// FORMAT PRICE
+// PRICE
 const formatPrice = (value) => {
-  if (value === null || value === undefined || value === "") {
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
     return "Price on request";
   }
 
@@ -153,10 +160,11 @@ const formatPrice = (value) => {
   return `PKR ${number.toLocaleString("en-PK")}`;
 };
 
-// CHECK PICTURES
-const hasPictures = (images) => getImageUrls(images).length > 0;
+// PICTURES
+const hasPictures = (images) =>
+  getImageUrls(images).length > 0;
 
-// GET PROMOTION PLAN
+// PROMOTION PLAN
 const getListingPlan = (item) => {
   const plan = String(
     item.promotion_plan ||
@@ -174,140 +182,146 @@ const getListingPlan = (item) => {
   return "normal";
 };
 
-// GET DESCRIPTION
-const getListingDescription = (item) => {
-  return (
-    item.description ||
-    item.ad_description ||
-    item.item_description ||
-    item.vehicle_description ||
-    ""
-  );
-};
+// DESCRIPTION
+const getListingDescription = (item) =>
+  item.description ||
+  item.ad_description ||
+  item.item_description ||
+  item.vehicle_description ||
+  "";
 
-// LIMIT DESCRIPTION CHARACTERS
 const limitDescription = (description, limit) => {
-  const text = String(description || "").trim();
+  const value = String(description || "").trim();
 
-  if (text.length <= limit) {
-    return text;
-  }
+  if (value.length <= limit) return value;
 
-  return `${text.slice(0, limit).trimEnd()}...`;
-};
-
-// SHUFFLE LISTINGS ONCE
-const shuffleListings = (items) => {
-  const shuffled = [...items];
-
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-  }
-
-  return shuffled;
+  return `${value.slice(0, limit).trimEnd()}...`;
 };
 
 const Listing = () => {
   const navigate = useNavigate();
-   const [selectedListingType, setSelectedListingType] = useState("");
-const [selectedVehicleType, setSelectedVehicleType] = useState("");
 
-const vehicleCategories = [
-  { label: "Car", value: "car", icon: "🚗" },
-  { label: "Bike", value: "bike", icon: "🏍️" },
-  { label: "Commercial", value: "commercial", icon: "🚚" },
-  { label: "Plant", value: "plant", icon: "🏗️" },
-  { label: "Machinery", value: "machinery", icon: "⚙️" },
-];
-  // LISTINGS
+  const [selectedListingType, setSelectedListingType] =
+    useState("");
+
+  const [selectedVehicleType, setSelectedVehicleType] =
+    useState("");
+
+  const vehicleCategories = [
+    { label: "Car", value: "car", icon: "🚗" },
+    { label: "Bike", value: "bike", icon: "🏍️" },
+    { label: "Commercial", value: "commercial", icon: "🚚" },
+    { label: "Plant", value: "plant", icon: "🏗️" },
+    { label: "Machinery", value: "machinery", icon: "⚙️" },
+  ];
+
   const [listings, setListings] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // MAIN SEARCH FILTERS
   const [makeModel, setMakeModel] = useState("");
   const [location, setLocation] = useState("");
   const [condition, setCondition] = useState("all");
 
-  // ADVANCED FILTER DRAWER
   const [advancedFilters, setAdvancedFilters] = useState({
     ...EMPTY_ADVANCED_FILTERS,
   });
 
-  const [showMoreFilters, setShowMoreFilters] = useState(false);
+  const [showMoreFilters, setShowMoreFilters] =
+    useState(false);
 
-  // PAGINATION
   const [currentPage, setCurrentPage] = useState(1);
 
-// LOAD LISTINGS WHEN SALE/HIRE AND CATEGORY ARE SELECTED
-useEffect(() => {
-  if (!selectedListingType || !selectedVehicleType) {
-    setListings([]);
-    setLoading(false);
-    setError("");
-    return;
-  }
+  // LOAD BACKEND LISTINGS
+  useEffect(() => {
+    if (!selectedListingType || !selectedVehicleType) {
+      setListings([]);
+      setLoading(false);
+      setError("");
+      return;
+    }
 
-  let isActive = true;
+    let isActive = true;
 
-  const loadListings = async () => {
-    try {
+    const loadListings = async () => {
       setLoading(true);
       setError("");
 
-      const response = await getAllListings({
-        listing_type: selectedListingType,
-        vehicle_type: selectedVehicleType,
-      });
+      try {
+        const response = await getAllListings({
+          listing_type: selectedListingType,
+          vehicle_type: selectedVehicleType,
+        });
 
-      const data = Array.isArray(response)
-        ? response
-        : Array.isArray(response?.data)
-          ? response.data
-          : [];
+        const result =
+          Array.isArray(response)
+            ? response
+            : Array.isArray(response?.data?.data)
+              ? response.data.data
+              : Array.isArray(response?.data?.listings)
+                ? response.data.listings
+                : Array.isArray(response?.data)
+                  ? response.data
+                  : [];
 
-      // Keep the demo promotional ads only for Sale > Car in development.
-      const demoAds =
-        import.meta.env.DEV &&
-        selectedListingType === "sale" &&
-        selectedVehicleType === "car"
-          ? DEMO_PROMOTION_ADS
-          : [];
+        if (isActive) {
+          setListings(result);
+        }
+      } catch (apiError) {
+        console.error("Listing API error:", apiError);
 
-      if (isActive) {
-        setListings(
-          shuffleListings([...data, ...demoAds])
-        );
+        if (isActive) {
+          setListings([]);
+          setError(
+            apiError?.response?.data?.message ||
+              "Unable to load vehicle listings."
+          );
+        }
+      } finally {
+        if (isActive) {
+          setLoading(false);
+        }
       }
-    } catch (err) {
-      console.error("Loading listings failed:", err);
+    };
 
-      if (isActive) {
-        setListings([]);
-        setError(
-          err.response?.data?.message ||
-          err.message ||
-          "Failed to load listings."
-        );
-      }
-    } finally {
-      if (isActive) {
-        setLoading(false);
-      }
+    loadListings();
+
+    return () => {
+      isActive = false;
+    };
+  }, [selectedListingType, selectedVehicleType]);
+
+  // COMBINE DEMO ADS WITH BACKEND LISTINGS
+  const allListings = useMemo(() => {
+    const showDemoAds =
+      selectedListingType === "sale" &&
+      selectedVehicleType === "car";
+
+    if (!showDemoAds) {
+      return listings;
     }
-  };
 
-  loadListings();
+    const demoIds = new Set(
+      DEMO_PROMOTION_ADS.map((item) =>
+        String(item.listing_id)
+      )
+    );
 
-  return () => {
-    isActive = false;
-  };
-}, [selectedListingType, selectedVehicleType]);
+    const realListings = listings.filter(
+      (item) =>
+        !demoIds.has(String(item.listing_id))
+    );
 
-  // FILTER LISTINGS
+    return [...DEMO_PROMOTION_ADS, ...realListings];
+  }, [
+    listings,
+    selectedListingType,
+    selectedVehicleType,
+  ]);
+
+  // FILTER DEMO AND BACKEND LISTINGS TOGETHER
   const filteredListings = useMemo(() => {
-    return listings.filter((item) => {
+    return allListings.filter((item) => {
       const combinedMakeModel = [
         item.make,
         item.model,
@@ -325,27 +339,29 @@ useEffect(() => {
           ""
       ).toLowerCase();
 
-      const itemCondition = String(item.condition || "").toLowerCase();
+      const itemCondition = String(
+        item.condition || ""
+      ).toLowerCase();
 
       const itemPrice = Number(item.display_price);
       const itemYear = Number(item.year);
       const itemMileage = Number(item.mileage);
       const itemEngineSize = Number(item.engine_size);
 
-      // MAIN FILTERS
-      const matchesMakeModel = combinedMakeModel.includes(
-        makeModel.trim().toLowerCase()
-      );
+      const matchesMakeModel =
+        combinedMakeModel.includes(
+          makeModel.trim().toLowerCase()
+        );
 
-      const matchesLocation = itemLocation.includes(
-        location.trim().toLowerCase()
-      );
+      const matchesLocation =
+        itemLocation.includes(
+          location.trim().toLowerCase()
+        );
 
       const matchesCondition =
         condition === "all" ||
         itemCondition === condition.toLowerCase();
 
-      // ADVANCED FILTERS
       const matchesSelected = (key, value) => {
         const selectedValues = advancedFilters[key] || [];
 
@@ -358,48 +374,23 @@ useEffect(() => {
         );
       };
 
-      const matchesYearMin =
-        !advancedFilters.yearMin ||
-        (Number.isFinite(itemYear) &&
-          itemYear >= Number(advancedFilters.yearMin));
+      const matchesRange = (minimum, maximum, value) => {
+        const minMatch =
+          !minimum ||
+          (Number.isFinite(value) &&
+            value >= Number(minimum));
 
-      const matchesYearMax =
-        !advancedFilters.yearMax ||
-        (Number.isFinite(itemYear) &&
-          itemYear <= Number(advancedFilters.yearMax));
+        const maxMatch =
+          !maximum ||
+          (Number.isFinite(value) &&
+            value <= Number(maximum));
 
-      const matchesPriceMin =
-        !advancedFilters.priceMin ||
-        (Number.isFinite(itemPrice) &&
-          itemPrice >= Number(advancedFilters.priceMin));
-
-      const matchesPriceMax =
-        !advancedFilters.priceMax ||
-        (Number.isFinite(itemPrice) &&
-          itemPrice <= Number(advancedFilters.priceMax));
-
-      const matchesMileageMin =
-        !advancedFilters.mileageMin ||
-        (Number.isFinite(itemMileage) &&
-          itemMileage >= Number(advancedFilters.mileageMin));
-
-      const matchesMileageMax =
-        !advancedFilters.mileageMax ||
-        (Number.isFinite(itemMileage) &&
-          itemMileage <= Number(advancedFilters.mileageMax));
-
-      const matchesEngineMin =
-        !advancedFilters.engineMin ||
-        (Number.isFinite(itemEngineSize) &&
-          itemEngineSize >= Number(advancedFilters.engineMin));
-
-      const matchesEngineMax =
-        !advancedFilters.engineMax ||
-        (Number.isFinite(itemEngineSize) &&
-          itemEngineSize <= Number(advancedFilters.engineMax));
+        return minMatch && maxMatch;
+      };
 
       const matchesPictures =
-        !advancedFilters.withPictures || hasPictures(item.images);
+        !advancedFilters.withPictures ||
+        hasPictures(item.images);
 
       return (
         matchesMakeModel &&
@@ -407,65 +398,90 @@ useEffect(() => {
         matchesCondition &&
         matchesSelected("condition", item.condition) &&
         matchesSelected("city", item.city) &&
-        matchesSelected("registrationCity", item.registration_city) &&
+        matchesSelected(
+          "registrationCity",
+          item.registration_city
+        ) &&
         matchesSelected("make", item.make) &&
         matchesSelected("model", item.model) &&
         matchesSelected("version", item.version) &&
         matchesSelected("fuelType", item.fuel_type) &&
         matchesSelected("bodyType", item.body_type) &&
-        matchesSelected("transmission", item.transmission) &&
+        matchesSelected(
+          "transmission",
+          item.transmission
+        ) &&
         matchesSelected("engineType", item.engine_type) &&
         matchesSelected("color", item.color) &&
         matchesSelected("adType", item.ad_type) &&
         matchesSelected("doors", item.doors) &&
-        matchesYearMin &&
-        matchesYearMax &&
-        matchesPriceMin &&
-        matchesPriceMax &&
-        matchesMileageMin &&
-        matchesMileageMax &&
-        matchesEngineMin &&
-        matchesEngineMax &&
+        matchesRange(
+          advancedFilters.yearMin,
+          advancedFilters.yearMax,
+          itemYear
+        ) &&
+        matchesRange(
+          advancedFilters.priceMin,
+          advancedFilters.priceMax,
+          itemPrice
+        ) &&
+        matchesRange(
+          advancedFilters.mileageMin,
+          advancedFilters.mileageMax,
+          itemMileage
+        ) &&
+        matchesRange(
+          advancedFilters.engineMin,
+          advancedFilters.engineMax,
+          itemEngineSize
+        ) &&
         matchesPictures
       );
     });
   }, [
-    listings,
+    allListings,
     makeModel,
     location,
     condition,
     advancedFilters,
   ]);
 
-  // RESET PAGINATION WHEN FILTERS CHANGE
+  const displayListings = filteredListings;
+
+  // RESET PAGE WHEN FILTERS CHANGE
   useEffect(() => {
     setCurrentPage(1);
-  }, [makeModel, location, condition, advancedFilters]);
+  }, [
+    makeModel,
+    location,
+    condition,
+    advancedFilters,
+    selectedListingType,
+    selectedVehicleType,
+  ]);
 
   // PAGINATION
   const totalPages = Math.ceil(
-    filteredListings.length / ITEMS_PER_PAGE
+    displayListings.length / ITEMS_PER_PAGE
   );
 
-  const paginatedListings = filteredListings.slice(
+  const paginatedListings = displayListings.slice(
     (currentPage - 1) * ITEMS_PER_PAGE,
     currentPage * ITEMS_PER_PAGE
   );
 
-  // CLEAR ALL FILTERS
+  // CLEAR FILTERS
   const clearFilters = () => {
     setMakeModel("");
     setLocation("");
     setCondition("all");
-
     setAdvancedFilters({
       ...EMPTY_ADVANCED_FILTERS,
     });
-
     setCurrentPage(1);
   };
 
-  // CHANGE SALE / HIRE SELECTION
+  // CHANGE SALE / HIRE
   const handleListingTypeChange = (type) => {
     setSelectedListingType(type);
     setSelectedVehicleType("");
@@ -483,17 +499,37 @@ useEffect(() => {
     setShowMoreFilters(false);
   };
 
-  // OPEN LISTING DETAILS
+  // OPEN DETAILS
   const openListing = (item) => {
-    const id = item.listing_id;
-
-    if (!id || !item.listing_type) {
-      console.error("Listing ID or listing type is missing:", item);
+    if (!item.listing_id || !item.listing_type) {
+      console.error("Listing ID/type missing:", item);
       return;
     }
 
-    navigate(`/listing/${item.listing_type}/${id}`);
+    navigate(
+      `/listing/${item.listing_type}/${item.listing_id}`
+    );
   };
+
+  // IMAGE RENDERER
+  const renderImage = (url, alt, className) => (
+    <div className={className}>
+      {url ? (
+        <img
+          src={url}
+          alt={alt}
+          loading="lazy"
+          onError={(event) => {
+            event.currentTarget.style.display = "none";
+          }}
+        />
+      ) : (
+        <div className="listing-image-placeholder">
+          No Image
+        </div>
+      )}
+    </div>
+  );
 
   // VEHICLE CARD
   const renderVehicleCard = (item) => {
@@ -517,32 +553,12 @@ useEffect(() => {
       item.location ||
       "Location not specified";
 
+    const description = getListingDescription(item);
+
     const priceLabel =
       item.listing_type === "hire"
         ? item.charges_type
         : "";
-
-    const description = getListingDescription(item);
-
-    const descriptionLimit =
-      plan === "hotspot" ? 200 : 350;
-
-    const limitedDescription = limitDescription(
-      description,
-      descriptionLimit
-    );
-
-    const renderImage = (url, alt, className = "") => (
-      <div className={className || "listing-card-image"}>
-        {url ? (
-          <img src={url} alt={alt} />
-        ) : (
-          <div className="listing-image-placeholder">
-            <span>No Image</span>
-          </div>
-        )}
-      </div>
-    );
 
     return (
       <article
@@ -550,11 +566,13 @@ useEffect(() => {
         key={`${item.listing_type}-${item.listing_id}`}
         onClick={() => openListing(item)}
       >
-        {/* NORMAL AND HOTSPOT: ONE IMAGE */}
         {plan !== "supreme" &&
-          renderImage(imageUrls[0], title)}
+          renderImage(
+            imageUrls[0],
+            title,
+            "listing-card-image"
+          )}
 
-        {/* SUPREME: ONE LARGE + TWO SMALL IMAGES */}
         {plan === "supreme" && (
           <div className="listing-card-gallery">
             {renderImage(
@@ -563,26 +581,21 @@ useEffect(() => {
               "gallery-main"
             )}
 
-            {imageUrls[1] && (
-              renderImage(
-                imageUrls[1],
-                `${title} second image`,
-                "gallery-small"
-              )
+            {renderImage(
+              imageUrls[1],
+              `${title} second image`,
+              "gallery-small"
             )}
 
-            {imageUrls[2] && (
-              renderImage(
-                imageUrls[2],
-                `${title} third image`,
-                "gallery-small"
-              )
+            {renderImage(
+              imageUrls[2],
+              `${title} third image`,
+              "gallery-small"
             )}
           </div>
         )}
 
         <div className="listing-card-content">
-          {/* PLAN BADGE */}
           <span className="listing-plan-badge">
             {plan === "normal"
               ? "Normal Ad"
@@ -607,21 +620,32 @@ useEffect(() => {
 
           <h3>{title}</h3>
 
-          {/* SPECIFICATIONS: HOTSPOT AND SUPREME */}
           {plan !== "normal" && (
             <div className="listing-card-specs">
               {item.year && <span>{item.year}</span>}
-              {item.condition && <span>{item.condition}</span>}
-              {item.transmission && <span>{item.transmission}</span>}
-              {item.fuel_type && <span>{item.fuel_type}</span>}
-              {item.mileage && <span>{item.mileage} km</span>}
+              {item.condition && (
+                <span>{item.condition}</span>
+              )}
+              {item.transmission && (
+                <span>{item.transmission}</span>
+              )}
+              {item.fuel_type && (
+                <span>{item.fuel_type}</span>
+              )}
+              {item.mileage && (
+                <span>
+                  {Number(item.mileage).toLocaleString()} km
+                </span>
+              )}
             </div>
           )}
 
-          {/* DESCRIPTION: HOTSPOT AND SUPREME */}
-          {plan !== "normal" && limitedDescription && (
+          {plan !== "normal" && description && (
             <p className="listing-description">
-              {limitedDescription}
+              {limitDescription(
+                description,
+                plan === "supreme" ? 350 : 200
+              )}
             </p>
           )}
 
@@ -630,7 +654,6 @@ useEffect(() => {
           </p>
         </div>
 
-        {/* PRICE AND ACTIONS */}
         <div className="listing-card-right">
           <button
             className="listing-favorite"
@@ -638,14 +661,18 @@ useEffect(() => {
             aria-label="Add to favorites"
             onClick={(event) => {
               event.stopPropagation();
-              alert("Favorites functionality will be connected later.");
+              alert(
+                "Favorites functionality will be connected later."
+              );
             }}
           >
             ♡
           </button>
 
           <div className="listing-card-price">
-            <strong>{formatPrice(item.display_price)}</strong>
+            <strong>
+              {formatPrice(item.display_price)}
+            </strong>
             {priceLabel && <small>{priceLabel}</small>}
           </div>
 
@@ -699,7 +726,7 @@ useEffect(() => {
         </div>
       </section>
 
-      {/* LISTINGS */}
+      {/* MAIN LISTING SECTION */}
       <section
         className="listing-main-section"
         id="vehicle-listings"
@@ -719,17 +746,23 @@ useEffect(() => {
 
           <span className="listing-count">
             {selectedListingType && selectedVehicleType
-              ? `${filteredListings.length} Listings`
+              ? `${displayListings.length} Listings`
               : "Choose a category"}
           </span>
         </div>
 
-        {/* SALE AND HIRE SELECTION */}
+        {/* SALE / HIRE */}
         <div className="listing-selection-section">
           <div className="listing-selection-heading">
-            <span className="listing-eyebrow">CHOOSE YOUR REQUIREMENT</span>
+            <span className="listing-eyebrow">
+              CHOOSE YOUR REQUIREMENT
+            </span>
+
             <h2>What are you looking for?</h2>
-            <p>Select Sale or Hire to explore available listings.</p>
+
+            <p>
+              Select Sale or Hire to explore available listings.
+            </p>
           </div>
 
           <div className="listing-type-options">
@@ -738,13 +771,15 @@ useEffect(() => {
               className={`listing-type-option ${
                 selectedListingType === "sale" ? "selected" : ""
               }`}
-              aria-pressed={selectedListingType === "sale"}
               onClick={() => handleListingTypeChange("sale")}
+              aria-pressed={selectedListingType === "sale"}
             >
               <span className="listing-option-icon">🏷️</span>
               <span className="listing-option-content">
                 <strong>Sale</strong>
-                <small>Find vehicles available for purchase</small>
+                <small>
+                  Find vehicles available for purchase
+                </small>
               </span>
               <span className="listing-option-arrow">→</span>
             </button>
@@ -754,13 +789,15 @@ useEffect(() => {
               className={`listing-type-option ${
                 selectedListingType === "hire" ? "selected" : ""
               }`}
-              aria-pressed={selectedListingType === "hire"}
               onClick={() => handleListingTypeChange("hire")}
+              aria-pressed={selectedListingType === "hire"}
             >
               <span className="listing-option-icon">🔑</span>
               <span className="listing-option-content">
                 <strong>Hire</strong>
-                <small>Find vehicles available for hire</small>
+                <small>
+                  Find vehicles available for hire
+                </small>
               </span>
               <span className="listing-option-arrow">→</span>
             </button>
@@ -772,6 +809,7 @@ useEffect(() => {
                 Select a category for{" "}
                 {selectedListingType === "sale" ? "Sale" : "Hire"}
               </h3>
+
               <p>Choose the type of vehicle you want.</p>
 
               <div className="listing-category-options">
@@ -780,10 +818,16 @@ useEffect(() => {
                     type="button"
                     key={category.value}
                     className={`listing-category-option ${
-                      selectedVehicleType === category.value ? "selected" : ""
+                      selectedVehicleType === category.value
+                        ? "selected"
+                        : ""
                     }`}
-                    aria-pressed={selectedVehicleType === category.value}
-                    onClick={() => handleVehicleTypeChange(category.value)}
+                    onClick={() =>
+                      handleVehicleTypeChange(category.value)
+                    }
+                    aria-pressed={
+                      selectedVehicleType === category.value
+                    }
                   >
                     <span className="listing-category-icon">
                       {category.icon}
@@ -796,120 +840,139 @@ useEffect(() => {
           )}
         </div>
 
+        {/* FILTERS AND RESULTS */}
         {selectedListingType && selectedVehicleType && (
           <>
-            {/* MAIN FILTER BAR */}
             <div className="listing-filter-wrapper">
-          <div className="listing-filters">
-            <input
-              type="text"
-              placeholder="Make & Model"
-              value={makeModel}
-              onChange={(event) => setMakeModel(event.target.value)}
-            />
+              <div className="listing-filters">
+                <input
+                  type="text"
+                  placeholder="Make & Model"
+                  value={makeModel}
+                  onChange={(event) =>
+                    setMakeModel(event.target.value)
+                  }
+                />
 
-            <input
-              type="text"
-              placeholder="Location"
-              value={location}
-              onChange={(event) => setLocation(event.target.value)}
-            />
+                <input
+                  type="text"
+                  placeholder="Location"
+                  value={location}
+                  onChange={(event) =>
+                    setLocation(event.target.value)
+                  }
+                />
 
-            <select
-              value={condition}
-              onChange={(event) => setCondition(event.target.value)}
-            >
-              <option value="all">All Conditions</option>
-              <option value="new">New</option>
-              <option value="used">Used</option>
-              <option value="re-conditioned">Re-conditioned</option>
-            </select>
-
-            <button
-              type="button"
-              className="listing-more-filters-button"
-              onClick={() => setShowMoreFilters(true)}
-            >
-              <span>☷</span>
-              More Filters
-              <span className="listing-filter-arrow">+</span>
-            </button>
-          </div>
-        </div>
-
-        {/* LISTING RESULTS */}
-        {loading ? (
-          <div className="listing-state">
-            <div className="listing-spinner" />
-            <p>Loading vehicle listings...</p>
-          </div>
-        ) : error ? (
-          <div className="listing-state listing-error">
-            <h3>Unable to load listings</h3>
-            <p>{error}</p>
-
-            <button onClick={() => window.location.reload()}>
-              Try Again
-            </button>
-          </div>
-        ) : paginatedListings.length > 0 ? (
-          <>
-            <div className="listing-cards">
-              {paginatedListings.map(renderVehicleCard)}
-            </div>
-
-            {/* PAGINATION */}
-            {totalPages > 1 && (
-              <div className="listing-pagination">
-                <button
-                  disabled={currentPage === 1}
-                  onClick={() =>
-                    setCurrentPage((page) => page - 1)
+                <select
+                  value={condition}
+                  onChange={(event) =>
+                    setCondition(event.target.value)
                   }
                 >
-                  Previous
-                </button>
-
-                {Array.from(
-                  { length: totalPages },
-                  (_, index) => index + 1
-                ).map((page) => (
-                  <button
-                    key={page}
-                    className={
-                      currentPage === page ? "active" : ""
-                    }
-                    onClick={() => setCurrentPage(page)}
-                  >
-                    {page}
-                  </button>
-                ))}
+                  <option value="all">All Conditions</option>
+                  <option value="new">New</option>
+                  <option value="used">Used</option>
+                  <option value="re-conditioned">
+                    Re-conditioned
+                  </option>
+                </select>
 
                 <button
-                  disabled={currentPage === totalPages}
-                  onClick={() =>
-                    setCurrentPage((page) => page + 1)
-                  }
+                  type="button"
+                  className="listing-more-filters-button"
+                  onClick={() => setShowMoreFilters(true)}
                 >
-                  Next
+                  <span>☷</span>
+                  More Filters
+                  <span className="listing-filter-arrow">+</span>
                 </button>
               </div>
-            )}
-          </>
-        ) : (
-          <div className="listing-state">
-            <h3>No vehicles found</h3>
-            <p>Try changing your search or filters.</p>
+            </div>
 
-            <button
-              type="button"
-              className="listing-clear-filters"
-              onClick={clearFilters}
-            >
-              Clear Filters
-            </button>
-          </div>
-        )}
+            {/* VEHICLE RESULTS + DEALERSHIP SIDEBAR */}
+            <div className="listing-results-layout">
+              <div className="listing-results-main">
+                {loading && displayListings.length === 0 ? (
+                  <div className="listing-state">
+                    <div className="listing-spinner" />
+                    <p>Loading vehicle listings...</p>
+                  </div>
+                ) : error && displayListings.length === 0 ? (
+                  <div className="listing-state listing-error">
+                    <h3>Unable to load listings</h3>
+                    <p>{error}</p>
+
+                    <button
+                      type="button"
+                      onClick={() => window.location.reload()}
+                    >
+                      Try Again
+                    </button>
+                  </div>
+                ) : paginatedListings.length > 0 ? (
+                  <>
+                    <div className="listing-cards">
+                      {paginatedListings.map(renderVehicleCard)}
+                    </div>
+
+                    {totalPages > 1 && (
+                      <div className="listing-pagination">
+                        <button
+                          disabled={currentPage === 1}
+                          onClick={() =>
+                            setCurrentPage((page) => page - 1)
+                          }
+                        >
+                          Previous
+                        </button>
+
+                        {Array.from(
+                          { length: totalPages },
+                          (_, index) => index + 1
+                        ).map((page) => (
+                          <button
+                            key={page}
+                            className={
+                              currentPage === page ? "active" : ""
+                            }
+                            onClick={() => setCurrentPage(page)}
+                          >
+                            {page}
+                          </button>
+                        ))}
+
+                        <button
+                          disabled={currentPage === totalPages}
+                          onClick={() =>
+                            setCurrentPage((page) => page + 1)
+                          }
+                        >
+                          Next
+                        </button>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <div className="listing-state">
+                    <h3>No vehicles found</h3>
+                    <p>Try changing your search or filters.</p>
+
+                    <button
+                      type="button"
+                      className="listing-clear-filters"
+                      onClick={clearFilters}
+                    >
+                      Clear Filters
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* RIGHT SIDE DEALERSHIPS */}
+              <aside className="listing-dealership-sidebar">
+                <FeaturedDealerships />
+              </aside>
+            </div>
           </>
         )}
       </section>
@@ -926,6 +989,7 @@ useEffect(() => {
           </p>
 
           <button
+            type="button"
             onClick={() => {
               handleListingTypeChange("sale");
               document
@@ -942,8 +1006,7 @@ useEffect(() => {
       {selectedListingType &&
         selectedVehicleType &&
         !loading &&
-        !error &&
-        filteredListings.length > ITEMS_PER_PAGE && (
+        displayListings.length > ITEMS_PER_PAGE && (
           <section className="listing-secondary-section">
             <div className="listing-section-heading">
               <div>
@@ -955,7 +1018,7 @@ useEffect(() => {
             </div>
 
             <div className="listing-cards">
-              {filteredListings
+              {displayListings
                 .slice(ITEMS_PER_PAGE, ITEMS_PER_PAGE * 2)
                 .map(renderVehicleCard)}
             </div>
@@ -975,7 +1038,10 @@ useEffect(() => {
           </p>
 
           <button
-            onClick={() => navigate("/dashboard/business-services")}
+            type="button"
+            onClick={() =>
+              navigate("/dashboard/business-services")
+            }
           >
             Explore Business Services
           </button>
@@ -989,7 +1055,6 @@ useEffect(() => {
             <h2>
               Motors<span>Cube</span>
             </h2>
-
             <p>Your journey. Your vehicle. Your MotorsCube.</p>
           </div>
 
@@ -1025,7 +1090,7 @@ useEffect(() => {
       <MoreFilters
         open={showMoreFilters}
         onClose={() => setShowMoreFilters(false)}
-        listings={listings}
+        listings={allListings}
         filters={advancedFilters}
         onApply={(newFilters) => {
           setAdvancedFilters(newFilters);

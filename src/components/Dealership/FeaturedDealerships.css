@@ -1,0 +1,113 @@
+
+.featured-dealerships {
+  width: 100%;
+  min-width: 0;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.04);
+  box-sizing: border-box;
+}
+
+.featured-dealerships-heading {
+  margin-bottom: 20px;
+}
+
+.featured-dealerships-heading > span {
+  color: #e32636;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.featured-dealerships-heading h2 {
+  margin: 7px 0;
+  color: #222;
+  font-size: 19px;
+  line-height: 1.4;
+}
+
+.featured-dealerships-heading p {
+  margin: 0;
+  color: #888;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.featured-dealerships-list {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.featured-dealership-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #eee;
+  border-radius: 9px;
+  background: #fff;
+  transition: 0.2s ease;
+}
+
+.featured-dealership-card:hover {
+  border-color: #e32636;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  transform: translateY(-2px);
+}
+
+.featured-dealership-image,
+.featured-dealership-placeholder {
+  width: 65px;
+  height: 65px;
+  flex-shrink: 0;
+  border-radius: 8px;
+  object-fit: cover;
+  background: #f5f5f5;
+}
+
+.featured-dealership-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #e32636;
+  font-size: 25px;
+  font-weight: 700;
+}
+
+.featured-dealership-info {
+  min-width: 0;
+}
+
+.featured-dealership-info h3 {
+  margin: 0 0 6px;
+  color: #222;
+  font-size: 13px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.featured-dealership-info p {
+  margin: 0 0 7px;
+  color: #777;
+  font-size: 10px;
+}
+
+.featured-dealership-type {
+  display: inline-block;
+  padding: 4px 7px;
+  border-radius: 4px;
+  background: #fff1f1;
+  color: #d51f30;
+  font-size: 9px;
+  text-transform: capitalize;
+}
+
+.featured-dealership-message {
+  color: #888;
+  font-size: 12px;
+  line-height: 1.6;
+}

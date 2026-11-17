@@ -3,7 +3,6 @@ import { useState, useEffect } from "react";
 import axios from "../../api/axios";
 import { createSaleAd } from "../../api/itemsAdSale.api";
 import SellHero from "../../components/AddSale/SellHero";
-import { jwtDecode } from "jwt-decode";
 
 import VehicleTypeSelector from "../../components/AddSale/VehicleTypeSelector";
 import AdInformation from "../../components/AddSale/AdInformation";
@@ -32,8 +31,6 @@ import {
   MapPin,
   Building2,
   ClipboardCheck,
-  CheckCircle2,
-  CreditCard,
 } from "lucide-react";
 
 import "./AddSale.css";
@@ -41,13 +38,6 @@ import "./AddSale.css";
 function AddSale() {
   const [images, setImages] = useState([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const [walletBalance, setWalletBalance] = useState(0);
-  const [isLoadingWallet, setIsLoadingWallet] = useState(true);
-
-  // Controls which payment option is visible.
-  const [paymentSection, setPaymentSection] = useState("");
-  const [freeAdConfirmed, setFreeAdConfirmed] = useState(false);
 
   const [makes, setMakes] = useState([]);
   const [models, setModels] = useState([]);
@@ -90,64 +80,8 @@ function AddSale() {
     serial_no: "",
     hours_used: "",
     description: "",
+    promotion_plan: "normal",
   });
-
-  // Fetch the authenticated user's wallet balance.
-  useEffect(() => {
-    let cancelled = false;
-
-    const fetchWalletBalance = async () => {
-      try {
-        setIsLoadingWallet(true);
-
-        const token = localStorage.getItem("motorscube_token");
-
-        if (!token) {
-          throw new Error("Please log in to view your wallet balance.");
-        }
-
-        const decoded = jwtDecode(token);
-        const userId = decoded.sub;
-
-        if (!userId) {
-          throw new Error("User ID not found in authentication token.");
-        }
-
-        const response = await axios.get(
-          `/user-wallet/user/${encodeURIComponent(String(userId))}`
-        );
-
-        const wallet = response.data?.data;
-        const amount = Number(wallet?.remaining_amount);
-
-        if (!Number.isFinite(amount) || amount < 0) {
-          throw new Error("Invalid wallet balance returned by the API.");
-        }
-
-        if (!cancelled) {
-          setWalletBalance(amount);
-        }
-      } catch (error) {
-        if (!cancelled) {
-          console.error(
-            "Failed to fetch wallet balance:",
-            error.response?.data || error.message
-          );
-          setWalletBalance(0);
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoadingWallet(false);
-        }
-      }
-    };
-
-    fetchWalletBalance();
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   // Fetch vehicle makes when the category changes.
   useEffect(() => {
@@ -381,37 +315,11 @@ function AddSale() {
     setMakes([]);
     setModels([]);
     setVersions([]);
-
-    // Reset payment selection and free-ad confirmation.
-    setPaymentSection("");
-    setFreeAdConfirmed(false);
   };
 
-  // Handle the selected promotion/payment details.
-  // Actual payment processing is not implemented here.
-  const handlePostCardPayment = (paymentDetails) => {
-    console.log("Selected promotion payment:", paymentDetails);
-
-    alert(
-      "Your package and payment selection have been received. " +
-        "Actual payment processing is not connected yet."
-    );
-  };
-
-  // Submit the free sale advertisement.
+  // Submit the sale advertisement.
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    // Prevent submission unless the free-ad option is selected.
-    if (paymentSection !== "free") {
-      return;
-    }
-
-    // Require checkbox confirmation before posting for free.
-    if (!freeAdConfirmed) {
-      alert("Please confirm that you want to post this ad for free.");
-      return;
-    }
 
     if (!formData.vehicle_type) {
       alert("Please select a vehicle category.");
@@ -941,146 +849,29 @@ function AddSale() {
 
               <ImageUpload images={images} setImages={setImages} />
 
-              {/* Payment option selector */}
-              <section className="payment-choice-section">
-                <div className="payment-choice-heading">
-                  <h2>Choose How to Post Your Ad</h2>
-                  <p>
-                    Post your advertisement for free or choose a
-                    promotion package to increase its visibility.
-                  </p>
-                </div>
+              {/* Advertisement promotion selector }
+              <PostCard
+                value={formData.promotion_plan}
+                onChange={(plan) =>
+                  setFormData((previous) => ({
+                    ...previous,
+                    promotion_plan: plan,
+                  }))
+                }
+              />
 
-                <div
-                  className="payment-section-selector"
-                  role="group"
-                  aria-label="Choose advertisement posting option"
+              {/* Submit advertisement */}
+              <div className="free-ad-actions">
+                <button
+                  type="submit"
+                  className="free-ad-submit-btn"
+                  disabled={isSubmitting || !formData.vehicle_type}
                 >
-                  <button
-                    type="button"
-                    aria-pressed={paymentSection === "free"}
-                    className={paymentSection === "free" ? "active" : ""}
-                    onClick={() => {
-                      setPaymentSection("free");
-                      setFreeAdConfirmed(false);
-                    }}
-                  >
-                    <BadgeCheck size={24} aria-hidden="true" />
-
-                    <span className="payment-choice-text">
-                      <strong>Post Ad Free</strong>
-                      <small>Publish a regular advertisement.</small>
-                    </span>
-
-                    {paymentSection === "free" && (
-                      <CheckCircle2
-                        className="payment-choice-check"
-                        size={20}
-                        aria-hidden="true"
-                      />
-                    )}
-                  </button>
-
-                  <button
-                    type="button"
-                    aria-pressed={paymentSection === "post"}
-                    className={paymentSection === "post" ? "active" : ""}
-                    onClick={() => {
-                      setPaymentSection("post");
-                      setFreeAdConfirmed(false);
-                    }}
-                  >
-                    <CreditCard size={24} aria-hidden="true" />
-
-                    <span className="payment-choice-text">
-                      <strong>Post Ad</strong>
-                      <small>Explore promotion packages.</small>
-                    </span>
-
-                    {paymentSection === "post" && (
-                      <CheckCircle2
-                        className="payment-choice-check"
-                        size={20}
-                        aria-hidden="true"
-                      />
-                    )}
-                  </button>
-                </div>
-              </section>
-
-              {/* Free-ad card and its external submit button */}
-              {paymentSection === "free" && (
-                <>
-                  <section className="post-ad-free-card">
-                    <div className="post-ad-free-header">
-                      <div className="post-ad-free-icon">
-                        <BadgeCheck size={28} aria-hidden="true" />
-                      </div>
-
-                      <div>
-                        <h2>Post Your Ad for Free</h2>
-                        <p>
-                          You're one step away from listing your vehicle
-                          on MotorsCube.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="post-ad-free-benefits">
-                      <div>
-                        <CheckCircle2 size={18} aria-hidden="true" />
-                        <span>Free ad posting</span>
-                      </div>
-
-                      <div>
-                        <CheckCircle2 size={18} aria-hidden="true" />
-                        <span>Up to 30 vehicle images</span>
-                      </div>
-
-                      <div>
-                        <CheckCircle2 size={18} aria-hidden="true" />
-                        <span>
-                          Showcase your vehicle to potential buyers
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Checkbox inside the free-ad card */}
-                    <label className="free-ad-checkbox">
-                      <input
-                        type="checkbox"
-                        checked={freeAdConfirmed}
-                        onChange={(event) =>
-                          setFreeAdConfirmed(event.target.checked)
-                        }
-                      />
-                      <span>
-                        I confirm that I want to post this ad for free.
-                      </span>
-                    </label>
-                  </section>
-
-                  {/* Submit button outside the card, bottom-left */}
-                  <div className="free-ad-actions">
-                    <button
-                      type="submit"
-                      className="free-ad-submit-btn"
-                      disabled={isSubmitting || !freeAdConfirmed}
-                    >
-                      {isSubmitting ? "Posting Your Ad..." : "Post Ad Free"}
-                    </button>
-                  </div>
-                </>
-              )}
-
-              {/* Paid promotion card */}
-              {paymentSection === "post" && (
-                <PostCard
-                  walletBalance={walletBalance}
-                  isLoadingWallet={isLoadingWallet}
-                  onPayment={handlePostCardPayment}
-                />
-              )}
+                  {isSubmitting
+                    ? "Posting Your Ad..."
+                    : "Post Advertisement"}
+                </button>
+              </div>
             </>
           )}
         </form>
@@ -1090,4 +881,3 @@ function AddSale() {
 }
 
 export default AddSale;
-// This is not the end of it we will fix it and we will decide what more things to add in it

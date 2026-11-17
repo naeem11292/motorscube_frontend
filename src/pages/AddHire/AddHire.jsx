@@ -7,6 +7,7 @@ import Description from "../../components/AddHire/Description";
 import PostCard from "../../components/AddSale/PostCard";
 import SearchableSelect from "../../components/AddSale/SearchableSelect";
 import ImageUpload from "../../components/AddSale/ImageUpload";
+
 import {
   CarFront,
   Bike,
@@ -20,10 +21,10 @@ import {
   MapPin,
   Building2,
   ClipboardCheck,
-  
   FileText,
   CreditCard,
 } from "lucide-react";
+
 import "./AddHire.css";
 
 const categories = [
@@ -66,6 +67,7 @@ const initialFormData = {
   serial_no: "",
   hours_used: "",
   description: "",
+  promotion_plan: "normal",
 };
 
 function AddHire() {
@@ -80,9 +82,6 @@ function AddHire() {
   const [loadingMakes, setLoadingMakes] = useState(false);
   const [loadingModels, setLoadingModels] = useState(false);
   const [loadingVersions, setLoadingVersions] = useState(false);
-
-  const [postingOption, setPostingOption] = useState("");
-  const [freeHireConfirmed, setFreeHireConfirmed] = useState(false);
 
   // Load makes for the selected category.
   useEffect(() => {
@@ -229,6 +228,7 @@ function AddHire() {
     };
   }, [formData.model]);
 
+  // Handle regular form inputs.
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -238,17 +238,21 @@ function AddHire() {
     }));
   };
 
+  // Handle category selection.
   const handleCategoryChange = (category) => {
-    setFormData({
+    setFormData((previous) => ({
       ...initialFormData,
       vehicle_type: category,
-    });
+      promotion_plan: previous.promotion_plan,
+    }));
 
     setMakes([]);
     setModels([]);
     setVersions([]);
+    setImages([]);
   };
 
+  // Handle make selection.
   const handleMakeChange = (makeId) => {
     setFormData((previous) => ({
       ...previous,
@@ -261,6 +265,7 @@ function AddHire() {
     setVersions([]);
   };
 
+  // Handle model selection.
   const handleModelChange = (modelId) => {
     setFormData((previous) => ({
       ...previous,
@@ -269,52 +274,6 @@ function AddHire() {
     }));
 
     setVersions([]);
-  };
-
-  const handleImageChange = (event) => {
-    const selectedFiles = Array.from(event.target.files || []);
-    const remainingSlots = Math.max(0, 30 - images.length);
-
-    const allowedTypes = [
-      "image/jpeg",
-      "image/png",
-      "image/webp",
-    ];
-
-    const validFiles = selectedFiles.filter((file) => {
-      if (!allowedTypes.includes(file.type)) {
-        alert(
-          `${file.name} is not supported. Use JPG, PNG, or WebP.`
-        );
-        return false;
-      }
-
-      if (file.size > 5 * 1024 * 1024) {
-        alert(`${file.name} exceeds the 5 MB per-image limit.`);
-        return false;
-      }
-
-      return true;
-    });
-
-    if (validFiles.length > remainingSlots) {
-      alert(
-        `You can upload up to 30 images. ${remainingSlots} slot(s) remaining.`
-      );
-    }
-
-    setImages((previous) => [
-      ...previous,
-      ...validFiles.slice(0, remainingSlots),
-    ]);
-
-    event.target.value = "";
-  };
-
-  const removeImage = (indexToRemove) => {
-    setImages((previous) =>
-      previous.filter((_, index) => index !== indexToRemove)
-    );
   };
 
   const renderInput = (
@@ -662,33 +621,9 @@ function AddHire() {
     }
   };
 
-  const handlePostCardPayment = ({
-    packageName,
-    paymentType,
-    provider,
-    amount,
-  }) => {
-    // Payment processing must be verified by the backend.
-    console.log("Hire ad payment selection:", {
-      packageName,
-      paymentType,
-      provider,
-      amount,
-    });
-  };
-
+  // Submit the hire advertisement.
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    if (postingOption !== "free") {
-      alert("Please select Add Free to submit a free hire advertisement.");
-      return;
-    }
-
-    if (!freeHireConfirmed) {
-      alert("Please confirm that you want to post this hire advertisement for free.");
-      return;
-    }
 
     if (!formData.vehicle_type) {
       alert("Please select a vehicle category.");
@@ -888,94 +823,38 @@ function AddHire() {
             formData={formData}
             handleChange={handleChange}
           />
-            {/* Images */}
-            <ImageUpload images={images} setImages={setImages} />
 
-          {/* Posting options at the end of the form */}
-          <section className="add-sale-section">
-            <h2 className="add-sale-section-heading">
-              <CreditCard size={22} aria-hidden="true" />
-              <span>Choose Posting Option</span>
-            </h2>
+          {/* Images */}
+          <ImageUpload images={images} setImages={setImages} />
 
-            <div className="hire-posting-options-grid">
-              <button
-                type="button"
-                className={`hire-posting-option ${
-                  postingOption === "free" ? "active" : ""
-                }`}
-                aria-pressed={postingOption === "free"}
-                onClick={() => {
-                  setPostingOption("free");
-                  setFreeHireConfirmed(false);
-                }}
-              >
-                <BadgeCheck size={26} aria-hidden="true" />
-                <strong>Add Free</strong>
-                <span>Post your hire advertisement for free.</span>
-              </button>
+          {/* Advertisement promotion selector */}
+          <PostCard
+            value={formData.promotion_plan}
+            onChange={(plan) =>
+              setFormData((previous) => ({
+                ...previous,
+                promotion_plan: plan,
+              }))
+            }
+          />
 
-              <button
-                type="button"
-                className={`hire-posting-option ${
-                  postingOption === "paid" ? "active" : ""
-                }`}
-                aria-pressed={postingOption === "paid"}
-                onClick={() => setPostingOption("paid")}
-              >
-                <CreditCard size={26} aria-hidden="true" />
-                <strong>Post Ad</strong>
-                <span>Choose a promotion package and payment option.</span>
-              </button>
-            </div>
-          </section>
-
-          {/* Free posting confirmation and submission */}
-          {postingOption === "free" && (
-            <section className="add-sale-section free-hire-confirmation">
-              <label className="free-ad-checkbox">
-                <input
-                  type="checkbox"
-                  checked={freeHireConfirmed}
-                  onChange={(event) =>
-                    setFreeHireConfirmed(event.target.checked)
-                  }
-                />
-
-                <span>
-                  I confirm that I want to post this hire advertisement
-                  for free.
-                </span>
-              </label>
-
-              <div className="hire-submit-actions">
-                <button
-                  type="submit"
-                  className="free-ad-submit-btn"
-                  disabled={
-                    isSubmitting ||
-                    !formData.vehicle_type ||
-                    !formData.charges ||
-                    Number(formData.charges) <= 0 ||
-                    !freeHireConfirmed
-                  }
-                >
-                  {isSubmitting
-                    ? "Submitting Hire Ad..."
-                    : "Post Hire Ad Free"}
-                </button>
-              </div>
-            </section>
-          )}
-
-          {/* Paid posting */}
-          {postingOption === "paid" && (
-            <PostCard
-              walletBalance={0}
-              isLoadingWallet={false}
-              onPayment={handlePostCardPayment}
-            />
-          )}
+          {/* Submit hire advertisement */}
+          <div className="hire-submit-actions">
+            <button
+              type="submit"
+              className="free-ad-submit-btn"
+              disabled={
+                isSubmitting ||
+                !formData.vehicle_type ||
+                !formData.charges ||
+                Number(formData.charges) <= 0
+              }
+            >
+              {isSubmitting
+                ? "Submitting Hire Ad..."
+                : "Post Hire Advertisement"}
+            </button>
+          </div>
         </form>
       </main>
     </>
