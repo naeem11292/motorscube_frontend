@@ -1,12 +1,12 @@
 
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getSaleById, getHireById } from "../../api/listing.api";
 import "./ListingDetails.css";
 
 const API_BASE = "http://localhost:5000";
 
-const dummyListings = {
+const DUMMY_LISTINGS = {
   "demo-supreme-001": {
     sale_id: "demo-supreme-001",
     listing_id: "demo-supreme-001",
@@ -18,8 +18,8 @@ const dummyListings = {
     model: "5 Series",
     version: "530i M Sport",
     year: 2024,
-    display_price: 28500000,
     price: 28500000,
+    display_price: 28500000,
     city: "Lahore",
     registration_city: "Lahore",
     location: "Lahore",
@@ -27,6 +27,8 @@ const dummyListings = {
     mileage: 8500,
     fuel_type: "Petrol",
     transmission: "Automatic",
+    seller_name: "MotorsCube Advertiser",
+    phone: "",
     description:
       "Experience premium German engineering with this stunning BMW 530i M Sport. Featuring a luxurious interior, advanced technology, powerful performance, elegant exterior styling and exceptional comfort. Carefully maintained with an excellent service record.",
     images: [
@@ -36,6 +38,10 @@ const dummyListings = {
     ],
   },
 };
+
+// --------------------------------------------------
+// HELPERS
+// --------------------------------------------------
 
 const getImages = (images) => {
   if (!images) return [];
@@ -55,12 +61,11 @@ const getImages = (images) => {
   }
 
   return parsedImages
-    .filter(Boolean)
     .map((image) => {
       const filename =
         typeof image === "string"
           ? image
-          : image.url || image.filename || image.path || "";
+          : image?.url || image?.filename || image?.path || "";
 
       if (!filename) return "";
 
@@ -83,13 +88,13 @@ const formatPrice = (value) => {
     return "Price on request";
   }
 
-  const number = Number(value);
+  const amount = Number(value);
 
-  if (!Number.isFinite(number)) {
+  if (!Number.isFinite(amount)) {
     return String(value);
   }
 
-  return `PKR ${number.toLocaleString("en-PK")}`;
+  return `PKR ${amount.toLocaleString("en-PK")}`;
 };
 
 const getPlan = (listing) => {
@@ -102,18 +107,37 @@ const getPlan = (listing) => {
     .toLowerCase()
     .replace(/[\s_-]+/g, "");
 
-  if (plan === "supreme") return "supreme";
-  if (plan === "hotspot") return "hotspot";
-
-  return "normal";
+  return ["supreme", "hotspot"].includes(plan) ? plan : "normal";
 };
+
+const getAdvertiserName = (listing) =>
+  listing?.seller_name ||
+  listing?.user_name ||
+  listing?.owner_name ||
+  listing?.contact_person ||
+  listing?.advertiser_name ||
+  listing?.name ||
+  "Advertiser";
+
+const getAdvertiserPhone = (listing) =>
+  listing?.phone ||
+  listing?.phone_number ||
+  listing?.contact_number ||
+  listing?.mobile ||
+  listing?.contact ||
+  listing?.advertiser_phone ||
+  "";
+
+// --------------------------------------------------
+// COMPONENT
+// --------------------------------------------------
 
 function ListingDetails({ type: typeProp }) {
   const { id, type: routeType } = useParams();
   const navigate = useNavigate();
 
   const listingType =
-    typeProp || routeType || dummyListings[id]?.listing_type || "sale";
+    typeProp || routeType || DUMMY_LISTINGS[id]?.listing_type || "sale";
 
   const [listing, setListing] = useState(null);
   const [images, setImages] = useState([]);
@@ -121,28 +145,31 @@ function ListingDetails({ type: typeProp }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  // ------------------------------------------------
+  // FETCH LISTING
+  // ------------------------------------------------
+
   useEffect(() => {
     let isActive = true;
 
     const fetchListing = async () => {
-      try {
-        setLoading(true);
-        setError("");
-        setListing(null);
-        setImages([]);
-        setSelectedImage("");
+      setLoading(true);
+      setError("");
+      setListing(null);
+      setImages([]);
+      setSelectedImage("");
 
-        const demoListing = dummyListings[id];
+      try {
+        const demoListing = DUMMY_LISTINGS[id];
 
         if (demoListing) {
-          if (isActive) {
-            const demoImages = getImages(demoListing.images);
+          if (!isActive) return;
 
-            setListing(demoListing);
-            setImages(demoImages);
-            setSelectedImage(demoImages[0] || "");
-          }
+          const demoImages = getImages(demoListing.images);
 
+          setListing(demoListing);
+          setImages(demoImages);
+          setSelectedImage(demoImages[0] || "");
           return;
         }
 
@@ -175,7 +202,7 @@ function ListingDetails({ type: typeProp }) {
         if (isActive) {
           setError(
             err?.response?.data?.message ||
-              "Unable to load listing."
+              "Unable to load listing. Please try again."
           );
         }
       } finally {
@@ -185,27 +212,41 @@ function ListingDetails({ type: typeProp }) {
       }
     };
 
-    fetchListing();
+    if (id) {
+      fetchListing();
+    } else {
+      setError("Invalid listing ID.");
+      setLoading(false);
+    }
 
     return () => {
       isActive = false;
     };
   }, [id, listingType]);
 
+  // ------------------------------------------------
+  // LOADING STATE
+  // ------------------------------------------------
+
   if (loading) {
     return (
       <div className="listing-details-message">
         <div className="listing-details-spinner" />
-        Loading vehicle details...
+        <p>Loading vehicle details...</p>
       </div>
     );
   }
 
-  if (error) {
+  // ------------------------------------------------
+  // ERROR STATE
+  // ------------------------------------------------
+
+  if (error || !listing) {
     return (
       <div className="listing-details-message">
-        <h2>Unable to load listing</h2>
-        <p>{error}</p>
+        <h2>{error ? "Unable to load listing" : "Listing not found"}</h2>
+        {error && <p>{error}</p>}
+
         <button onClick={() => navigate("/listing")}>
           Back to Listings
         </button>
@@ -213,16 +254,9 @@ function ListingDetails({ type: typeProp }) {
     );
   }
 
-  if (!listing) {
-    return (
-      <div className="listing-details-message">
-        <h2>Listing not found</h2>
-        <button onClick={() => navigate("/listing")}>
-          Back to Listings
-        </button>
-      </div>
-    );
-  }
+  // ------------------------------------------------
+  // LISTING DATA
+  // ------------------------------------------------
 
   const plan = getPlan(listing);
 
@@ -253,17 +287,29 @@ function ListingDetails({ type: typeProp }) {
     listing.vehicle_description ||
     "No description available.";
 
-  // The selected photo is always the large image.
-  // The next two available photos are displayed on the right.
+  const advertiserName = getAdvertiserName(listing);
+  const advertiserPhone = getAdvertiserPhone(listing);
+
+  const phoneLink = advertiserPhone
+    ? `tel:${String(advertiserPhone).replace(/[^\d+]/g, "")}`
+    : "";
+
+  // ------------------------------------------------
+  // IMAGE GALLERY
+  // ------------------------------------------------
+
   const sideImages = images
     .filter((image) => image !== selectedImage)
     .slice(0, 2);
 
-  // Any remaining photos are displayed as thumbnails below.
   const additionalImages = images.filter(
     (image) =>
       image !== selectedImage && !sideImages.includes(image)
   );
+
+  // ------------------------------------------------
+  // VEHICLE SPECIFICATIONS
+  // ------------------------------------------------
 
   const specifications = [
     ["Vehicle Type", listing.vehicle_type],
@@ -287,30 +333,30 @@ function ListingDetails({ type: typeProp }) {
     ["Doors", listing.doors],
   ].filter(([, value]) => value !== null && value !== undefined && value !== "");
 
-  const sellerName =
-    listing.seller_name ||
-    listing.user_name ||
-    listing.owner_name ||
-    listing.contact_person ||
-    "";
+  const quickSpecifications = [
+    ["Year", listing.year],
+    ["Condition", listing.condition],
+    [
+      "Mileage",
+      listing.mileage
+        ? `${Number(listing.mileage).toLocaleString()} km`
+        : "",
+    ],
+    ["Transmission", listing.transmission],
+    ["Fuel", listing.fuel_type],
+    ["Engine", listing.engine_capacity || listing.engine_size],
+  ].filter(([, value]) => value !== null && value !== undefined && value !== "");
 
-  const sellerPhone =
-    listing.phone ||
-    listing.phone_number ||
-    listing.contact_number ||
-    listing.mobile ||
-    "";
-
-  const sellerEmail =
-    listing.email ||
-    listing.contact_email ||
-    "";
+  // ------------------------------------------------
+  // RENDER
+  // ------------------------------------------------
 
   return (
     <main className="listing-details-page">
       <div className="listing-details-container">
+
         {/* BREADCRUMB */}
-        <div className="listing-details-breadcrumb">
+        <nav className="listing-details-breadcrumb">
           <button onClick={() => navigate("/")}>Home</button>
           <span>/</span>
           <button onClick={() => navigate("/listing")}>
@@ -318,13 +364,14 @@ function ListingDetails({ type: typeProp }) {
           </button>
           <span>/</span>
           <span>{title}</span>
-        </div>
+        </nav>
 
-        {/* VEHICLE GALLERY */}
+        {/* VEHICLE IMAGE GALLERY */}
         <section className="listing-details-gallery-section">
           <div className="listing-details-gallery">
             <div className="listing-details-gallery-grid">
-              {/* LARGE MAIN IMAGE */}
+
+              {/* MAIN IMAGE */}
               <div className="listing-details-main-image-wrapper">
                 {selectedImage ? (
                   <img
@@ -350,7 +397,7 @@ function ListingDetails({ type: typeProp }) {
                 </span>
               </div>
 
-              {/* TWO SMALL IMAGES ON THE RIGHT */}
+              {/* SIDE IMAGES */}
               {sideImages.length > 0 && (
                 <div className="listing-details-side-images">
                   {sideImages.map((image, index) => (
@@ -380,7 +427,7 @@ function ListingDetails({ type: typeProp }) {
               )}
             </div>
 
-            {/* ADDITIONAL PHOTOS */}
+            {/* ADDITIONAL THUMBNAILS */}
             {additionalImages.length > 0 && (
               <div className="listing-details-thumbnails">
                 {additionalImages.map((image, index) => (
@@ -401,9 +448,13 @@ function ListingDetails({ type: typeProp }) {
           </div>
         </section>
 
-        {/* MAIN DETAILS */}
+        {/* DETAILS AND SIDEBAR */}
         <div className="listing-details-layout">
+
+          {/* MAIN CONTENT */}
           <div className="listing-details-main-content">
+
+            {/* VEHICLE HEADING */}
             <section className="listing-details-heading-card">
               <div className="listing-details-labels">
                 <span className={`listing-details-type ${listingType}`}>
@@ -430,7 +481,7 @@ function ListingDetails({ type: typeProp }) {
               </div>
             </section>
 
-            {/* QUICK SPECIFICATIONS */}
+            {/* VEHICLE OVERVIEW */}
             <section className="listing-details-section">
               <div className="listing-details-section-heading">
                 <span>VEHICLE INFORMATION</span>
@@ -438,33 +489,16 @@ function ListingDetails({ type: typeProp }) {
               </div>
 
               <div className="listing-details-quick-specs">
-                {[
-                  ["Year", listing.year],
-                  ["Condition", listing.condition],
-                  [
-                    "Mileage",
-                    listing.mileage
-                      ? `${Number(listing.mileage).toLocaleString()} km`
-                      : "",
-                  ],
-                  ["Transmission", listing.transmission],
-                  ["Fuel", listing.fuel_type],
-                  ["Engine", listing.engine_capacity || listing.engine_size],
-                ]
-                  .filter(
-                    ([, value]) =>
-                      value !== null && value !== undefined && value !== ""
-                  )
-                  .map(([label, value]) => (
-                    <div className="listing-details-quick-spec" key={label}>
-                      <span>{label}</span>
-                      <strong>{value}</strong>
-                    </div>
-                  ))}
+                {quickSpecifications.map(([label, value]) => (
+                  <div className="listing-details-quick-spec" key={label}>
+                    <span>{label}</span>
+                    <strong>{value}</strong>
+                  </div>
+                ))}
               </div>
             </section>
 
-            {/* COMPLETE SPECIFICATIONS */}
+            {/* TECHNICAL SPECIFICATIONS */}
             <section className="listing-details-section">
               <div className="listing-details-section-heading">
                 <span>TECHNICAL DETAILS</span>
@@ -497,9 +531,11 @@ function ListingDetails({ type: typeProp }) {
             </section>
           </div>
 
-          {/* PRICE AND SELLER SIDEBAR */}
+          {/* RIGHT SIDEBAR */}
           <aside className="listing-details-sidebar">
             <div className="listing-details-contact-card">
+
+              {/* PRICE */}
               <span className="listing-details-sidebar-label">
                 {listingType === "sale" ? "SELLING PRICE" : "HIRING PRICE"}
               </span>
@@ -514,38 +550,24 @@ function ListingDetails({ type: typeProp }) {
 
               <div className="listing-details-contact-divider" />
 
-              <h3>Seller Information</h3>
+              {/* ADVERTISER */}
+              <h3>Advertiser Information</h3>
 
               <p className="listing-details-seller-name">
-                {sellerName || "Vehicle Seller"}
+                {advertiserName}
               </p>
 
-              {sellerPhone ? (
+              {advertiserPhone ? (
                 <a
-                  href={`tel:${sellerPhone}`}
+                  href={phoneLink}
                   className="listing-details-contact-button"
                 >
-                  Call Seller
+                  Call Advertiser
                 </a>
               ) : (
-                <button
-                  type="button"
-                  className="listing-details-contact-button"
-                  onClick={() =>
-                    alert("Seller contact details are not available yet.")
-                  }
-                >
-                  Contact Seller
-                </button>
-              )}
-
-              {sellerEmail && (
-                <a
-                  href={`mailto:${sellerEmail}`}
-                  className="listing-details-email-button"
-                >
-                  Email Seller
-                </a>
+                <p className="listing-details-no-contact">
+                  Contact number unavailable
+                </p>
               )}
 
               <p className="listing-details-safety-note">
@@ -556,7 +578,7 @@ function ListingDetails({ type: typeProp }) {
           </aside>
         </div>
 
-        {/* BACK TO LISTINGS */}
+        {/* BACK BUTTON */}
         <div className="listing-details-back">
           <button
             type="button"

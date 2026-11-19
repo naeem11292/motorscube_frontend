@@ -57,8 +57,13 @@ function AddSale() {
     version: "",
     year: "",
     registration_city: "",
+
+    // Vehicle location details
     location: "",
-    country: "",
+    country: "Pakistan",
+    city: "",
+    locality: "",
+
     mileage: "",
     price: "",
     body_type: "",
@@ -81,9 +86,29 @@ function AddSale() {
     hours_used: "",
     description: "",
     promotion_plan: "normal",
+    free_ad_confirmed: "false",
   });
 
-  // Fetch vehicle makes when the category changes.
+  // ==========================================
+  // HELPER: EXTRACT API ARRAY
+  // ==========================================
+
+  const getApiArray = (response) => {
+    const payload = response?.data;
+
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload?.data)) return payload.data;
+    if (Array.isArray(payload?.makes)) return payload.makes;
+    if (Array.isArray(payload?.models)) return payload.models;
+    if (Array.isArray(payload?.versions)) return payload.versions;
+
+    return [];
+  };
+
+  // ==========================================
+  // FETCH VEHICLE MAKES
+  // ==========================================
+
   useEffect(() => {
     let cancelled = false;
 
@@ -106,10 +131,14 @@ function AddSale() {
           },
         });
 
-        if (!cancelled) {
-          const data = response.data?.data;
-          setMakes(Array.isArray(data) ? data : []);
-        }
+        if (cancelled) return;
+
+        const fetchedMakes = getApiArray(response);
+
+        console.log("Vehicle Type:", formData.vehicle_type);
+        console.log("Vehicle Makes API Response:", fetchedMakes);
+
+        setMakes(fetchedMakes);
       } catch (error) {
         if (!cancelled) {
           console.error(
@@ -119,9 +148,7 @@ function AddSale() {
           setMakes([]);
         }
       } finally {
-        if (!cancelled) {
-          setLoadingMakes(false);
-        }
+        if (!cancelled) setLoadingMakes(false);
       }
     };
 
@@ -132,7 +159,10 @@ function AddSale() {
     };
   }, [formData.vehicle_type]);
 
-  // Fetch vehicle models when a make is selected.
+  // ==========================================
+  // FETCH VEHICLE MODELS
+  // ==========================================
+
   useEffect(() => {
     let cancelled = false;
 
@@ -148,6 +178,8 @@ function AddSale() {
       try {
         setLoadingModels(true);
 
+        console.log("Selected Make ID:", formData.make);
+
         const response = await axios.get("/vehicle-models", {
           params: {
             vehicle_make_id: formData.make,
@@ -156,15 +188,11 @@ function AddSale() {
 
         if (cancelled) return;
 
-        const data = response.data?.data;
-        const fetchedModels = Array.isArray(data) ? data : [];
+        const fetchedModels = getApiArray(response);
 
-        setModels(
-          fetchedModels.filter(
-            (model) =>
-              String(model.vehicle_make_id) === String(formData.make)
-          )
-        );
+        console.log("Vehicle Models API Response:", fetchedModels);
+
+        setModels(fetchedModels);
       } catch (error) {
         if (!cancelled) {
           console.error(
@@ -174,9 +202,7 @@ function AddSale() {
           setModels([]);
         }
       } finally {
-        if (!cancelled) {
-          setLoadingModels(false);
-        }
+        if (!cancelled) setLoadingModels(false);
       }
     };
 
@@ -187,7 +213,10 @@ function AddSale() {
     };
   }, [formData.make]);
 
-  // Fetch vehicle versions when a model is selected.
+  // ==========================================
+  // FETCH VEHICLE VERSIONS
+  // ==========================================
+
   useEffect(() => {
     let cancelled = false;
 
@@ -199,27 +228,24 @@ function AddSale() {
         return;
       }
 
-      const selectedModel = models.find(
-        (model) =>
-          String(model.vehicle_model_id) === String(formData.model)
-      );
-
-      if (!selectedModel?.vehicle_model_id) {
-        setLoadingVersions(false);
-        return;
-      }
-
       try {
         setLoadingVersions(true);
 
+        console.log("Selected Model ID:", formData.model);
+
         const response = await axios.get(
-          `/version/model/${selectedModel.vehicle_model_id}`
+          `/version/model/${formData.model}`
         );
 
-        if (!cancelled) {
-          const data = response.data?.data;
-          setVersions(Array.isArray(data) ? data : []);
-        }
+        if (cancelled) return;
+
+        console.log("Versions API Response:", response.data);
+
+        const fetchedVersions = getApiArray(response);
+
+        console.log("Versions Found:", fetchedVersions);
+
+        setVersions(fetchedVersions);
       } catch (error) {
         if (!cancelled) {
           console.error(
@@ -229,9 +255,7 @@ function AddSale() {
           setVersions([]);
         }
       } finally {
-        if (!cancelled) {
-          setLoadingVersions(false);
-        }
+        if (!cancelled) setLoadingVersions(false);
       }
     };
 
@@ -240,9 +264,12 @@ function AddSale() {
     return () => {
       cancelled = true;
     };
-  }, [formData.model, models]);
+  }, [formData.model]);
 
-  // Handle regular form inputs.
+  // ==========================================
+  // HANDLE REGULAR INPUTS
+  // ==========================================
+
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -252,11 +279,16 @@ function AddSale() {
     }));
   };
 
-  // Handle make selection.
+  // ==========================================
+  // HANDLE MAKE SELECTION
+  // ==========================================
+
   const handleMakeChange = (selectedMakeId) => {
+    console.log("Make Selected:", selectedMakeId);
+
     setFormData((previous) => ({
       ...previous,
-      make: selectedMakeId,
+      make: String(selectedMakeId),
       model: "",
       version: "",
     }));
@@ -265,18 +297,26 @@ function AddSale() {
     setVersions([]);
   };
 
-  // Handle model selection.
+  // ==========================================
+  // HANDLE MODEL SELECTION
+  // ==========================================
+
   const handleModelChange = (selectedModelId) => {
+    console.log("Model Selected:", selectedModelId);
+
     setFormData((previous) => ({
       ...previous,
-      model: selectedModelId,
+      model: String(selectedModelId),
       version: "",
     }));
 
     setVersions([]);
   };
 
-  // Reset category-specific information when category changes.
+  // ==========================================
+  // HANDLE VEHICLE CATEGORY CHANGE
+  // ==========================================
+
   const handleVehicleTypeChange = (event) => {
     const selectedType = event.target.value;
 
@@ -291,8 +331,13 @@ function AddSale() {
       version: "",
       year: "",
       registration_city: "",
+
+      // Reset location when category changes
       location: "",
-      country: "",
+      country: "Pakistan",
+      city: "",
+      locality: "",
+
       mileage: "",
       price: "",
       body_type: "",
@@ -317,7 +362,10 @@ function AddSale() {
     setVersions([]);
   };
 
-  // Submit the sale advertisement.
+  // ==========================================
+  // SUBMIT SALE ADVERTISEMENT
+  // ==========================================
+
   const handleSubmit = async (event) => {
     event.preventDefault();
 
@@ -326,7 +374,11 @@ function AddSale() {
       return;
     }
 
-    if (!formData.price || Number(formData.price) <= 0) {
+    const numericPrice = Number(
+      String(formData.price ?? "").replace(/,/g, "").trim()
+    );
+
+    if (!formData.price || !Number.isFinite(numericPrice) || numericPrice <= 0) {
       alert("Please enter a valid price.");
       return;
     }
@@ -336,14 +388,38 @@ function AddSale() {
       return;
     }
 
+    const isFreeAd = formData.promotion_plan === "normal";
+
+    if (
+      isFreeAd &&
+      formData.free_ad_confirmed !== "true"
+    ) {
+      alert("Please confirm the Free Ad option before posting.");
+      return;
+    }
+
+    if (!isFreeAd) {
+      alert(
+        "Paid advertisement checkout is not connected in this submission handler. Your advertisement has not been submitted."
+      );
+      return;
+    }
+
     try {
       setIsSubmitting(true);
 
       const payload = new FormData();
 
       Object.entries(formData).forEach(([key, value]) => {
-        if (value !== "" && value !== null && value !== undefined) {
-          payload.append(key, value);
+        if (
+          value !== "" &&
+          value !== null &&
+          value !== undefined
+        ) {
+          payload.append(
+            key,
+            key === "price" ? String(numericPrice) : value
+          );
         }
       });
 
@@ -351,10 +427,14 @@ function AddSale() {
         payload.append("images", image);
       });
 
+      // FREE AD: Direct submission, no payment or wallet deduction.
       const response = await createSaleAd(payload);
 
-      console.log("Sale created:", response);
-      alert("Sale advertisement created successfully!");
+      console.log("Free sale advertisement created:", response);
+
+      alert(
+        "Your free advertisement has been submitted successfully!"
+      );
     } catch (error) {
       console.error(
         "Create sale error:",
@@ -370,7 +450,10 @@ function AddSale() {
     }
   };
 
-  // Common fields used by vehicle categories.
+  // ==========================================
+  // COMMON VEHICLE FIELDS
+  // ==========================================
+
   function renderCommonVehicleFields() {
     return (
       <>
@@ -380,11 +463,13 @@ function AddSale() {
           icon={Factory}
           value={formData.make}
           options={makes}
-          getOptionValue={(make) => make.vehicle_make_id}
+          getOptionValue={(make) => String(make.vehicle_make_id)}
           getOptionLabel={(make) => make.make_name}
           onChange={handleMakeChange}
           placeholder={
-            loadingMakes ? "Loading makes..." : "Search or select make"
+            loadingMakes
+              ? "Loading makes..."
+              : "Search or select make"
           }
           disabled={loadingMakes}
         />
@@ -395,7 +480,7 @@ function AddSale() {
           icon={CarFront}
           value={formData.model}
           options={models}
-          getOptionValue={(model) => model.vehicle_model_id}
+          getOptionValue={(model) => String(model.vehicle_model_id)}
           getOptionLabel={(model) => model.model_name}
           onChange={handleModelChange}
           placeholder={
@@ -403,7 +488,9 @@ function AddSale() {
               ? "Select make first"
               : loadingModels
                 ? "Loading models..."
-                : "Search or select model"
+                : models.length === 0
+                  ? "No models available"
+                  : "Search or select model"
           }
           disabled={!formData.make || loadingModels}
         />
@@ -442,6 +529,7 @@ function AddSale() {
             <CalendarDays size={16} aria-hidden="true" />
             <span>Year</span>
           </label>
+
           <input
             id={`${formData.vehicle_type}_year`}
             name="year"
@@ -461,6 +549,7 @@ function AddSale() {
             <ClipboardCheck size={16} aria-hidden="true" />
             <span>Condition</span>
           </label>
+
           <select
             id={`${formData.vehicle_type}_condition`}
             name="condition"
@@ -470,8 +559,11 @@ function AddSale() {
             <option value="">Select condition</option>
             <option value="new">New</option>
             <option value="used">Used</option>
+
             {formData.vehicle_type === "bike" && (
-              <option value="re-conditioned">Re-Conditioned</option>
+              <option value="re-conditioned">
+                Re-Conditioned
+              </option>
             )}
           </select>
         </div>
@@ -484,6 +576,7 @@ function AddSale() {
             <MapPin size={16} aria-hidden="true" />
             <span>City / Location</span>
           </label>
+
           <input
             id={`${formData.vehicle_type}_location`}
             name="location"
@@ -501,6 +594,7 @@ function AddSale() {
             <Building2 size={16} aria-hidden="true" />
             <span>Registration City</span>
           </label>
+
           <input
             id={`${formData.vehicle_type}_registration_city`}
             name="registration_city"
@@ -513,7 +607,10 @@ function AddSale() {
     );
   }
 
-  // Render category-specific information.
+  // ==========================================
+  // CATEGORY-SPECIFIC INFORMATION
+  // ==========================================
+
   const renderCategoryDetails = () => {
     switch (formData.vehicle_type) {
       case "car":
@@ -530,6 +627,7 @@ function AddSale() {
                   <CarFront size={16} aria-hidden="true" />
                   <span>Type</span>
                 </label>
+
                 <input
                   id="car_type"
                   name="type"
@@ -544,6 +642,7 @@ function AddSale() {
                   <Layers size={16} aria-hidden="true" />
                   <span>Subtype</span>
                 </label>
+
                 <input
                   id="car_subtype"
                   name="subtype"
@@ -574,6 +673,7 @@ function AddSale() {
                   <Bike size={16} aria-hidden="true" />
                   <span>Type</span>
                 </label>
+
                 <input
                   id="bike_type"
                   name="type"
@@ -588,6 +688,7 @@ function AddSale() {
                   <Layers size={16} aria-hidden="true" />
                   <span>Subtype</span>
                 </label>
+
                 <input
                   id="bike_subtype"
                   name="subtype"
@@ -621,6 +722,7 @@ function AddSale() {
                   <Truck size={16} aria-hidden="true" />
                   <span>Vehicle Type</span>
                 </label>
+
                 <input
                   id="commercial_type"
                   name="type"
@@ -638,6 +740,7 @@ function AddSale() {
                   <Layers size={16} aria-hidden="true" />
                   <span>Subtype</span>
                 </label>
+
                 <input
                   id="commercial_subtype"
                   name="subtype"
@@ -674,6 +777,7 @@ function AddSale() {
                   <Cog size={16} aria-hidden="true" />
                   <span>Machinery Type</span>
                 </label>
+
                 <input
                   id="machinery_type"
                   name="type"
@@ -691,6 +795,7 @@ function AddSale() {
                   <Layers size={16} aria-hidden="true" />
                   <span>Subtype</span>
                 </label>
+
                 <input
                   id="machinery_subtype"
                   name="subtype"
@@ -724,6 +829,7 @@ function AddSale() {
                   <Sprout size={16} aria-hidden="true" />
                   <span>Plant Name</span>
                 </label>
+
                 <input
                   id="plant_name"
                   name="plant_name"
@@ -738,6 +844,7 @@ function AddSale() {
                   <Sprout size={16} aria-hidden="true" />
                   <span>Plant Type</span>
                 </label>
+
                 <input
                   id="plant_type"
                   name="type"
@@ -752,6 +859,7 @@ function AddSale() {
                   <Layers size={16} aria-hidden="true" />
                   <span>Subtype</span>
                 </label>
+
                 <input
                   id="plant_subtype"
                   name="subtype"
@@ -769,6 +877,7 @@ function AddSale() {
                   <ClipboardCheck size={16} aria-hidden="true" />
                   <span>Condition</span>
                 </label>
+
                 <select
                   id="plant_condition"
                   name="condition"
@@ -789,6 +898,7 @@ function AddSale() {
                   <MapPin size={16} aria-hidden="true" />
                   <span>City / Location</span>
                 </label>
+
                 <input
                   id="plant_location"
                   name="location"
@@ -807,6 +917,10 @@ function AddSale() {
         return null;
     }
   };
+
+  // ==========================================
+  // MAIN RENDER
+  // ==========================================
 
   return (
     <>
@@ -847,29 +961,126 @@ function AddSale() {
                 handleChange={handleChange}
               />
 
-              <ImageUpload images={images} setImages={setImages} />
+              <ImageUpload
+                images={images}
+                setImages={setImages}
+              />
+              
 
-              {/* Advertisement promotion selector }
+              {/* VEHICLE LOCATION CARD */}
+              <section className="add-sale-section vehicle-location-card">
+                <h2 className="add-sale-section-heading">
+                  <MapPin size={22} aria-hidden="true" />
+                  <span>Vehicle Location</span>
+                </h2>
+
+                <p className="vehicle-location-description">
+                  Enter the city and area where the vehicle is available.
+                </p>
+
+                <div className="form-group">
+                  <label htmlFor="vehicle_city" className="add-sale-field-label">
+                    <Building2 size={16} aria-hidden="true" />
+                    <span>City</span>
+                  </label>
+                  <input
+                    id="vehicle_city"
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    placeholder="e.g. Lahore, Islamabad, Karachi"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="vehicle_locality" className="add-sale-field-label">
+                    <MapPin size={16} aria-hidden="true" />
+                    <span>Area / Locality</span>
+                  </label>
+                  <input
+                    id="vehicle_locality"
+                    name="locality"
+                    value={formData.locality}
+                    onChange={handleChange}
+                    placeholder="e.g. DHA Phase 6, Bahria Town"
+                  />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="vehicle_location" className="add-sale-field-label">
+                    <MapPin size={16} aria-hidden="true" />
+                    <span>Complete Address (optional)</span>
+                  </label>
+                  <input
+                    id="vehicle_location"
+                    name="location"
+                    value={formData.location}
+                    onChange={handleChange}
+                    placeholder="Enter street, block or nearby landmark"
+                  />
+                </div>
+
+                <input type="hidden" name="country" value="Pakistan" />
+              </section>
+
+              {/* ADVERTISEMENT PROMOTION */}
               <PostCard
                 value={formData.promotion_plan}
                 onChange={(plan) =>
                   setFormData((previous) => ({
                     ...previous,
                     promotion_plan: plan,
+                    free_ad_confirmed: "false",
                   }))
                 }
               />
 
-              {/* Submit advertisement */}
+              {/* FREE AD CONFIRMATION */}
+              {formData.promotion_plan === "normal" && (
+                <section className="free-ad-confirmation">
+                  <label className="free-ad-confirmation-label">
+                    <input
+                      type="checkbox"
+                      checked={
+                        formData.free_ad_confirmed === "true"
+                      }
+                      onChange={(event) =>
+                        setFormData((previous) => ({
+                          ...previous,
+                          free_ad_confirmed: event.target.checked
+                            ? "true"
+                            : "false",
+                        }))
+                      }
+                    />
+
+                    <span>
+                      I confirm that I want to publish this
+                      advertisement using the Free Ad option without
+                      making any payment.
+                    </span>
+                  </label>
+                </section>
+              )}
+
               <div className="free-ad-actions">
                 <button
                   type="submit"
                   className="free-ad-submit-btn"
-                  disabled={isSubmitting || !formData.vehicle_type}
+                  disabled={
+                    isSubmitting ||
+                    !formData.vehicle_type ||
+                    (
+                      formData.promotion_plan === "normal" &&
+                      formData.free_ad_confirmed !== "true"
+                    )
+                  }
                 >
                   {isSubmitting
                     ? "Posting Your Ad..."
-                    : "Post Advertisement"}
+                    : formData.promotion_plan === "normal"
+                      ? "Post Free Advertisement"
+                      : "Continue to Payment"}
                 </button>
               </div>
             </>
