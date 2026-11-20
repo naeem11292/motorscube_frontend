@@ -46,6 +46,8 @@ const VEHICLE_TYPE_SERVICES = [
   "insurance",
   "leasing",
   "workshop",
+  "drivingSchool",
+  "showroom",
 ];
 
 function BusinessServices() {
@@ -96,23 +98,39 @@ function BusinessServices() {
     }
   };
 
+  const handleImportExportTypeSelect = (type) => {
+    setImportExportType(type);
+    setSelectedVehicleType("");
+    setMessage("");
+    setShowVehiclePopup(true);
+  };
+
   const handleVehicleTypeSelect = ({ vehicleType, registration }) => {
     setSelectedVehicleType(vehicleType);
 
-    if (selectedCategory === "dealership") {
+    const activeService =
+      selectedCategory === "importExport"
+        ? importExportType
+        : selectedCategory;
+
+    if (activeService === "dealership") {
       setEditingDealership(registration || null);
     }
 
-    if (selectedCategory === "insurance") {
+    if (activeService === "insurance") {
       setEditingInsurance(registration || null);
     }
 
-    if (selectedCategory === "leasing") {
+    if (activeService === "leasing") {
       setEditingLeasing(registration || null);
     }
 
-    if (selectedCategory === "workshop") {
+    if (activeService === "workshop") {
       setEditingWorkshop(registration || null);
+    }
+
+    if (activeService === "importer" || activeService === "exporter") {
+      setImportExportType(activeService);
     }
 
     setMessage("");
@@ -138,6 +156,7 @@ function BusinessServices() {
   const closeVehicleTypePopup = () => {
     setShowVehiclePopup(false);
     setSelectedCategory("");
+    setImportExportType("");
     setSelectedVehicleType("");
     setEditingWorkshop(null);
     setMessage("");
@@ -344,12 +363,17 @@ function BusinessServices() {
 
       {/* VEHICLE TYPE POPUP */}
       {showVehiclePopup && (
-        <VehicleTypePopup
-          category={selectedCategory}
-          onSelect={handleVehicleTypeSelect}
-          onClose={closeVehicleTypePopup}
-        />
-      )}
+  <VehicleTypePopup
+    category={selectedCategory}
+    serviceKey={
+      selectedCategory === "importExport"
+        ? importExportType
+        : selectedCategory
+    }
+    onSelect={handleVehicleTypeSelect}
+    onClose={closeVehicleTypePopup}
+  />
+)}
 
       {/* DEALERSHIP */}
       {selectedCategory === "dealership" &&
@@ -530,20 +554,42 @@ function BusinessServices() {
         )}
 
       {/* DRIVING SCHOOL */}
-      {selectedCategory === "drivingSchool" && (
-        <section className="business-service-form-section">
-          <h2>Driving School Form</h2>
-          <DrivingSchoolForm />
-        </section>
-      )}
+      {selectedCategory === "drivingSchool" &&
+        selectedVehicleType &&
+        !showVehiclePopup && (
+          <section className="business-service-form-section">
+            <button
+              type="button"
+              className="business-service-cancel-button"
+              onClick={openVehicleTypePopup}
+              disabled={saving}
+            >
+              ← Change Vehicle Type
+            </button>
+
+            <h2>Driving School Form</h2>
+            <DrivingSchoolForm selectedVehicleType={selectedVehicleType} />
+          </section>
+        )}
 
       {/* SHOWROOM */}
-      {selectedCategory === "showroom" && (
-        <section className="business-service-form-section">
-          <h2>Showroom Form</h2>
-          <ShowroomForm />
-        </section>
-      )}
+      {selectedCategory === "showroom" &&
+        selectedVehicleType &&
+        !showVehiclePopup && (
+          <section className="business-service-form-section">
+            <button
+              type="button"
+              className="business-service-cancel-button"
+              onClick={openVehicleTypePopup}
+              disabled={saving}
+            >
+              ← Change Vehicle Type
+            </button>
+
+            <h2>Showroom Form</h2>
+            <ShowroomForm selectedVehicleType={selectedVehicleType} />
+          </section>
+        )}
 
       {/* IMPORT / EXPORT */}
       {selectedCategory === "importExport" && !importExportType && (
@@ -557,7 +603,7 @@ function BusinessServices() {
             <button
               type="button"
               className="import-export-choice-card"
-              onClick={() => setImportExportType("importer")}
+              onClick={() => handleImportExportTypeSelect("importer")}
             >
               <h3>Importer</h3>
               <p>Import vehicles and automotive products.</p>
@@ -566,7 +612,7 @@ function BusinessServices() {
             <button
               type="button"
               className="import-export-choice-card"
-              onClick={() => setImportExportType("exporter")}
+              onClick={() => handleImportExportTypeSelect("exporter")}
             >
               <h3>Exporter</h3>
               <p>Export vehicles and automotive products.</p>
@@ -575,25 +621,41 @@ function BusinessServices() {
         </section>
       )}
 
-      {selectedCategory === "importExport" && importExportType && (
+      {selectedCategory === "importExport" &&
+        importExportType &&
+        selectedVehicleType &&
+        !showVehiclePopup && (
         <section className="business-service-form-section">
           <button
             type="button"
             className="import-export-back-button"
-            onClick={() => setImportExportType("")}
+            onClick={() => {
+              setImportExportType("")
+              setSelectedVehicleType("")
+              setShowVehiclePopup(false)
+            }}
           >
             ← Back to Importer / Exporter
+          </button>
+
+          <button
+            type="button"
+            className="business-service-cancel-button"
+            onClick={openVehicleTypePopup}
+            disabled={saving}
+          >
+            ← Change Vehicle Type
           </button>
 
           {importExportType === "importer" ? (
             <>
               <h2>Importer Form</h2>
-              <ImporterForm />
+              <ImporterForm selectedVehicleType={selectedVehicleType} />
             </>
           ) : (
             <>
               <h2>Exporter Form</h2>
-              <ExporterForm />
+              <ExporterForm selectedVehicleType={selectedVehicleType} />
             </>
           )}
         </section>

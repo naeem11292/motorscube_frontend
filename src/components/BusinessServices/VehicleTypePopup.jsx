@@ -1,8 +1,15 @@
+
 import { useEffect, useState } from "react";
+
 import { getDealerships } from "../../api/dealership.api";
 import { getInsuranceListings } from "../../api/insurance.api";
 import { getLeasingListings } from "../../api/leasing.api";
 import { getWorkshopListings } from "../../api/workshop.api";
+import {
+  getImporters,
+  getExporters,
+} from "../../api/importExport.api";
+
 import "./VehicleTypePopup.css";
 
 const VEHICLE_TYPES = [
@@ -18,26 +25,55 @@ const SERVICE_CONFIG = {
     title: "Dealership",
     fetch: getDealerships,
   },
+
   insurance: {
     title: "Insurance",
     fetch: getInsuranceListings,
   },
+
   leasing: {
     title: "Leasing",
     fetch: getLeasingListings,
   },
+
   workshop: {
     title: "Workshop",
     fetch: getWorkshopListings,
   },
+
+  importer: {
+    title: "Importer",
+    fetch: getImporters,
+  },
+
+  exporter: {
+    title: "Exporter",
+    fetch: getExporters,
+  },
+
+  drivingSchool: {
+    title: "Driving School",
+    fetch: null,
+  },
+
+  showroom: {
+    title: "Showroom",
+    fetch: null,
+  },
 };
 
-function VehicleTypePopup({ category, onSelect, onClose }) {
+function VehicleTypePopup({
+  category,
+  serviceKey,
+  onSelect,
+  onClose,
+}) {
   const [registrations, setRegistrations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const service = SERVICE_CONFIG[category];
+  const activeServiceKey = serviceKey || category;
+  const service = SERVICE_CONFIG[activeServiceKey];
 
   useEffect(() => {
     let mounted = true;
@@ -51,23 +87,43 @@ function VehicleTypePopup({ category, onSelect, onClose }) {
           throw new Error("Unsupported business service.");
         }
 
+        // Services without listing APIs are selectable,
+        // but their registered status cannot be checked yet.
+        if (!service.fetch) {
+          if (mounted) {
+            setRegistrations([]);
+          }
+          return;
+        }
+
         const response = await service.fetch();
-        const data = response?.data?.data ?? response?.data ?? response;
+
+        const data =
+          response?.data?.data ??
+          response?.data ??
+          response;
 
         if (mounted) {
-          setRegistrations(Array.isArray(data) ? data : []);
+          setRegistrations(
+            Array.isArray(data) ? data : []
+          );
         }
       } catch (err) {
-        console.error("Failed to fetch registrations:", err);
+        console.error(
+          "Failed to fetch registrations:",
+          err
+        );
 
         if (mounted) {
           setError(
             err?.response?.data?.message ||
-            "Unable to load your registrations. Please try again."
+              "Unable to load your registrations. Please try again."
           );
         }
       } finally {
-        if (mounted) setLoading(false);
+        if (mounted) {
+          setLoading(false);
+        }
       }
     };
 
@@ -76,7 +132,7 @@ function VehicleTypePopup({ category, onSelect, onClose }) {
     return () => {
       mounted = false;
     };
-  }, [category]);
+  }, [activeServiceKey, service]);
 
   const handleSelect = (vehicleType) => {
     const existing = registrations.find(
@@ -86,13 +142,17 @@ function VehicleTypePopup({ category, onSelect, onClose }) {
     onSelect({
       vehicleType,
       registration: existing || null,
+      serviceKey: activeServiceKey,
     });
   };
 
   if (!service) return null;
 
   return (
-    <div className="vehicle-popup-overlay" onClick={onClose}>
+    <div
+      className="vehicle-popup-overlay"
+      onClick={onClose}
+    >
       <section
         className="vehicle-popup"
         onClick={(event) => event.stopPropagation()}
@@ -126,7 +186,11 @@ function VehicleTypePopup({ category, onSelect, onClose }) {
         {error && (
           <div className="vehicle-popup-error">
             <p>{error}</p>
-            <button type="button" onClick={() => window.location.reload()}>
+
+            <button
+              type="button"
+              onClick={() => window.location.reload()}
+            >
               Retry
             </button>
           </div>
@@ -137,7 +201,8 @@ function VehicleTypePopup({ category, onSelect, onClose }) {
             <div className="vehicle-popup-grid">
               {VEHICLE_TYPES.map((type) => {
                 const registered = registrations.some(
-                  (item) => item.vehicle_type === type.value
+                  (item) =>
+                    item.vehicle_type === type.value
                 );
 
                 return (
@@ -145,9 +210,13 @@ function VehicleTypePopup({ category, onSelect, onClose }) {
                     key={type.value}
                     type="button"
                     className={`vehicle-popup-card ${
-                      registered ? "registered" : "available"
+                      registered
+                        ? "registered"
+                        : "available"
                     }`}
-                    onClick={() => handleSelect(type.value)}
+                    onClick={() =>
+                      handleSelect(type.value)
+                    }
                   >
                     <span className="vehicle-popup-icon">
                       {type.icon}

@@ -2,31 +2,55 @@
 import axios from "axios";
 
 const BASE_URL =
-  import.meta.env.VITE_API_URL ||
-  "http://localhost:5000/api/v1";
+  import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1";
 
-const axiosInstance = axios.create({
+const TOKEN_KEY = "motorscube_token";
+
+const api = axios.create({
   baseURL: BASE_URL,
+  withCredentials: true,
 });
 
-axiosInstance.interceptors.request.use(
-  (config) => {
-    const token = localStorage.getItem("motorscube_token");
+let refreshPromise = null;
+let redirectingToLogin = false;
 
-    // Temporary authentication diagnostics
-    console.log("API REQUEST:", config.method?.toUpperCase(), config.url);
-    console.log("API TOKEN EXISTS:", Boolean(token));
-    console.log("API TOKEN LENGTH:", token?.length || 0);
+const isAuthEndpoint = (url = "") =>
+  /\/auth\/(login|register|refresh|logout|forgot-password|verify-otp|reset-password)/i.test(
+    url
+  );
+
+const clearAuthentication = () => {
+  localStorage.removeItem(TOKEN_KEY);
+
+  window.dispatchEvent(new Event("auth-changed"));
+
+  if (!redirectingToLogin) {
+    redirectingToLogin = true;
+    window.location.href = "/login";
+  }
+};
+
+api.interceptors.request.use(
+  (config) => {
+    config.withCredentials = true;
+
+    const token = localStorage.getItem(TOKEN_KEY);
 
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    } else {
-      delete config.headers.Authorization;
+      if (typeof config.headers?.set === "function") {
+        config.headers.set("Authorization", `Bearer ${token}`);
+      } else {
+        config.headers = config.headers || {};
+        config.headers.Authorization = `Bearer ${token}`;
+      }
     }
 
-    // Let the browser set the multipart boundary for FormData.
-    if (config.data instanceof FormData) {
-      delete config.headers["Content-Type"];
+    if (typeof FormData !== "undefined" && config.data instanceof FormData) {
+      if (typeof config.headers?.delete === "function") {
+        config.headers.delete("Content-Type");
+      } else if (config.headers) {
+        delete config.headers["Content-Type"];
+      }
     }
 
     return config;
@@ -34,15 +58,89 @@ axiosInstance.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-axiosInstance.interceptors.response.use(
+api.interceptors.response.use(
   (response) => response,
-  (error) => {
-    console.error("API ERROR STATUS:", error.response?.status);
-    console.error("API ERROR MESSAGE:", error.response?.data);
-    console.error("API ERROR URL:", error.config?.url);
+  async (error) => {
+    const originalRequest = error.config;
 
-    return Promise.reject(error);
+    if (!error.response || !originalRequest) {
+      return Promise.reject(error);
+    }
+
+    const status = error.response.status;
+    const message = String(
+      error.response.data?.message || ""
+    ).toLowerCase();
+
+    const isExpiredToken =
+      message.includes("expired") ||
+      error.response.data?.code === "ACCESS_TOKEN_EXPIRED";
+
+    if (
+      status !== 401 ||
+      !isExpiredToken ||
+      originalRequest._retry ||
+      isAuthEndpoint(originalRequest.url)
+    ) {
+      return Promise.reject(error);
+    }
+
+    originalRequest._retry = true;
+
+    try {
+      if (!refreshPromise) {
+        refreshPromise = axios
+          .post(
+            `${BASE_URL}/auth/refresh`,
+            {},
+            {
+              withCredentials: true,
+            }
+          )
+          .then((response) => {
+            const newAccessToken =
+              response.data?.data?.access_token ||
+              response.data?.access_token;
+
+            if (!newAccessToken) {
+              throw new Error("Refresh response did not contain an access token.");
+            }
+
+            localStorage.setItem(TOKEN_KEY, newAccessToken);
+
+            window.dispatchEvent(new Event("auth-changed"));
+
+            return newAccessToken;
+          })
+          .finally(() => {
+            refreshPromise = null;
+          });
+      }
+
+      const newAccessToken = await refreshPromise;
+
+      if (typeof originalRequest.headers?.set === "function") {
+        originalRequest.headers.set(
+          "Authorization",
+          `Bearer ${newAccessToken}`
+        );
+      } else {
+        originalRequest.headers = originalRequest.headers || {};
+        originalRequest.headers.Authorization =
+          `Bearer ${newAccessToken}`;
+      }
+
+      return api(originalRequest);
+    } catch (refreshError) {
+      const refreshStatus = refreshError.response?.status;
+
+      if (refreshStatus === 401 || refreshStatus === 403) {
+        clearAuthentication();
+      }
+
+      return Promise.reject(refreshError);
+    }
   }
 );
 
-export default axiosInstance;
+export default api;
