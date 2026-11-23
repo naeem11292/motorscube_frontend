@@ -46,6 +46,17 @@ import Career from "./pages/Career/Career";
 import Listing from "./pages/Listing/Listing";
 import ListingDetails from "./pages/Listing/ListingDetails";
 
+// Public Business Listings
+import BusinessServicesHome from "./pages/BusinessListings/BusinessServicesHome";
+import DealershipListing from "./pages/BusinessListings/DealershipListing";
+import InsuranceListing from "./pages/BusinessListings/InsuranceListing";
+import LeasingListing from "./pages/BusinessListings/LeasingListing";
+import WorkshopListing from "./pages/BusinessListings/WorkshopListing";
+import ImporterListing from "./pages/BusinessListings/ImporterListing";
+import ExporterListing from "./pages/BusinessListings/ExporterListing";
+import DrivingSchoolListing from "./pages/BusinessListings/DrivingSchoolListing";
+import ShowroomListing from "./pages/BusinessListings/ShowroomListing";
+
 function App() {
   return (
     <BrowserRouter>
@@ -54,22 +65,27 @@ function App() {
         <Route path="/" element={<SignIn />} />
         <Route path="/login" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
+
         <Route
           path="/verify-registration"
           element={<OTPVerification />}
         />
+
         <Route
           path="/forgot-password"
           element={<ForgotPassword />}
         />
+
         <Route
           path="/otp-verification"
           element={<OTPVerification />}
         />
+
         <Route
           path="/reset-password"
           element={<ResetPassword />}
         />
+
         <Route
           path="/password-reset-success"
           element={<PasswordResetSuccess />}
@@ -135,7 +151,7 @@ function App() {
           }
         />
 
-        {/* DEALERSHIP */}
+        {/* DEALERSHIP MANAGEMENT */}
         <Route
           path="/dashboard/dealership"
           element={
@@ -147,7 +163,7 @@ function App() {
           }
         />
 
-        {/* BUSINESS SERVICES */}
+        {/* BUSINESS SERVICES MANAGEMENT */}
         <Route
           path="/dashboard/business-services"
           element={
@@ -213,6 +229,64 @@ function App() {
           element={<ListingDetails type="hire" />}
         />
 
+        {/* ============================= */}
+        {/* PUBLIC BUSINESS SERVICES    */}
+        {/* ============================= */}
+
+        {/* BUSINESS SERVICES HOME */}
+        <Route
+          path="/business-services"
+          element={<BusinessServicesHome />}
+        />
+
+        {/* DEALERSHIPS */}
+        <Route
+          path="/business/dealerships"
+          element={<DealershipListing />}
+        />
+
+        {/* INSURANCE */}
+        <Route
+          path="/business/insurance"
+          element={<InsuranceListing />}
+        />
+
+        {/* LEASING */}
+        <Route
+          path="/business/leasing"
+          element={<LeasingListing />}
+        />
+
+        {/* WORKSHOPS */}
+        <Route
+          path="/business/workshops"
+          element={<WorkshopListing />}
+        />
+
+        {/* IMPORTERS */}
+        <Route
+          path="/business/importers"
+          element={<ImporterListing />}
+        />
+
+        {/* EXPORTERS */}
+        <Route
+          path="/business/exporters"
+          element={<ExporterListing />}
+        />
+
+        {/* DRIVING SCHOOLS */}
+        <Route
+          path="/business/driving-schools"
+          element={<DrivingSchoolListing />}
+        />
+
+        {/* SHOWROOMS */}
+        <Route
+          path="/business/showrooms"
+          element={<ShowroomListing />}
+        />
+
         {/* MY ITEMS */}
         <Route
           path="/dashboard/my-items"
@@ -237,6 +311,7 @@ function App() {
           }
         />
 
+        {/* ORDER DETAILS */}
         <Route
           path="/dashboard/orders/:id"
           element={
