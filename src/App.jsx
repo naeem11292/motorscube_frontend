@@ -1,6 +1,9 @@
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+// Public Homepage
+import PublicHome from "./pages/PublicHome/PublicHome";
+
 // Authentication
 import SignIn from "./pages/Auth/Login";
 import SignUp from "./pages/Auth/Register";
@@ -18,7 +21,7 @@ import DashboardLayout from "./components/Layout/DashboardLayout";
 import AddSale from "./pages/AddSale/AddSale";
 import AddHire from "./pages/AddHire/AddHire";
 
-// Business Services
+// Business Services Management
 import Dealership from "./pages/Dealership/Dealership";
 import BusinessServices from "./pages/BusinessServices/BusinessServices";
 
@@ -42,7 +45,7 @@ import OrderDetails from "./pages/Orders/OrderDetails";
 // Career
 import Career from "./pages/Career/Career";
 
-// Public Listings
+// Public Vehicle Listings
 import Listing from "./pages/Listing/Listing";
 import ListingDetails from "./pages/Listing/ListingDetails";
 
@@ -61,8 +64,17 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* AUTHENTICATION */}
-        <Route path="/" element={<SignIn />} />
+
+        {/* ================================= */}
+        {/* PUBLIC HOMEPAGE                  */}
+        {/* ================================= */}
+
+        <Route path="/" element={<PublicHome />} />
+
+        {/* ================================= */}
+        {/* AUTHENTICATION                   */}
+        {/* ================================= */}
+
         <Route path="/login" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
 
@@ -91,7 +103,10 @@ function App() {
           element={<PasswordResetSuccess />}
         />
 
-        {/* DASHBOARD */}
+        {/* ================================= */}
+        {/* PROTECTED DASHBOARD              */}
+        {/* ================================= */}
+
         <Route
           path="/dashboard"
           element={
@@ -211,82 +226,6 @@ function App() {
           }
         />
 
-        {/* PUBLIC VEHICLE LISTINGS */}
-        <Route
-          path="/listing"
-          element={<Listing />}
-        />
-
-        {/* PUBLIC SALE DETAILS */}
-        <Route
-          path="/listing/sale/:id"
-          element={<ListingDetails type="sale" />}
-        />
-
-        {/* PUBLIC HIRE DETAILS */}
-        <Route
-          path="/listing/hire/:id"
-          element={<ListingDetails type="hire" />}
-        />
-
-        {/* ============================= */}
-        {/* PUBLIC BUSINESS SERVICES    */}
-        {/* ============================= */}
-
-        {/* BUSINESS SERVICES HOME */}
-        <Route
-          path="/business-services"
-          element={<BusinessServicesHome />}
-        />
-
-        {/* DEALERSHIPS */}
-        <Route
-          path="/business/dealerships"
-          element={<DealershipListing />}
-        />
-
-        {/* INSURANCE */}
-        <Route
-          path="/business/insurance"
-          element={<InsuranceListing />}
-        />
-
-        {/* LEASING */}
-        <Route
-          path="/business/leasing"
-          element={<LeasingListing />}
-        />
-
-        {/* WORKSHOPS */}
-        <Route
-          path="/business/workshops"
-          element={<WorkshopListing />}
-        />
-
-        {/* IMPORTERS */}
-        <Route
-          path="/business/importers"
-          element={<ImporterListing />}
-        />
-
-        {/* EXPORTERS */}
-        <Route
-          path="/business/exporters"
-          element={<ExporterListing />}
-        />
-
-        {/* DRIVING SCHOOLS */}
-        <Route
-          path="/business/driving-schools"
-          element={<DrivingSchoolListing />}
-        />
-
-        {/* SHOWROOMS */}
-        <Route
-          path="/business/showrooms"
-          element={<ShowroomListing />}
-        />
-
         {/* MY ITEMS */}
         <Route
           path="/dashboard/my-items"
@@ -299,7 +238,78 @@ function App() {
           }
         />
 
-        {/* ORDERS */}
+        {/* ================================= */}
+        {/* PUBLIC VEHICLE LISTINGS          */}
+        {/* ================================= */}
+
+        <Route
+          path="/listing"
+          element={<Listing />}
+        />
+
+        <Route
+          path="/listing/sale/:id"
+          element={<ListingDetails type="sale" />}
+        />
+
+        <Route
+          path="/listing/hire/:id"
+          element={<ListingDetails type="hire" />}
+        />
+
+        {/* ================================= */}
+        {/* PUBLIC BUSINESS SERVICES         */}
+        {/* ================================= */}
+
+        <Route
+          path="/business-services"
+          element={<BusinessServicesHome />}
+        />
+
+        <Route
+          path="/business/dealerships"
+          element={<DealershipListing />}
+        />
+
+        <Route
+          path="/business/insurance"
+          element={<InsuranceListing />}
+        />
+
+        <Route
+          path="/business/leasing"
+          element={<LeasingListing />}
+        />
+
+        <Route
+          path="/business/workshops"
+          element={<WorkshopListing />}
+        />
+
+        <Route
+          path="/business/importers"
+          element={<ImporterListing />}
+        />
+
+        <Route
+          path="/business/exporters"
+          element={<ExporterListing />}
+        />
+
+        <Route
+          path="/business/driving-schools"
+          element={<DrivingSchoolListing />}
+        />
+
+        <Route
+          path="/business/showrooms"
+          element={<ShowroomListing />}
+        />
+
+        {/* ================================= */}
+        {/* PROTECTED ORDERS                 */}
+        {/* ================================= */}
+
         <Route
           path="/dashboard/orders"
           element={
@@ -311,7 +321,6 @@ function App() {
           }
         />
 
-        {/* ORDER DETAILS */}
         <Route
           path="/dashboard/orders/:id"
           element={
@@ -321,12 +330,6 @@ function App() {
               </DashboardLayout>
             </ProtectedRoute>
           }
-        />
-
-        {/* CAREERS */}
-        <Route
-          path="/careers"
-          element={<Career />}
         />
 
         {/* STORE OWNER ORDERS */}
@@ -340,6 +343,16 @@ function App() {
             </ProtectedRoute>
           }
         />
+
+        {/* ================================= */}
+        {/* CAREERS                          */}
+        {/* ================================= */}
+
+        <Route
+          path="/careers"
+          element={<Career />}
+        />
+
       </Routes>
     </BrowserRouter>
   );

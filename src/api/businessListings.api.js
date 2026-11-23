@@ -7,8 +7,7 @@ import { getLeasingListings } from "./leasing.api";
 import { getWorkshopListings } from "./workshop.api";
 import { getImporters, getExporters } from "./importExport.api";
 import { getDrivingSchools } from "./drivingSchool.api";
-import { getShowroomListings } from "./showroom.api";
-
+import { getPublicShowroomListings } from "./showroom.api";
 // Public dealership APIs
 export const getPublicDealerships = async (params = {}) => {
   const response = await api.get("/dealership/public", { params });
@@ -43,7 +42,7 @@ export const getAllBusinessListings = async () => {
     ["Importer", getImporters],
     ["Exporter", getExporters],
     ["Driving School", getDrivingSchools],
-    ["Showroom", getShowroomListings],
+    ["Showroom", getPublicShowroomListings],
   ];
 
   const results = await Promise.allSettled(

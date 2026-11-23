@@ -32,3 +32,8 @@ export const deleteShowroom = async (id) => {
   const response = await api.delete(`/showroom/${id}`);
   return response.data;
 };
+// Get public showroom listings
+export const getPublicShowroomListings = async () => {
+  const response = await api.get("/showroom/public");
+  return response.data;
+};
