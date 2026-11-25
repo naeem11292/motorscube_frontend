@@ -7,6 +7,7 @@ import "./Dealership.css";
 
 function Dealership() {
   const [editingDealership, setEditingDealership] = useState(null);
+  const [showForm, setShowForm] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
   const [success, setSuccess] = useState("");
 
@@ -16,23 +17,39 @@ function Dealership() {
     if (editingDealership) {
       await updateDealership(editingDealership.id, formData);
       setSuccess("Dealership updated successfully.");
-      setEditingDealership(null);
     } else {
       await createDealership(formData);
       setSuccess("Dealership created successfully.");
     }
 
+    setEditingDealership(null);
+    setShowForm(false);
     setRefreshKey((previous) => previous + 1);
   };
 
+  // Open form only when Update is clicked
   const handleEdit = (dealership) => {
     setEditingDealership(dealership);
+    setShowForm(true);
     setSuccess("");
-    window.scrollTo({ top: 0, behavior: "smooth" });
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
-  const handleCancelEdit = () => {
+  // Open form when Add Dealership is clicked
+  const handleAdd = () => {
     setEditingDealership(null);
+    setShowForm(true);
+    setSuccess("");
+  };
+
+  // Close form
+  const handleCancel = () => {
+    setEditingDealership(null);
+    setShowForm(false);
     setSuccess("");
   };
 
@@ -43,7 +60,7 @@ function Dealership() {
       <main className="dealership-page">
         <header className="dealership-page-header">
           <h1>Dealership Management</h1>
-          <p>Create and manage your MotorsCube dealership listings.</p>
+          <p>Manage your MotorsCube dealership listings.</p>
         </header>
 
         {success && (
@@ -52,20 +69,25 @@ function Dealership() {
           </p>
         )}
 
-        <DealershipForm
-          key={editingDealership?.id ?? "new-dealership"}
-          initialData={editingDealership}
-          onSubmit={handleSubmit}
-        />
-
-        {editingDealership && (
+        {!showForm && (
           <button
             type="button"
-            className="dealership-cancel-edit"
-            onClick={handleCancelEdit}
+            className="dealership-add-button"
+            onClick={handleAdd}
           >
-            Cancel Editing
+            + Add Dealership
           </button>
+        )}
+
+        {showForm && (
+          <>
+            <DealershipForm
+              key={editingDealership?.id ?? "new-dealership"}
+              initialData={editingDealership}
+              onSubmit={handleSubmit}
+              onCancel={handleCancel}
+            />
+          </>
         )}
 
         <DealershipList

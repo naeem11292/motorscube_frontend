@@ -1,5 +1,5 @@
 
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 // Public Homepage
 import PublicHome from "./pages/PublicHome/PublicHome";
@@ -65,16 +65,10 @@ function App() {
     <BrowserRouter>
       <Routes>
 
-        {/* ================================= */}
-        {/* PUBLIC HOMEPAGE                  */}
-        {/* ================================= */}
-
+        {/* PUBLIC HOMEPAGE */}
         <Route path="/" element={<PublicHome />} />
 
-        {/* ================================= */}
-        {/* AUTHENTICATION                   */}
-        {/* ================================= */}
-
+        {/* AUTHENTICATION */}
         <Route path="/login" element={<SignIn />} />
         <Route path="/signup" element={<SignUp />} />
 
@@ -103,10 +97,7 @@ function App() {
           element={<PasswordResetSuccess />}
         />
 
-        {/* ================================= */}
-        {/* PROTECTED DASHBOARD              */}
-        {/* ================================= */}
-
+        {/* PROTECTED DASHBOARD */}
         <Route
           path="/dashboard"
           element={
@@ -238,14 +229,8 @@ function App() {
           }
         />
 
-        {/* ================================= */}
-        {/* PUBLIC VEHICLE LISTINGS          */}
-        {/* ================================= */}
-
-        <Route
-          path="/listing"
-          element={<Listing />}
-        />
+        {/* PUBLIC VEHICLE LISTINGS */}
+        <Route path="/listing" element={<Listing />} />
 
         <Route
           path="/listing/sale/:id"
@@ -257,13 +242,16 @@ function App() {
           element={<ListingDetails type="hire" />}
         />
 
-        {/* ================================= */}
-        {/* PUBLIC BUSINESS SERVICES         */}
-        {/* ================================= */}
-
+        {/* PUBLIC BUSINESS SERVICES */}
         <Route
           path="/business-services"
           element={<BusinessServicesHome />}
+        />
+
+        {/* OLD URL REDIRECT */}
+        <Route
+          path="/business-listings"
+          element={<Navigate to="/business-services" replace />}
         />
 
         <Route
@@ -306,10 +294,7 @@ function App() {
           element={<ShowroomListing />}
         />
 
-        {/* ================================= */}
-        {/* PROTECTED ORDERS                 */}
-        {/* ================================= */}
-
+        {/* PROTECTED ORDERS */}
         <Route
           path="/dashboard/orders"
           element={
@@ -344,10 +329,7 @@ function App() {
           }
         />
 
-        {/* ================================= */}
-        {/* CAREERS                          */}
-        {/* ================================= */}
-
+        {/* CAREERS */}
         <Route
           path="/careers"
           element={<Career />}

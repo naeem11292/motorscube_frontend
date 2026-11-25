@@ -105,42 +105,33 @@ function BusinessServices() {
     setShowVehiclePopup(true);
   };
 
-  const handleVehicleTypeSelect = ({ vehicleType, registration }) => {
-    setSelectedVehicleType(vehicleType);
 
-    const activeService =
-      selectedCategory === "importExport"
-        ? importExportType
-        : selectedCategory;
+const handleVehicleTypeSelect = ({ vehicleType, registration }) => {
+  setSelectedVehicleType(vehicleType);
 
-    if (activeService === "dealership") {
-      setEditingDealership(registration || null);
-    }
+  const activeService =
+    selectedCategory === "importExport"
+      ? importExportType
+      : selectedCategory;
 
-    if (activeService === "insurance") {
-      setEditingInsurance(registration || null);
-    }
+  // Selecting a category must NOT activate edit mode.
+  setEditingDealership(null);
+  setEditingInsurance(null);
+  setEditingLeasing(null);
+  setEditingWorkshop(null);
 
-    if (activeService === "leasing") {
-      setEditingLeasing(registration || null);
-    }
+  if (activeService === "importer" || activeService === "exporter") {
+    setImportExportType(activeService);
+  }
 
-    if (activeService === "workshop") {
-      setEditingWorkshop(registration || null);
-    }
+  setMessage("");
+  setShowVehiclePopup(false);
 
-    if (activeService === "importer" || activeService === "exporter") {
-      setImportExportType(activeService);
-    }
-
-    setMessage("");
-    setShowVehiclePopup(false);
-
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  };
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth",
+  });
+};
 
   const openVehicleTypePopup = () => {
     setEditingDealership(null);

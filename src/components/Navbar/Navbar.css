@@ -1,3 +1,4 @@
+
 .navbar {
   --bar: rgba(18, 18, 22, 0.92);
   --pill: rgba(0, 0, 0, 0.45);
@@ -10,8 +11,10 @@
   min-height: 66px;
 
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 20px;
+  column-gap: 20px;
+  row-gap: 8px;
 
   padding: 12px 28px;
 
@@ -32,6 +35,7 @@
 /* Logo */
 
 .navbar-logo {
+  order: 1;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -56,9 +60,10 @@
   font-weight: 700;
 }
 
-/* Vehicle category pill */
+/* Vehicle category pill - First row */
 
 .navbar-category {
+  order: 2;
   display: flex;
   align-items: center;
   gap: 4px;
@@ -113,22 +118,25 @@
   background: rgba(230, 57, 70, 0.12);
 }
 
-/* Main links */
+/* Main links - Second row */
 
 .navbar-links {
+  order: 4;
+  flex-basis: 100%;
+
   display: flex;
   align-items: center;
-  gap: 26px;
+  gap: 20px;
 
-  margin-left: 8px;
+  margin-left: 230px;
 }
 
 .navbar-links a {
   color: var(--text);
   text-decoration: none;
 
-  font-size: 13px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 10;
   white-space: nowrap;
 
   padding: 6px 0;
@@ -139,7 +147,9 @@
     color 0.2s ease,
     border-color 0.2s ease;
 }
-
+.navbar-category {
+  margin-left: 65px;
+}
 .navbar-links a:hover {
   color: #ffffff;
   border-bottom-color: rgba(255, 255, 255, 0.4);
@@ -150,9 +160,10 @@
   border-bottom-color: var(--blue);
 }
 
-/* Logout icon */
+/* Logout icon - First row */
 
 .navbar-login {
+  order: 3;
   margin-left: auto;
 
   flex-shrink: 0;
@@ -233,6 +244,14 @@
   .navbar {
     flex-wrap: wrap;
     padding: 12px 16px;
+  }
+
+  .navbar-logo,
+  .navbar-burger,
+  .navbar-category,
+  .navbar-links,
+  .navbar-login {
+    order: 0;
   }
 
   .navbar-burger {

@@ -1,6 +1,7 @@
+
 import "./PublicHome.css";
 
-import PublicNavbar from "../../components/PublicHome/PublicNavbar";
+import Navbar from "../../components/Navbar/Navbar";
 import HeroSection from "../../components/PublicHome/HeroSection";
 import VehicleCategories from "../../components/PublicHome/VehicleCategories";
 import FeaturedVehicles from "../../components/PublicHome/FeaturedVehicles";
@@ -11,7 +12,7 @@ import PublicFooter from "../../components/PublicHome/PublicFooter";
 function PublicHome() {
   return (
     <div className="public-home">
-      <PublicNavbar />
+      <Navbar />
 
       <main>
         <HeroSection />

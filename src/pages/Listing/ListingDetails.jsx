@@ -5,6 +5,7 @@ import { getSaleById, getHireById } from "../../api/listing.api";
 import "./ListingDetails.css";
 
 const API_BASE = "http://localhost:5000";
+const MAX_GALLERY_IMAGES = 30;
 
 const DUMMY_LISTINGS = {
   "demo-supreme-001": {
@@ -40,7 +41,7 @@ const DUMMY_LISTINGS = {
 };
 
 // --------------------------------------------------
-// HELPERS
+// IMAGE HELPER
 // --------------------------------------------------
 
 const getImages = (images) => {
@@ -65,9 +66,15 @@ const getImages = (images) => {
       const filename =
         typeof image === "string"
           ? image
-          : image?.url || image?.filename || image?.path || "";
+          : image?.url ||
+            image?.image_url ||
+            image?.imageUrl ||
+            image?.filename ||
+            image?.path ||
+            image?.src ||
+            "";
 
-      if (!filename) return "";
+      if (!filename || typeof filename !== "string") return "";
 
       if (/^https?:\/\//i.test(filename)) {
         return filename;
@@ -80,8 +87,14 @@ const getImages = (images) => {
 
       return `${API_BASE}/uploads/${cleanFilename}`;
     })
-    .filter(Boolean);
+    .filter(Boolean)
+    .filter((image, index, array) => array.indexOf(image) === index)
+    .slice(0, MAX_GALLERY_IMAGES);
 };
+
+// --------------------------------------------------
+// OTHER HELPERS
+// --------------------------------------------------
 
 const formatPrice = (value) => {
   if (value === null || value === undefined || value === "") {
@@ -142,6 +155,8 @@ function ListingDetails({ type: typeProp }) {
   const [listing, setListing] = useState(null);
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState("");
+  const [galleryOpen, setGalleryOpen] = useState(false);
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -158,6 +173,8 @@ function ListingDetails({ type: typeProp }) {
       setListing(null);
       setImages([]);
       setSelectedImage("");
+      setGalleryOpen(false);
+      setGalleryIndex(0);
 
       try {
         const demoListing = DUMMY_LISTINGS[id];
@@ -223,6 +240,70 @@ function ListingDetails({ type: typeProp }) {
       isActive = false;
     };
   }, [id, listingType]);
+
+  // ------------------------------------------------
+  // OPEN FULL-SCREEN GALLERY
+  // ------------------------------------------------
+
+  const openGallery = (image) => {
+    if (!images.length) return;
+
+    const index = images.indexOf(image);
+    const nextIndex = index >= 0 ? index : 0;
+
+    setGalleryIndex(nextIndex);
+    setSelectedImage(images[nextIndex]);
+    setGalleryOpen(true);
+  };
+
+  // ------------------------------------------------
+  // CHANGE GALLERY IMAGE
+  // ------------------------------------------------
+
+  const changeGalleryImage = (index) => {
+    if (!images.length) return;
+
+    const nextIndex = (index + images.length) % images.length;
+
+    setGalleryIndex(nextIndex);
+    setSelectedImage(images[nextIndex]);
+  };
+
+  const closeGallery = () => {
+    setGalleryOpen(false);
+  };
+
+  // ------------------------------------------------
+  // KEYBOARD NAVIGATION + BODY SCROLL LOCK
+  // ------------------------------------------------
+
+  useEffect(() => {
+    if (!galleryOpen) return;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        closeGallery();
+      }
+
+      if (event.key === "ArrowRight") {
+        changeGalleryImage(galleryIndex + 1);
+      }
+
+      if (event.key === "ArrowLeft") {
+        changeGalleryImage(galleryIndex - 1);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [galleryOpen, galleryIndex, images.length]);
 
   // ------------------------------------------------
   // LOADING STATE
@@ -295,7 +376,7 @@ function ListingDetails({ type: typeProp }) {
     : "";
 
   // ------------------------------------------------
-  // IMAGE GALLERY
+  // GALLERY DISPLAY IMAGES
   // ------------------------------------------------
 
   const sideImages = images
@@ -369,19 +450,27 @@ function ListingDetails({ type: typeProp }) {
         {/* VEHICLE IMAGE GALLERY */}
         <section className="listing-details-gallery-section">
           <div className="listing-details-gallery">
+
             <div className="listing-details-gallery-grid">
 
               {/* MAIN IMAGE */}
               <div className="listing-details-main-image-wrapper">
                 {selectedImage ? (
-                  <img
-                    src={selectedImage}
-                    alt={title}
-                    className="listing-details-main-image"
-                    onError={(event) => {
-                      event.currentTarget.style.display = "none";
-                    }}
-                  />
+                  <button
+                    type="button"
+                    className="listing-details-main-image-button"
+                    onClick={() => openGallery(selectedImage)}
+                    aria-label="Open full-screen image gallery"
+                  >
+                    <img
+                      src={selectedImage}
+                      alt={title}
+                      className="listing-details-main-image"
+                    />
+                    <span className="listing-details-open-gallery">
+                      <span>⛶</span> View all photos
+                    </span>
+                  </button>
                 ) : (
                   <div className="listing-details-no-image">
                     No image available
@@ -395,6 +484,12 @@ function ListingDetails({ type: typeProp }) {
                       ? "HOTSPOT AD"
                       : "NORMAL AD"}
                 </span>
+
+                {images.length > 0 && (
+                  <span className="listing-details-photo-count">
+                    {images.length} Photos
+                  </span>
+                )}
               </div>
 
               {/* SIDE IMAGES */}
@@ -405,12 +500,15 @@ function ListingDetails({ type: typeProp }) {
                       type="button"
                       key={`${image}-${index}`}
                       className="listing-details-side-image"
-                      onClick={() => setSelectedImage(image)}
-                      aria-label={`View vehicle image ${index + 2}`}
+                      onClick={() => {
+                        setSelectedImage(image);
+                        openGallery(image);
+                      }}
+                      aria-label={`Open photo ${images.indexOf(image) + 1}`}
                     >
                       <img
                         src={image}
-                        alt={`${title} ${index + 2}`}
+                        alt={`${title} ${images.indexOf(image) + 1}`}
                       />
                       <span className="listing-details-image-overlay">
                         View image
@@ -427,23 +525,47 @@ function ListingDetails({ type: typeProp }) {
               )}
             </div>
 
-            {/* ADDITIONAL THUMBNAILS */}
+            {/* ALL REMAINING THUMBNAILS */}
             {additionalImages.length > 0 && (
               <div className="listing-details-thumbnails">
-                {additionalImages.map((image, index) => (
-                  <button
-                    type="button"
-                    key={`${image}-${index}`}
-                    onClick={() => setSelectedImage(image)}
-                    aria-label={`View additional image ${index + 4}`}
-                  >
-                    <img
-                      src={image}
-                      alt={`${title} ${index + 4}`}
-                    />
-                  </button>
-                ))}
+                {additionalImages.map((image) => {
+                  const imageIndex = images.indexOf(image);
+
+                  return (
+                    <button
+                      type="button"
+                      key={`${image}-${imageIndex}`}
+                      onClick={() => {
+                        setSelectedImage(image);
+                        openGallery(image);
+                      }}
+                      aria-label={`Open photo ${imageIndex + 1}`}
+                    >
+                      <img
+                        src={image}
+                        alt={`${title} photo ${imageIndex + 1}`}
+                        loading="lazy"
+                      />
+                    </button>
+                  );
+                })}
               </div>
+            )}
+
+            {images.length > 0 && (
+              <button
+                type="button"
+                className="listing-details-view-all-photos"
+                onClick={() => openGallery(selectedImage || images[0])}
+              >
+                View all {images.length} photos
+              </button>
+            )}
+
+            {images.length === 0 && (
+              <p className="listing-details-no-photos">
+                No photos have been uploaded for this listing.
+              </p>
             )}
           </div>
         </section>
@@ -535,7 +657,6 @@ function ListingDetails({ type: typeProp }) {
           <aside className="listing-details-sidebar">
             <div className="listing-details-contact-card">
 
-              {/* PRICE */}
               <span className="listing-details-sidebar-label">
                 {listingType === "sale" ? "SELLING PRICE" : "HIRING PRICE"}
               </span>
@@ -550,7 +671,6 @@ function ListingDetails({ type: typeProp }) {
 
               <div className="listing-details-contact-divider" />
 
-              {/* ADVERTISER */}
               <h3>Advertiser Information</h3>
 
               <p className="listing-details-seller-name">
@@ -588,6 +708,101 @@ function ListingDetails({ type: typeProp }) {
           </button>
         </div>
       </div>
+
+      {/* =========================================
+          FULL-SCREEN PHOTO GALLERY
+      ========================================= */}
+
+      {galleryOpen && images.length > 0 && (
+        <div
+          className="listing-gallery-modal"
+          onClick={closeGallery}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Vehicle photo gallery"
+        >
+          <button
+            type="button"
+            className="listing-gallery-close"
+            onClick={closeGallery}
+            aria-label="Close gallery"
+          >
+            ×
+          </button>
+
+          <div
+            className="listing-gallery-content"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="listing-gallery-topbar">
+              <span>{title}</span>
+              <span>
+                {galleryIndex + 1} / {images.length}
+              </span>
+            </div>
+
+            <div className="listing-gallery-main">
+              {images.length > 1 && (
+                <button
+                  type="button"
+                  className="listing-gallery-arrow listing-gallery-prev"
+                  onClick={() => changeGalleryImage(galleryIndex - 1)}
+                  aria-label="Previous photo"
+                >
+                  &#10094;
+                </button>
+              )}
+
+              <img
+                src={images[galleryIndex]}
+                alt={`${title} photo ${galleryIndex + 1}`}
+                className="listing-gallery-full-image"
+              />
+
+              {images.length > 1 && (
+                <button
+                  type="button"
+                  className="listing-gallery-arrow listing-gallery-next"
+                  onClick={() => changeGalleryImage(galleryIndex + 1)}
+                  aria-label="Next photo"
+                >
+                  &#10095;
+                </button>
+              )}
+            </div>
+
+            <div className="listing-gallery-counter">
+              Photo {galleryIndex + 1} of {images.length}
+            </div>
+
+            <div className="listing-gallery-thumbnails">
+              {images.map((image, index) => (
+                <button
+                  type="button"
+                  key={`${image}-${index}`}
+                  className={
+                    galleryIndex === index
+                      ? "active"
+                      : ""
+                  }
+                  onClick={() => changeGalleryImage(index)}
+                  aria-label={`Select photo ${index + 1}`}
+                >
+                  <img
+                    src={image}
+                    alt={`Thumbnail ${index + 1}`}
+                    loading="lazy"
+                  />
+                </button>
+              ))}
+            </div>
+
+            <p className="listing-gallery-keyboard-hint">
+              Use ← → arrow keys to browse · Press ESC to close
+            </p>
+          </div>
+        </div>
+      )}
     </main>
   );
 }

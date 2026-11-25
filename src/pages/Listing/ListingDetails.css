@@ -1,834 +1,272 @@
 
 /* =========================================
-   LISTING DETAILS - BASE
+   CLICKABLE MAIN IMAGE
 ========================================= */
 
-.listing-details-page {
-  min-height: 100vh;
-  padding: 35px 2% 45px 1%;
-  background: #f5f6f8;
-  color: #202124;
-  font-family: inherit;
-}
-
-.listing-details-container {
+.listing-details-main-image-button {
+  position: relative;
+  display: block;
   width: 100%;
-  max-width: 1400px;
-  margin: 0 auto 0 0;
-}
-
-.listing-details-no-contact {
-  margin: 0;
-  padding: 13px;
-  border: 1px solid #eee;
-  border-radius: 8px;
-  background: #f8f8f8;
-  color: #777;
-  font-size: 13px;
-  text-align: center;
-}
-
-/* =========================================
-   BREADCRUMB
-========================================= */
-
-.listing-details-breadcrumb {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 22px;
-  color: #858585;
-  font-size: 13px;
-}
-
-.listing-details-breadcrumb button {
+  height: 100%;
   padding: 0;
   border: none;
   background: transparent;
-  color: #777;
-  font: inherit;
-  cursor: pointer;
-  transition: color 0.2s ease;
+  cursor: zoom-in;
 }
 
-.listing-details-breadcrumb button:hover {
-  color: #e32636;
-}
-
-.listing-details-breadcrumb span:last-child {
-  color: #222;
+.listing-details-open-gallery {
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  font-size: 12px;
   font-weight: 600;
 }
 
-/* =========================================
-   IMAGE GALLERY
-========================================= */
-
-.listing-details-gallery-section {
-  width: 100%;
-  margin-bottom: 28px;
-}
-
-.listing-details-gallery {
-  width: 100%;
-  padding: 16px;
-  overflow: hidden;
-  border: 1px solid #eeeeef;
-  border-radius: 12px;
-  background: #fff;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.035);
-}
-
-/* Large image left, two smaller images right */
-
-.listing-details-gallery-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
-  gap: 13px;
-  height: 480px;
-}
-
-.listing-details-main-image-wrapper {
-  position: relative;
-  min-width: 0;
-  height: 100%;
-  overflow: hidden;
-  border-radius: 9px;
-  background: #f0f0f0;
-}
-
-.listing-details-main-image {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  background: #f0f0f0;
-  transition: transform 0.35s ease;
-}
-
-.listing-details-main-image-wrapper:hover
-.listing-details-main-image {
-  transform: scale(1.015);
-}
-
-.listing-details-no-image {
-  display: grid;
-  width: 100%;
-  height: 100%;
-  place-items: center;
-  background: #f0f0f0;
-  color: #888;
-  font-size: 15px;
-}
-
-/* Smaller right-side images */
-
-.listing-details-side-images {
-  display: grid;
-  min-width: 0;
-  min-height: 0;
-  grid-template-rows: repeat(2, minmax(0, 1fr));
-  gap: 13px;
-}
-
-.listing-details-side-image {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 100%;
-  min-height: 0;
-  padding: 0;
-  overflow: hidden;
-  border: none;
-  border-radius: 9px;
-  background: #f0f0f0;
-  cursor: pointer;
-}
-
-.listing-details-side-image img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.35s ease;
-}
-
-.listing-details-side-image:hover img {
-  transform: scale(1.06);
-}
-
-.listing-details-image-overlay {
+.listing-details-photo-count {
   position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.38);
+  right: 15px;
+  top: 15px;
+  padding: 7px 11px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.7);
   color: #fff;
-  font-size: 13px;
+  font-size: 11px;
   font-weight: 600;
-  opacity: 0;
-  transition: opacity 0.25s ease;
 }
 
-.listing-details-side-image:hover
-.listing-details-image-overlay {
-  opacity: 1;
-}
-
-.listing-details-empty-image {
-  display: grid;
-  min-height: 0;
-  place-items: center;
-  border-radius: 9px;
-  background: #f0f0f0;
-  color: #888;
-  font-size: 13px;
-}
-
-/* =========================================
-   PROMOTION BADGE
-========================================= */
-
-.listing-details-plan-badge {
-  position: absolute;
-  top: 18px;
-  left: 18px;
-  z-index: 2;
-  padding: 9px 15px;
-  border-radius: 5px;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-}
-
-.listing-details-plan-badge.supreme {
-  background: #c99a22;
-}
-
-.listing-details-plan-badge.hotspot {
-  background: #e32636;
-}
-
-.listing-details-plan-badge.normal {
-  background: #333;
-}
-
-/* =========================================
-   IMAGE THUMBNAILS
-========================================= */
-
-.listing-details-thumbnails {
-  display: flex;
-  gap: 12px;
-  overflow-x: auto;
-  padding: 15px 2px 4px;
-  scrollbar-width: thin;
-  scrollbar-color: #ccc transparent;
-}
-
-.listing-details-thumbnails button {
-  flex: 0 0 115px;
-  height: 80px;
-  padding: 3px;
-  overflow: hidden;
-  border: 2px solid transparent;
-  border-radius: 7px;
-  background: #f5f5f5;
-  cursor: pointer;
-  transition: border-color 0.2s ease, transform 0.2s ease;
-}
-
-.listing-details-thumbnails button:hover {
-  border-color: #e32636;
-  transform: translateY(-2px);
-}
-
-.listing-details-thumbnails img {
+.listing-details-view-all-photos {
   display: block;
-  width: 100%;
-  height: 100%;
-  border-radius: 4px;
-  object-fit: cover;
-}
-
-/* =========================================
-   MAIN CONTENT + SIDEBAR
-========================================= */
-
-.listing-details-layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  align-items: start;
-  gap: 25px;
-}
-
-.listing-details-main-content {
-  min-width: 0;
-}
-
-/* =========================================
-   LISTING HEADING
-========================================= */
-
-.listing-details-heading-card {
-  margin-bottom: 22px;
-  padding: 30px;
-  border: 1px solid #eeeeef;
-  border-radius: 11px;
-  background: #fff;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
-}
-
-.listing-details-labels {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-bottom: 16px;
-}
-
-.listing-details-type {
-  display: inline-block;
-  padding: 7px 13px;
-  border-radius: 5px;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-}
-
-.listing-details-type.sale {
-  background: #e32636;
-}
-
-.listing-details-type.hire {
-  background: #1769aa;
-}
-
-.listing-details-category {
-  padding: 7px 12px;
-  border-radius: 5px;
-  background: #f1f2f4;
-  color: #555;
-  font-size: 12px;
-  text-transform: capitalize;
-}
-
-.listing-details-heading-card h1 {
-  margin: 0 0 13px;
-  color: #191919;
-  font-size: 30px;
-  font-weight: 750;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
-}
-
-.listing-details-location {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin: 0 0 23px;
-  color: #777;
-  font-size: 14px;
-}
-
-.listing-details-location span {
-  color: #e32636;
-  font-size: 19px;
-}
-
-.listing-details-price {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.listing-details-price strong {
-  color: #e32636;
-  font-size: 29px;
-  font-weight: 800;
-}
-
-.listing-details-price span {
-  color: #777;
-  font-size: 13px;
-}
-
-/* =========================================
-   CONTENT SECTIONS
-========================================= */
-
-.listing-details-section {
-  margin-bottom: 22px;
-  padding: 30px;
-  border: 1px solid #eeeeef;
-  border-radius: 11px;
-  background: #fff;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
-}
-
-.listing-details-section-heading {
-  margin-bottom: 24px;
-}
-
-.listing-details-section-heading > span {
-  display: block;
-  margin-bottom: 7px;
-  color: #e32636;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 1.3px;
-  text-transform: uppercase;
-}
-
-.listing-details-section-heading h2 {
-  margin: 0;
-  color: #202124;
-  font-size: 22px;
-  font-weight: 750;
-}
-
-/* =========================================
-   QUICK SPECIFICATIONS
-========================================= */
-
-.listing-details-quick-specs {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 13px;
-}
-
-.listing-details-quick-spec {
-  display: flex;
-  min-height: 85px;
-  flex-direction: column;
-  justify-content: center;
-  gap: 9px;
-  padding: 16px;
-  border: 1px solid #eeeeef;
-  border-radius: 8px;
-  background: #f8f9fa;
-  transition: border-color 0.2s ease, transform 0.2s ease;
-}
-
-.listing-details-quick-spec:hover {
-  border-color: #e8b2b7;
-  transform: translateY(-2px);
-}
-
-.listing-details-quick-spec span {
-  color: #858585;
-  font-size: 12px;
-}
-
-.listing-details-quick-spec strong {
-  color: #222;
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: capitalize;
-  overflow-wrap: anywhere;
-}
-
-/* =========================================
-   COMPLETE SPECIFICATIONS
-========================================= */
-
-.listing-details-specifications {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0 30px;
-}
-
-.listing-details-specification {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 16px 0;
-  border-bottom: 1px solid #eeeeef;
-}
-
-.listing-details-specification span {
-  color: #777;
-  font-size: 13px;
-}
-
-.listing-details-specification strong {
-  color: #222;
-  font-size: 13px;
-  font-weight: 650;
-  text-align: right;
-  text-transform: capitalize;
-  overflow-wrap: anywhere;
-}
-
-/* =========================================
-   DESCRIPTION
-========================================= */
-
-.listing-details-description {
-  margin: 0;
-  color: #626262;
-  font-size: 14px;
-  line-height: 1.9;
-  white-space: pre-line;
-  overflow-wrap: anywhere;
-}
-
-/* =========================================
-   ADVERTISER SIDEBAR
-========================================= */
-
-.listing-details-sidebar {
-  position: sticky;
-  top: 25px;
-}
-
-.listing-details-contact-card {
-  padding: 26px;
-  border: 1px solid #eeeeef;
-  border-radius: 11px;
-  background: #fff;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.045);
-}
-
-.listing-details-sidebar-label {
-  color: #888;
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.9px;
-  text-transform: uppercase;
-}
-
-.listing-details-contact-card h2 {
-  margin: 10px 0;
-  color: #e32636;
-  font-size: 26px;
-  font-weight: 800;
-  overflow-wrap: anywhere;
-}
-
-.listing-details-charge-period {
-  margin: 0;
-  color: #777;
-  font-size: 13px;
-}
-
-.listing-details-contact-divider {
-  height: 1px;
-  margin: 23px 0;
-  background: #eeeeef;
-}
-
-.listing-details-contact-card h3 {
-  margin: 0 0 13px;
-  color: #222;
-  font-size: 17px;
-  font-weight: 750;
-}
-
-.listing-details-seller-name {
-  margin: 0 0 20px;
-  color: #626262;
-  font-size: 14px;
-  font-weight: 500;
-  overflow-wrap: anywhere;
-}
-
-/* CALL ADVERTISER BUTTON */
-
-.listing-details-contact-button {
-  display: flex;
-  width: 100%;
-  min-height: 48px;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 10px;
-  padding: 12px 16px;
-  border: none;
-  border-radius: 7px;
-  background: #e32636;
-  color: #fff;
-  font-size: 14px;
-  font-weight: 700;
-  text-decoration: none;
-  cursor: pointer;
-  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.listing-details-contact-button:hover {
-  transform: translateY(-2px);
-  background: #bd1d2a;
-  box-shadow: 0 5px 12px rgba(227, 38, 54, 0.2);
-}
-
-.listing-details-contact-button:focus-visible {
-  outline: 3px solid rgba(227, 38, 54, 0.25);
-  outline-offset: 3px;
-}
-
-.listing-details-safety-note {
-  margin: 18px 0 0;
-  padding: 13px;
-  border: 1px solid #f2e7c9;
-  border-radius: 7px;
-  background: #fffaf0;
-  color: #80682d;
-  font-size: 11px;
-  line-height: 1.7;
-}
-
-/* =========================================
-   BACK BUTTON
-========================================= */
-
-.listing-details-back {
-  margin-top: 25px;
-}
-
-.listing-details-back button {
-  padding: 12px 21px;
-  border: 1px solid #dedede;
+  margin: 15px auto 0;
+  padding: 10px 20px;
+  border: 1px solid #e32636;
   border-radius: 6px;
   background: #fff;
-  color: #333;
-  font-size: 13px;
-  font-weight: 650;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.listing-details-back button:hover {
-  border-color: #e32636;
-  background: #fff8f8;
   color: #e32636;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
-/* =========================================
-   LOADING / ERROR STATES
-========================================= */
+.listing-details-view-all-photos:hover {
+  background: #e32636;
+  color: #fff;
+}
 
-.listing-details-message {
-  display: flex;
-  min-height: 60vh;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  padding: 50px 20px;
-  color: #555;
+.listing-details-no-photos {
+  margin: 15px 0 0;
+  color: #888;
+  font-size: 13px;
   text-align: center;
 }
 
-.listing-details-message h2 {
-  margin: 0;
-  color: #222;
+/* =========================================
+   FULL-SCREEN GALLERY MODAL
+========================================= */
+
+.listing-gallery-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 25px;
+  background: rgba(0, 0, 0, 0.96);
 }
 
-.listing-details-message p {
-  margin: 0;
-  font-size: 14px;
+.listing-gallery-content {
+  display: flex;
+  width: 100%;
+  max-width: 1250px;
+  height: 100%;
+  max-height: 950px;
+  flex-direction: column;
+  justify-content: center;
+  gap: 15px;
 }
 
-.listing-details-message button {
-  padding: 12px 21px;
+.listing-gallery-close {
+  position: absolute;
+  top: 20px;
+  right: 30px;
+  z-index: 3;
+  width: 45px;
+  height: 45px;
   border: none;
-  border-radius: 6px;
-  background: #e32636;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.13);
   color: #fff;
-  font-size: 13px;
-  font-weight: 650;
+  font-size: 32px;
+  line-height: 1;
   cursor: pointer;
   transition: background 0.2s ease;
 }
 
-.listing-details-message button:hover {
-  background: #bd1d2a;
+.listing-gallery-close:hover {
+  background: #e32636;
 }
 
-.listing-details-spinner {
-  width: 38px;
-  height: 38px;
-  border: 4px solid #eee;
-  border-top-color: #e32636;
+.listing-gallery-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding: 0 55px 0 0;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.listing-gallery-main {
+  position: relative;
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+}
+
+.listing-gallery-full-image {
+  display: block;
+  max-width: calc(100% - 110px);
+  max-height: 65vh;
+  object-fit: contain;
+  border-radius: 5px;
+}
+
+.listing-gallery-arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  display: flex;
+  width: 48px;
+  height: 48px;
+  align-items: center;
+  justify-content: center;
+  transform: translateY(-50%);
+  border: 1px solid rgba(255, 255, 255, 0.25);
   border-radius: 50%;
-  animation: listing-details-spin 0.8s linear infinite;
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font-size: 19px;
+  cursor: pointer;
+  transition: 0.2s ease;
 }
 
-@keyframes listing-details-spin {
-  to {
-    transform: rotate(360deg);
-  }
+.listing-gallery-arrow:hover {
+  background: #e32636;
+  border-color: #e32636;
+}
+
+.listing-gallery-prev {
+  left: 0;
+}
+
+.listing-gallery-next {
+  right: 0;
+}
+
+.listing-gallery-counter {
+  color: #ddd;
+  font-size: 12px;
+  text-align: center;
+}
+
+.listing-gallery-thumbnails {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  max-width: 100%;
+  padding: 5px 0 12px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #777 transparent;
+}
+
+.listing-gallery-thumbnails button {
+  flex: 0 0 90px;
+  height: 65px;
+  padding: 3px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: 5px;
+  background: transparent;
+  cursor: pointer;
+  opacity: 0.65;
+  transition: 0.2s ease;
+}
+
+.listing-gallery-thumbnails button:hover {
+  opacity: 1;
+}
+
+.listing-gallery-thumbnails button.active {
+  border-color: #e32636;
+  opacity: 1;
+}
+
+.listing-gallery-thumbnails img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 3px;
+  object-fit: cover;
+}
+
+.listing-gallery-keyboard-hint {
+  margin: 0;
+  color: #999;
+  font-size: 11px;
+  text-align: center;
 }
 
 /* =========================================
-   TABLET
-========================================= */
-
-@media (max-width: 950px) {
-  .listing-details-page {
-    padding: 28px 3%;
-  }
-
-  .listing-details-layout {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 20px;
-  }
-
-  .listing-details-sidebar {
-    position: static;
-  }
-
-  .listing-details-contact-card {
-    max-width: none;
-  }
-
-  .listing-details-gallery-grid {
-    height: 400px;
-  }
-}
-
-/* =========================================
-   MOBILE
+   GALLERY MOBILE RESPONSIVE
 ========================================= */
 
 @media (max-width: 600px) {
-  .listing-details-page {
-    padding: 18px 4%;
+  .listing-gallery-modal {
+    padding: 15px;
   }
 
-  .listing-details-breadcrumb {
-    gap: 7px;
-    margin-bottom: 16px;
-    font-size: 11px;
-  }
-
-  .listing-details-gallery {
-    padding: 8px;
-    border-radius: 9px;
-  }
-
-  .listing-details-gallery-grid {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: 250px auto;
-    height: auto;
-    gap: 8px;
-  }
-
-  .listing-details-main-image-wrapper {
-    height: 250px;
-  }
-
-  .listing-details-side-images {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: 110px;
-    gap: 8px;
-  }
-
-  .listing-details-empty-image {
-    min-height: 110px;
-  }
-
-  .listing-details-plan-badge {
+  .listing-gallery-close {
     top: 12px;
-    left: 12px;
-    padding: 7px 11px;
-    font-size: 10px;
+    right: 12px;
+    width: 38px;
+    height: 38px;
+    font-size: 27px;
   }
 
-  .listing-details-thumbnails {
-    gap: 8px;
-    padding-top: 11px;
-  }
-
-  .listing-details-thumbnails button {
-    flex-basis: 85px;
-    height: 65px;
-  }
-
-  .listing-details-heading-card,
-  .listing-details-section {
-    padding: 20px;
-    border-radius: 9px;
-  }
-
-  .listing-details-heading-card h1 {
-    font-size: 23px;
-  }
-
-  .listing-details-location {
+  .listing-gallery-topbar {
+    padding-right: 40px;
     font-size: 12px;
   }
 
-  .listing-details-price strong {
-    font-size: 24px;
+  .listing-gallery-full-image {
+    max-width: calc(100% - 65px);
+    max-height: 55vh;
   }
 
-  .listing-details-section-heading h2 {
-    font-size: 19px;
+  .listing-gallery-arrow {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
   }
 
-  .listing-details-quick-specs {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 9px;
+  .listing-gallery-thumbnails button {
+    flex-basis: 70px;
+    height: 52px;
   }
 
-  .listing-details-quick-spec {
-    min-height: 75px;
-    padding: 12px;
-  }
-
-  .listing-details-quick-spec strong {
-    font-size: 13px;
-  }
-
-  .listing-details-specifications {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
-  }
-
-  .listing-details-specification {
-    padding: 13px 0;
-  }
-
-  .listing-details-contact-card {
-    padding: 21px;
-    border-radius: 9px;
-  }
-
-  .listing-details-contact-card h2 {
-    font-size: 23px;
-  }
-
-  .listing-details-back button {
-    width: 100%;
-  }
-}
-
-/* =========================================
-   SMALL MOBILE
-========================================= */
-
-@media (max-width: 380px) {
-  .listing-details-quick-specs {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .listing-details-heading-card h1 {
-    font-size: 21px;
-  }
-
-  .listing-details-price strong {
-    font-size: 22px;
-  }
-
-  .listing-details-section,
-  .listing-details-heading-card {
-    padding: 16px;
+  .listing-gallery-keyboard-hint {
+    font-size: 10px;
   }
 }

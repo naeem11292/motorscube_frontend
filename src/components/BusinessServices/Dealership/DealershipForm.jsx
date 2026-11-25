@@ -65,10 +65,7 @@ function DealershipForm({
 
     setImages([]);
     setError("");
-    if (!formData.vehicle_type) {
-  setError("Please select a vehicle type.");
-  return;
-}
+   
   }, [initialData, selectedVehicleType]);
 
   const handleChange = (event) => {
