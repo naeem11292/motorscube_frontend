@@ -60,6 +60,8 @@ import ExporterListing from "./pages/BusinessListings/ExporterListing";
 import DrivingSchoolListing from "./pages/BusinessListings/DrivingSchoolListing";
 import ShowroomListing from "./pages/BusinessListings/ShowroomListing";
 
+import ExploreCategory from "./pages/ExploreCategory/ExploreCategory";
+
 function App() {
   return (
     <BrowserRouter>
@@ -96,7 +98,8 @@ function App() {
           path="/password-reset-success"
           element={<PasswordResetSuccess />}
         />
-
+            {/* Public Vehicle Category Exploration */}
+            <Route path="/explore/:category" element={<ExploreCategory />} />
         {/* PROTECTED DASHBOARD */}
         <Route
           path="/dashboard"

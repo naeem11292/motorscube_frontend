@@ -1,4 +1,3 @@
-
 .navbar {
   --bar: rgba(18, 18, 22, 0.92);
   --pill: rgba(0, 0, 0, 0.45);
@@ -32,7 +31,7 @@
   box-sizing: border-box;
 }
 
-/* Logo */
+/* Logo - Far Left */
 
 .navbar-logo {
   order: 1;
@@ -60,7 +59,7 @@
   font-weight: 700;
 }
 
-/* Vehicle category pill - First row */
+/* Vehicle Category Pill - First Row */
 
 .navbar-category {
   order: 2;
@@ -69,6 +68,7 @@
   gap: 4px;
 
   padding: 6px 8px;
+  margin-left: 65px;
 
   border-radius: 999px;
 
@@ -118,7 +118,7 @@
   background: rgba(230, 57, 70, 0.12);
 }
 
-/* Main links - Second row */
+/* Main Links - Second Row */
 
 .navbar-links {
   order: 4;
@@ -147,9 +147,7 @@
     color 0.2s ease,
     border-color 0.2s ease;
 }
-.navbar-category {
-  margin-left: 65px;
-}
+
 .navbar-links a:hover {
   color: #ffffff;
   border-bottom-color: rgba(255, 255, 255, 0.4);
@@ -160,12 +158,23 @@
   border-bottom-color: var(--blue);
 }
 
-/* Logout icon - First row */
+/* Login & Register - Far Right */
 
-.navbar-login {
+.navbar-auth {
   order: 3;
   margin-left: auto;
 
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  flex-shrink: 0;
+}
+
+/* Login Button */
+
+.navbar-login {
+  margin-left: 0;
   flex-shrink: 0;
 
   width: 40px;
@@ -202,7 +211,29 @@
   stroke-linejoin: round;
 }
 
-/* Mobile menu button */
+/* Register Button */
+
+.navbar-register {
+  text-decoration: none;
+  color: #fff;
+  background: #e63946;
+
+  padding: 8px 14px;
+
+  border-radius: 6px;
+
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+
+  transition: 0.2s;
+}
+
+.navbar-register:hover {
+  background: #c92c38;
+}
+
+/* Mobile Menu Button */
 
 .navbar-burger {
   display: none;
@@ -238,7 +269,7 @@
   outline-offset: 2px;
 }
 
-/* Responsive */
+/* Responsive - Tablet & Mobile */
 
 @media (max-width: 1100px) {
   .navbar {
@@ -246,20 +277,18 @@
     padding: 12px 16px;
   }
 
-  .navbar-logo,
-  .navbar-burger,
-  .navbar-category,
-  .navbar-links,
-  .navbar-login {
-    order: 0;
+  .navbar-logo {
+    order: 1;
   }
 
   .navbar-burger {
+    order: 2;
     display: block;
   }
 
-  .navbar-login {
-    display: none;
+  .navbar-auth {
+    order: 3;
+    margin-left: 0;
   }
 
   .navbar-category,
@@ -273,26 +302,36 @@
     display: flex;
   }
 
-  .navbar.open .navbar-login {
-    display: grid;
-    margin-left: 0;
-  }
-
   .navbar-category {
+    order: 4;
+    margin-left: 0;
     overflow-x: auto;
     border-radius: 16px;
   }
 
   .navbar-links {
+    order: 5;
+    flex-basis: 100%;
     flex-wrap: wrap;
     gap: 6px 22px;
     margin: 4px 0 0;
   }
 }
 
+/* Small Mobile */
+
 @media (max-width: 600px) {
   .navbar {
     gap: 12px;
+  }
+
+  .navbar-logo {
+    font-size: 16px;
+  }
+
+  .navbar-logo svg {
+    width: 30px;
+    height: 30px;
   }
 
   .navbar-category {
@@ -310,5 +349,19 @@
 
   .navbar-links a {
     font-size: 12px;
+  }
+
+  .navbar-auth {
+    gap: 8px;
+  }
+
+  .navbar-register {
+    padding: 7px 11px;
+    font-size: 13px;
+  }
+
+  .navbar-login {
+    width: 36px;
+    height: 36px;
   }
 }

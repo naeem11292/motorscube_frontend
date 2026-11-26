@@ -9,19 +9,21 @@ function Navbar() {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
-  const handleLogout = () => {
-    logout();
-    navigate("/login");
-  };
-
   const closeMenu = () => {
     setMenuOpen(false);
   };
 
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+    closeMenu();
+  };
+
   return (
     <header className={`navbar ${menuOpen ? "open" : ""}`}>
+      {/* LOGO */}
       <Link
-        to="/dashboard"
+        to="/"
         className="navbar-logo"
         aria-label="MotorsCube home"
         onClick={closeMenu}
@@ -50,6 +52,7 @@ function Navbar() {
         </span>
       </Link>
 
+      {/* MOBILE MENU BUTTON */}
       <button
         type="button"
         className="navbar-burger"
@@ -62,8 +65,9 @@ function Navbar() {
         </svg>
       </button>
 
+      {/* VEHICLE CATEGORIES - TEMPORARILY INACTIVE */}
       <nav className="navbar-category" aria-label="Vehicle categories">
-        <Link to="/dashboard" className="active" onClick={closeMenu}>
+        <Link to="#" onClick={closeMenu}>
           <svg viewBox="0 0 24 24">
             <path d="M3 16v-4l2-5h14l2 5v4M3 16h18M3 16v2h3v-2M21 16v2h-3v-2M6 12h12" />
           </svg>
@@ -84,7 +88,7 @@ function Navbar() {
             <rect x="3" y="5" width="18" height="12" rx="2" />
             <path d="M3 11h18M7 17v2M17 17v2" />
           </svg>
-          Buses
+          Plant
         </Link>
 
         <Link to="#" onClick={closeMenu}>
@@ -100,30 +104,21 @@ function Navbar() {
           <svg viewBox="0 0 24 24">
             <path d="M3 20V9l6 4V9l6 4V5h4v15zM8 20v-3M13 20v-3" />
           </svg>
-          Industrial Plants
+          Commercial
         </Link>
       </nav>
 
+      {/* MAIN NAVIGATION - KEEPING ORIGINAL LINKS */}
       <nav className="navbar-links" aria-label="Main">
-        <Link
-          to="/dashboard"
-          className="active"
-          onClick={closeMenu}
-        >
+        <Link to="/" onClick={closeMenu}>
           Buying
         </Link>
 
-        <Link
-          to="/dashboard/add-sale"
-          onClick={closeMenu}
-        >
+        <Link to="/dashboard/add-sale" onClick={closeMenu}>
           Selling
         </Link>
 
-        <Link
-          to="/dashboard/add-hire"
-          onClick={closeMenu}
-        >
+        <Link to="/dashboard/add-hire" onClick={closeMenu}>
           Hire
         </Link>
 
@@ -135,24 +130,32 @@ function Navbar() {
           Parts & Accessories
         </Link>
 
-        <Link
-          to="/dashboard/add-sale"
-          onClick={closeMenu}
-        >
+        <Link to="/dashboard/add-sale" onClick={closeMenu}>
           Post Ad
         </Link>
       </nav>
 
-      <button
-        type="button"
-        className="navbar-login"
-        aria-label="Log out"
-        onClick={handleLogout}
-      >
-        <svg viewBox="0 0 24 24">
-          <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />
-        </svg>
-      </button>
+      {/* REGISTER AND LOGOUT */}
+      <div className="navbar-auth">
+        <Link
+          to="/signup"
+          className="navbar-register"
+          onClick={closeMenu}
+        >
+          Register
+        </Link>
+
+        <button
+          type="button"
+          className="navbar-login"
+          aria-label="Log out"
+          onClick={handleLogout}
+        >
+          <svg viewBox="0 0 24 24">
+            <path d="M14 4h4a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M15 12H3" />
+          </svg>
+        </button>
+      </div>
     </header>
   );
 }
